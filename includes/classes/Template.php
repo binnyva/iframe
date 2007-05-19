@@ -40,8 +40,10 @@ class Template {
 		global $config;
 		//Remove the absolute site path while conserving the directory structure in the URL
 		$file_name = str_replace($_SERVER['DOCUMENT_ROOT'],'',$file_name);
-		$file_name = str_replace($config['absolute_path'],'',$file_name);
-		$file_name = str_replace('controllers/','',$file_name);//If we are following mvc architecture
+		
+		$escaped_path = preg_replace('/([\/\\\.\?\~\\=\_\-\,])/','\\\$1',$config['absolute_path']);
+		$file_name = preg_replace('/' . $escaped_path . '/','',$file_name,1); //Replace just 1 time
+		$file_name = preg_replace('/controllers\//','',$file_name);//If we are following mvc architecture
 		if(strpos($file_name,'/') === 0) $file_name = substr($file_name,1);
 
 		//Remove the query parts		
@@ -64,19 +66,19 @@ class Template {
 		$this->_findResources($template_file);
 
 		$template_file = $GLOBALS['rel'] . $this->options['template_folder'] . '/' . $template_file;
-			
+		
 		//Plugins are a special case.
 		if(strpos($_SERVER['PHP_SELF'],'plugins') !== false) {
 			$template_file = 'template.php';
 		}
-
+		
 		if(!file_exists($template_file)) {
 			//Search the template folder for that file
 			if (file_exists( $this->options['template_folder'] . '/' . $template_file))
 				$this->template = $this->options['template_folder'] . '/' . $template_file;
 			else 
 				error('The template file "' . $this->template . '" does not exist.');
-		}	
+		}
 		else $this->template = $template_file;
 	}
 	
