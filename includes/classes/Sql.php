@@ -2,7 +2,7 @@
 /** ************************************************************************************************
 * Class  : Sql
 * Author : Binny V A(binnyva@gmail.com | http://www.bin-co.com/)
-* Version: 0.00.B Beta
+* Version: 1.00.B Beta
 * Date   : 1 Feb, 2007
 ***************************************************************************************************
 * Creates a Database abstration layer - using the most commonly used functions.
@@ -46,7 +46,9 @@ class Sql {
 	 * Return   : The SQL Resource of the given query
 	 */
 	function getSql($query) {
-		$this->_resource = mysql_query($query,$this->_db_connection);
+		if(is_string($query)) $this->_resource = mysql_query($query,$this->_db_connection);
+		else $this->_resource = $query;
+		
 		if(!$this->_resource) {
 			$this->_error($query);
 			return false;
