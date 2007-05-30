@@ -136,7 +136,7 @@ class Tagging {
 	}
 	
 	////////////////////////////////// API Functions ////////////////////////////////
-	function newTagFor($tag_name, $item_id) {
+	function newTagFor($item_id, $tag_name) {
 		global $sql;
 
 		$tag_id = $this->insertTag($tag_name);
