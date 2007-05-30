@@ -205,6 +205,8 @@ function array2json($arr) {
     $parts = array();
     $is_list = false;
 
+    if(!is_array($arr)) return $arr;
+
     //Find out if the given array is a numerical array
     $keys = array_keys($arr);
     $max_length = count($arr)-1;
