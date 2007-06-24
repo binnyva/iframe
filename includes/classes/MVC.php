@@ -1,22 +1,27 @@
 <?php
 /** *************************************************************************
- * File		: classes/Template.php
- * Version	: $Id: Template.php,v 1.2 2007/03/08 17:37:05 binnyva Exp $
+ * File		: classes/MVC.php
+ * Version	: $Id: MVC.php,v 1.2 2007/03/08 17:37:05 binnyva Exp $
  * This file holds all the templating actions. 
  *
  ****************************************************************************/
-$template = new Template();
+$template = new MVC();
 
 /**
- * Class : Template
- * All templating action are in this class
+ * Class : MVC
+ * All MVC action are in this class - Templating and Model, anyway
  */
-class Template {
+class MVC {
 	var $page		= ""; ///This variable holds the location of the controller page.
 	var $template	= ""; ///Holds the location of the view(or template) page. This value can be deduced from the controller page or can be explicitly set using the setTemplate() funciton.
+	var $model		= "";
+	var $model_name = "";
+	var $controller = "";
+
 	var $title		= ""; ///The title of the page - use setTemplate() to set it.
 	var $options	= array(
 		'template_folder'	=> 'templates',
+		'model_folder'		=> 'models',
 		'insert_layout'		=> true
 	);
 	var $includes	= array();
@@ -27,8 +32,10 @@ class Template {
 	 * Constructor
 	 * Finds the location of the current file - eg. 'advertise/myaccount.php'
 	 */
-	function Template() {
+	function MVC() {
 		$this->setPage($_SERVER["PHP_SELF"]);
+		$this->setController();
+		$this->setModel();
 	}
 	
 	/////////////////////////////// Setting functions ////////////////////////////////
@@ -56,6 +63,15 @@ class Template {
 
 		$this->page = $file_name;
 	}
+	
+	/**
+	 * Find the controller for the current page - usually the folder's name is the controller.
+	 */
+	function setController($controller = '') {
+		$controller = dirname($this->page);
+		if($controller == '.') $controller = '';
+		$this->controller = $controller;
+	}
 
 	/**
 	 * This will set the template for the page - you can specify the file to be used as the template.
@@ -77,9 +93,53 @@ class Template {
 			if (file_exists( $this->options['template_folder'] . '/' . $template_file))
 				$this->template = $this->options['template_folder'] . '/' . $template_file;
 			else 
-				error('The template file "' . $this->template . '" does not exist.');
+				$this->template = '';
 		}
 		else $this->template = $template_file;
+	}
+	
+	/**
+	 * See if a Model page exist for this page - if it is there, include it
+	 */
+	function setModel($model_file = false) {
+		$this->model = '';
+		if($model_file === '') { //The coder has specifically called setModel('') - so don't use a model
+			return;
+		}
+		$model_file = $this->controller . '.php';
+		$model_folder = $GLOBALS['rel'] . $this->options['model_folder'] . '/';
+		$model_name = '';
+	
+		if(!file_exists($model_file)) {
+			//Search the template folder for that file
+			if (file_exists( $model_folder . $model_file)) {
+				$this->model = $model_folder . $model_file;
+				$model_name = $model_file;
+			} else {
+				//Try to find the model with newer methods.
+				//First, try to make the first letter uppercase
+				if (file_exists( $model_folder . ucfirst($model_file) )) {
+					$this->model = $model_folder . ucfirst($model_file);
+					$model_name = ucfirst($model_file);
+				} else {
+					//Go thru the model folder and find all the files, then make it all lower case and see if one matchs the current controller.
+					$all_models = ls($model_folder);
+					foreach($all_models as $mod) {
+						if(strtolower($mod) == strtolower($this->controller) . '.php') {
+							$this->model = $mod;
+							$model_name = $mod;
+							break;
+						}
+					}
+				}
+			}
+		}
+		else $this->model = $model_file;
+
+		if($this->model) {
+			include($model_folder . $this->model);
+			$this->model_name = str_replace('.php','',$model_name);
+		}
 	}
 	
 	/**
@@ -93,7 +153,7 @@ class Template {
 		if(file_exists($rel . $this->css_folder . $css_file)) $this->addResource( $css_file , 'css' , true);
 		if(file_exists($rel . $this->js_folder . $js_file)) $this->addResource( $js_file , 'js' , true);
 	}
-	
+
 	/**
 	This will set the title of the page.
 	Argument : $title - The string to be used inside the <title></title> tag.
@@ -165,6 +225,8 @@ class Template {
 		} elseif(!$this->template) {
 			$this->setTemplate($this->page);
 		}
+		
+ 		if(!$this->template) error('The template file "' . $this->template . '" does not exist.');
 		
 		if($this->options['insert_layout']) $this->printLayout();
 		else include($this->template);
