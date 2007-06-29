@@ -3,13 +3,15 @@
  * Create a link by joining the given URL and the parameters given as the second argument.
  * Arguments :  $url - The base url.
  *				$params - An array containing all the parameters and their values.
+ *				$use_existing_arguments - Use the parameters that are present in the current page
  * Return : The new url.
  * Example : 
  *			getLink("http://www.google.com/search",array("q"=>"binny","hello"=>"world","results"=>10));
  *					will return
  *			http://www.google.com/search?q=binny&hello=world&results=10
  */
-function getLink($url,$params=array()) {
+function getLink($url,$params=array(),$use_existing_arguments=false) {
+	if($use_existing_arguments) $params = $params + $_GET;
 	if(!$params) return $url;
 	$link = $url;
 	if(strpos($link,'?') === false) $link .= '?'; //If there is no '?' add one at the end
