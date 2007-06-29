@@ -11,13 +11,13 @@
 ***************************************************************************************************/
 class Sql {
 	//All Variables - Public
-	var $mode = 'p'; ///Mode - p = Production, d = Development and t = Testing
-	
+	public static $mode = 'p'; ///Mode - p = Production, d = Development and t = Testing
+
 	//Private Variables
-	var $_row  = "";
-	var $_list = array();
-	var $_db_connection;
-	var $_resource;
+	private $_row  = "";
+	private $_list = array();
+	private $_db_connection;
+	private $_resource;
 
 	/**
 	 * Constructor
@@ -27,7 +27,7 @@ class Sql {
 	 *				$db_password - The password for the given user - eg. ''
 	 *				$db_name - The database that must be used.
 	 */
-	function Sql($db_host,$db_user,$db_password,$db_name,$options=array()) {
+	function __construct($db_host,$db_user,$db_password,$db_name,$options=array()) {
 		$this->_db_connection = mysql_connect($db_host, $db_user, $db_password);
 		
 		if(!$this->_db_connection) $this->_error("Cannot connect to Database Host '".$db_host."'");
@@ -46,6 +46,11 @@ class Sql {
 	 * Return   : The SQL Resource of the given query
 	 */
 	function getSql($query) {
+		if(Sql::$mode == 't') {
+			print $query;
+			return false;
+		}
+
 		if(is_string($query)) $this->_resource = mysql_query($query,$this->_db_connection);
 		else $this->_resource = $query;
 		
