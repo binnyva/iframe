@@ -1,5 +1,6 @@
 <?php
 class DBTable {
+	////////////////////////////////////// Variables /////////////////////////////////
 	private $table_name = '';
 	private $query = '';
 	private $conditions = array();
@@ -19,6 +20,11 @@ class DBTable {
 		$this->table_name = $table_name;
 	}
 
+	//////////////////////////////////// Public Functions ////////////////////////////
+	/**
+	 * Creates a query based on the data given to this object. 
+	 * Return : $query - The created Query
+	 */
 	function createQuery() {
 		$query = "SELECT {$this->select} FROM {$this->table_name}";
 		
@@ -26,15 +32,29 @@ class DBTable {
 		if($this->order) $query .= ' ORDER BY ' . $this->order;
 		if($this->group) $query .= ' GROUP BY ' . $this->group;
 		if($this->limit) $query .= ' LIMIT ' . $this->offset . ',' . $this->limit;
-		
-		$this->query = $query;
+
+		return $this->query = $query;
 	}
 	
+	/**
+	 * Creates a query and executes based on the data given to this object. 
+	 * Return : $result - The result of the query.
+	 */
 	function createExecQuery($type) {
 		$this->createQuery();
-		return $this->execQuery($type);
+		return $this->_execQuery($type);
 	}
 	
+	/**
+	 * This function is enough to create and execute a query.
+	 * 		You can specify any number of argument. If the argument is a number, this function will assume that 
+	 *		it is an ID. If it is an array, it will be send to setRequirement() function. If it is a stirng,
+	 *		it will be assumed to be a where clause.
+	 * Argument : See description
+	 * Return : The result of the executed query
+	 * Example :$User->find(15);  = SELECT * FROM User WHERE id=15
+	 *			$Project->find("user_id=15","name LIKE '%Nexty%'");  = SELECT * FROM Project WHERE user_id=15 AND name LIKE '%Nexty'
+	 */
 	function find() {
 		$arguments = func_get_args();
 		
@@ -49,16 +69,19 @@ class DBTable {
 			}
 		}
 		if($ids)
-			return $this->findByIds($ids);
+			return $this->findById($ids);
 		
 		return $this->createExecQuery('all');
 	}
 	
-	/** Specify the WHERE statements here
+	/** 
+	 * Specify the WHERE statements here. 
+	 * Arguments : A list of all the conditions
 	 * Example: $User->where(array("name='Binny'","age=23"));
+	 *			$User->where("name='Binny'","age=23");
 	 */
 	function where() {
-		$conditions = func_get_args();
+		$conditions = $this->_getArguments(func_get_args());
 		foreach($conditions as $cond) {
 			if(is_string($cond))
 				if(!in_array($cond,$this->conditions)) $this->conditions[] = $cond;
@@ -66,27 +89,23 @@ class DBTable {
 	}
 	
 	/// Returns the results of all the rows whose IDs are provided
-	function findByIds() {
-		$ids = $this->_getIds(func_get_args());
+	function findById() {
+		$ids = $this->_getArguments(func_get_args());
 		
-		if(count($ids) == 1) { //Just one id
-			return $this->findById($ids[0]);
+		if(!count($ids)) return false;
+		
+		if(count($ids) == 1) { //Just one ID
+			$this->where("`{$this->primary_key_field}`='$ids[0]'");
+		} else { //Multiple IDs - use IN to get all the data
+			$this->where("`{$this->primary_key_field}` IN (" . implode(",", $ids). ")");
 		}
 
-		// Get the result for each ID
-		foreach($arguments as $id) {
-			$returns[] = $this->findById($id);
-		}
-		return $returns;
-	}
-
-	/// Return the row whose id is provided
-	function findById($id) {
-		$this->where("`{$this->primary_key_field}`='$id'");
-		
 		$data = $this->createExecQuery('assoc');
-		$this->field = $data;
-		$this->primary_key_value = $id;
+		
+		if(count($ids) == 1) {
+			$this->field = $data;
+			$this->primary_key_value = $ids[0];
+		}
 
 		return $data;
 	}
@@ -121,7 +140,7 @@ class DBTable {
 				if ($this->_isKeyword($field_value)) { //If the is values has a special meaning - like NOW() give it special consideration
 					$update_array[] = "`$field_name`=$field_value";
 				} else {
-					$update_array[] = "`$field_name`=" . $this->escape($field_value);
+					$update_array[] = "`$field_name`=" . $this->_escape($field_value);
 				}
 			}
 			$this->query .= implode(', ',$update_array);
@@ -129,7 +148,7 @@ class DBTable {
 			$this->where("`{$this->primary_key_field}`={$this->primary_key_value}");
 			$this->query .= ' WHERE ' . implode(' AND ',$this->conditions);
 
-			$this->execQuery('exec');
+			$this->_execQuery('exec');
 			$return_value = $sql->fetchAffectedRows();
 
 		} else { //New row - do an insert
@@ -138,14 +157,14 @@ class DBTable {
 
 			for($i=0; $i<count($field_values); $i++) {
 				if(!$this->_isKeyword($field_values[$i])) {//Quote the value if it is not a Function call
-					$field_values[$i] = $this->escape($field_values[$i]);
+					$field_values[$i] = $this->_escape($field_values[$i]);
 				}
 			}
 			
 			$this->query = "INSERT INTO `{$this->table_name}` (`" . implode('`,`', $field_names) . '`) '
 					. ' VALUES (' .implode(",", $field_values) . ')';
 
-			$this->execQuery('exec');
+			$this->_execQuery('exec');
 			$return_value = $sql->fetchInsertId();
 		}
 		$this->field = array(); //Reset the data after the save
@@ -153,22 +172,30 @@ class DBTable {
 		return $return_value;
 	}
 	
+	/**
+	 * Execute a DELETE statement. If the ID of the deleted row is not specified as the argument, 
+	 *		the function will use just the where clause. Be careful - if the where clauses are not present, 
+	 *		kiss you table goodbye!
+	 * Arguments : An ID or a list of IDs - Optional
+	 * Returns : Affected Row count
+	 */
 	function delete() {
 		global $sql;
 
 		$this->query = "DELETE FROM `{$this->table_name}` ";
-		$ids = $this->_getIds(func_get_args());
+		$ids = $this->_getArguments(func_get_args());
 		if(count($ids)) {
 			if(count($ids) == 1) {
 				$this->query .= " WHERE `{$this->primary_key_field}` = " . $ids[0];
 			} else {
 				$this->query .= " WHERE `{$this->primary_key_field}` IN (" . implode(",", $ids). ")";
 			}
+			if(count($this->conditions)) $this->query .= ' AND ' . implode(' AND ',$this->conditions);
 
 		} else { //Remove muliptle rows at once
 			if(count($this->conditions)) $this->query .= ' WHERE ' . implode(' AND ',$this->conditions);
 		}
-		$this->execQuery('exec');
+		$this->_execQuery('exec');
 		return $sql->fetchAffectedRows();
 	}
 
@@ -204,11 +231,18 @@ class DBTable {
 		
 		// SELECT select
 		if(isset($arg['select'])) $this->select($arg['select']);
+		
+		//If its just array with none of our 'special' keys - it is consided to be an array of where clauses
+		if(!isset($arg['conditions']) and !isset($arg['where']) and !isset($arg['limit']) 
+				and !isset($arg['offset']) and !isset($arg['order']) and !isset($arg['group']) 
+				and !isset($arg['select'])) {
+			$this->where($arg);
+		}
 	}
 
 
 	//////////////////////////////////////////// The Privates /////////////////////////////////////
-	private function _getIds($id_list) {
+	private function _getArguments($id_list) {
 		$arguments = $id_list;
 		if(count($arguments) == 1 and is_array($arguments[0])) { //If the first argument is the list(array) of IDs
 			$arguments = $arguments[0];
@@ -253,7 +287,7 @@ class DBTable {
 	
 	
 	/// The SQL is executed only here.
-	private function execQuery($return_type) {
+	private function _execQuery($return_type) {
 		global $sql;
 		$result = array();
 		
@@ -261,22 +295,17 @@ class DBTable {
 			print $this->query . '<br />';
 
 		} else {
-			$resource = $sql->getSql($this->query);
-			
-			if($resource and $resource !== true) {
-				$rows = $sql->fetchNumRows($resource);
-				if($rows) {
-					if($rows == 1) { //Just 1 row - get the result as an associate array
-						$result = $sql->getAssoc($resource);
-						//Get the ID of this row
-						if(isset($results[$this->primary_key_field])) $this->primary_key_value = $id;
-						
-					} else {
-						$result = $sql->getAll($resource);
-					}
-				}
-			} elseif(!$this->primary_key_value) {
-				$this->primary_key_value = $sql->fetchInsertId();
+			$result = array();
+			if($return_type == 'assoc') {
+				$result = $sql->getAssoc($this->query);
+			} elseif($return_type == 'all') {
+				$result = $sql->getAll($this->query);
+			} elseif($return_type == 'one') {
+				$result = $sql->getOne($this->query);
+			} elseif($return_type == 'byid') {
+				$result = $sql->getById($this->query);
+			} else { //exec
+				$sql->getSql($this->query);
 			}
 		}
 		$this->newRow();
@@ -284,7 +313,7 @@ class DBTable {
 		return $result;
 	}
 	
-	private function escape($string) {
+	private function _escape($string) {
 		return "'" . mysql_real_escape_string($string) . "'";
 	}
 }
