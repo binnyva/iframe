@@ -10,8 +10,6 @@ while (strlen($path) > 2) {
 }
 $url = "http://" . $_SERVER['HTTP_HOST'] . $path.'/';
 
-
-$config['site_title']	= "Nexty";
 $config['site_url']		= $url;
 $config['site_path']	= $path;
 
@@ -21,11 +19,14 @@ $config['site_path']	= $path;
  *	t = Testing Mode
  *	p = Production Mode
  */
-$config['mode']			= 'd';
+if(!isset($config['mode'])) $config['mode']			= 'd'; //Default Config Mode
 
 if($config['mode'] == 'd') {
 	error_reporting(E_ALL);
+} elseif($config['mode'] == 'p') {
+	error_reporting(0);
 }
+
 // Connect to DB
 $sql = new Sql($config['db_host'],$config['db_user'],$config['db_password'],$config['db_database']);
 $sql->mode = $config['mode'];
