@@ -158,7 +158,7 @@ class Tagging {
 	/**
 	 * Remove the connection between the given tag and the given item.
 	 */
-	function removeTagFor($tag_id , $item_id) {
+	function removeTagFor($item_id, $tag_id) {
 		global $sql;
 		$sql->execQuery("DELETE FROM {$this->_reference_table} WHERE {$this->_reference_item_field}='$item_id' AND {$this->_reference_tag_field}='$tag_id'");
 	}
@@ -174,10 +174,10 @@ class Tagging {
 	
 	/**
 	 * Removes all existing tags for a item and insertes a new set of tags for it.
-	 * Arguments : $tags(Array) - An array of all the tags that must be inserted for this item
-	 *				$item_id	- The ID of the item that must be tagged with the given tags.
+	 * Arguments :	$item_id	- The ID of the item that must be tagged with the given tags.
+	 *				$tags(Array) - An array of all the tags that must be inserted for this item
 	 */
-	function setTags($tags, $item_id) {
+	function setTags($item_id, $tags) {
 		global $sql;
 		
 		$this->removeAllTagsFor($item_id);//First, remove all the tags for the item.

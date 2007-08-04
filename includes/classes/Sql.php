@@ -83,7 +83,7 @@ class Sql {
 		$row = mysql_fetch_row($result);
 		return $this->_stripSlashes($row);
 	}
-	
+
 	/**
 	 * Runs a query and returns the first column of the first row
 	 * Argument : $query - SQL Query
@@ -125,7 +125,7 @@ class Sql {
 		}
 		return $arr;
 	}
-	
+
 	/**
 	 * Runs a query and returns all the data as an array - with the first field as the key and the second as the value
  	 * Argument : $query - SQL Query
@@ -302,7 +302,7 @@ class Sql {
 	 * Handles the SQL errors depending on what mode we are in.
 	 * Argument : $query - The SQL Query in which the error occured.
 	 */
-	function _error($query) {
+	private function _error($query) {
 		$error_message = "MySQL Error : <code>" . mysql_error() . "<code><br /><u>Query...</u><code>" . $query . "</code>";
 		if($this->mode == 'd') {
 			die($error_message);

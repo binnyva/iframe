@@ -1,6 +1,7 @@
 <?php
 /**
  * :TODO: Currently, the system does not handle arrays in the URL well.
+ * :TODO: Use Database abstraction
  */
 class SqlPager {
 	///Public Variables
@@ -173,18 +174,21 @@ class SqlPager {
 				$url_parameters[$bits[0]] = $bits[1];
 			}
 		}
-		
+
 		// Add the url's parameters to the parameters supplied in the second argument. Mix well.
 		$params = $params + $url_parameters;
 
 		$params_arr = array();
 		foreach($params as $key=>$value) {
+			//Some stuff must be removed - iFrame specific
+			if($key == 'success' or $key == 'error') continue;
+
 			if(gettype($value) == 'array') { //Handle array data properly - :TODO: there will be problems
 				foreach($value as $val) {
-					$params_arr[] = $key . '[]=' . urlencode($val);
+					if($val) $params_arr[] = $key . '[]=' . urlencode($val);
 				}
 			} else {
-				$params_arr[] = $key . '=' . urlencode($value);
+				if($value) $params_arr[] = $key . '=' . urlencode($value);
 			}
 		}
 		

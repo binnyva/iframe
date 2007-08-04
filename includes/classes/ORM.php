@@ -9,6 +9,7 @@ class DBTable {
 	private $offset = 0;
 	private $order = '';
 	private $group = '';
+	private $query_result_type = 'all';
 
 	public $field = array();
 	public $primary_key_field = 'id';
@@ -40,7 +41,9 @@ class DBTable {
 	 * Creates a query and executes based on the data given to this object. 
 	 * Return : $result - The result of the query.
 	 */
-	function createExecQuery($type) {
+	function createExecQuery($type=false) {
+		if($type === false) $type = $this->query_result_type;
+		
 		$this->createQuery();
 		return $this->_execQuery($type);
 	}
@@ -210,6 +213,7 @@ class DBTable {
 		$this->offset = 0;
 		$this->order = '';
 		$this->group = '';
+		$this->query_result_type = 'all';
 	}
 	
 	function setRequirement($arg) {
@@ -232,10 +236,12 @@ class DBTable {
 		// SELECT select
 		if(isset($arg['select'])) $this->select($arg['select']);
 		
+		if(isset($arg['result_type'])) $this->query_result_type = $arg['result_type'];
+		
 		//If its just array with none of our 'special' keys - it is consided to be an array of where clauses
 		if(!isset($arg['conditions']) and !isset($arg['where']) and !isset($arg['limit']) 
 				and !isset($arg['offset']) and !isset($arg['order']) and !isset($arg['group']) 
-				and !isset($arg['select'])) {
+				and !isset($arg['select']) and !isset($arg['result_type'])) {
 			$this->where($arg);
 		}
 	}

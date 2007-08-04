@@ -171,7 +171,7 @@ class MVC {
 	 */
 	function addResource($file,$type="",$force=false) {
 		if(!$file) return;
-		global $rel;
+		global $rel,$config;
 		if(!$type) list($name,$type) = explode(".",$file);
 		$folder = ($type == 'js') ? $this->js_folder : $this->css_folder ;
 		
@@ -185,10 +185,10 @@ class MVC {
 		} else $file = $folder . $file;
 
 		if($type=='css' or $type=='stylesheet' or $type=='style' or $type=='stylesheets') {
-			$current_include = '<link href="' . $rel . $file . '" type="text/css" rel="stylesheet" />';
+			$current_include = '<link href="' . $config['url'] . $file . '" type="text/css" rel="stylesheet" />';
 
 		} elseif($type=='js' or $type=='javascript' or $type=='jscript' or $type=='script') {
-			$current_include = '<script src="' . $rel . $file . '" type="text/javascript"></script>';
+			$current_include = '<script src="' . $config['url'] . $file . '" type="text/javascript"></script>';
 
 		} else {
 			error("Template Error: $type not defined");
