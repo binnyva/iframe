@@ -6,7 +6,7 @@ $config = array(
 	'db_host'		=>	'localhost',
 	'db_user'		=>	'root',
 	'db_password'	=>	'',
-	'db_database'	=>	'App_Nexty',
+	'db_database'	=>	'Project_Nexty',
 	'url'			=>	'http://localhost/iframe/',
 	'absolute_path'	=>	'/iframe/'
 );
