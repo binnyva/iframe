@@ -198,6 +198,14 @@ class MVC {
 			array_push($this->includes,$current_include);
 		}
 	}
+	
+	/**
+	 * Adds meta tags. :TODO: improve this.
+	 */
+	function addMetadata($name,$contents) {
+		$this->head_data .= '<meta name="'.$name.'" content="'.$contents.'" />'."\n";
+	}
+
 
 	//////////////////////////////// Layout Functions ////////////////////////////////
 	/**
