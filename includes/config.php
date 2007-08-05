@@ -29,7 +29,7 @@ if($config['mode'] == 'd') {
 
 // Connect to DB
 $sql = new Sql($config['db_host'],$config['db_user'],$config['db_password'],$config['db_database']);
-$sql->mode = $config['mode'];
+Sql::$mode = $config['mode'];
 
 //Otherways it is a mess with google
 ini_set('url_rewriter.tags',"");
@@ -38,3 +38,4 @@ session_start();
 
 $date_format = '%d %b, %Y';
 $abs = $config['absolute_path']; //The final '/' is a must
+$config['code_path'] = preg_replace("/includes/",'',dirname(__FILE__));
