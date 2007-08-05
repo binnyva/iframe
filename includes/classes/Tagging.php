@@ -109,7 +109,7 @@ class Tagging {
 		global $sql;
 		if($this->tags) return; //Already Cached.
 
-		$tags = $sql->getById("SELECT {$this->_tag_id_field},{$this->_tag_name_field} FROM {$this->_tag_table}");
+		$tags = $sql->getById("SELECT `{$this->_tag_id_field}`,`{$this->_tag_name_field}` FROM `{$this->_tag_table}`");
 		$this->tags = $tags;
 		$this->tags_hash = array();
 		foreach($this->tags as $id=>$tag) {
@@ -125,7 +125,7 @@ class Tagging {
 
 		$tag_id = $this->getTagId($tag_name);
 		if($tag_id === false) {
-			$sql->execQuery("INSERT INTO {$this->_tag_table}({$this->_tag_name_field}) VALUE('$tag_name')");
+			$sql->execQuery("INSERT INTO `{$this->_tag_table}`(`{$this->_tag_name_field}`) VALUE('$tag_name')");
 			$tag_id = $sql->fetchInsertId();
 
 			//Add the new tag to the cache
@@ -140,8 +140,8 @@ class Tagging {
 		global $sql;
 
 		$tag_id = $this->insertTag($tag_name);
-		$sql->execQuery("INSERT INTO {$this->_reference_table} "
-			. " ({$this->_reference_tag_field},{$this->_reference_item_field}) VALUES($tag_id, $item_id)");
+		$sql->execQuery("INSERT INTO `{$this->_reference_table}` "
+			. " (`{$this->_reference_tag_field}`,`{$this->_reference_item_field}`) VALUES($tag_id, $item_id)");
 			
 		return $tag_id;
 	}
@@ -152,7 +152,7 @@ class Tagging {
 	 */
 	function removeAllTagsFor($item_id) {
 		global $sql;
-		$sql->execQuery("DELETE FROM {$this->_reference_table} WHERE {$this->_reference_item_field}='$item_id'");
+		$sql->execQuery("DELETE FROM `{$this->_reference_table}` WHERE `{$this->_reference_item_field}`='$item_id'");
 		return $sql->fetchAffectedRows();
 	}
 	/**
@@ -160,7 +160,7 @@ class Tagging {
 	 */
 	function removeTagFor($item_id, $tag_id) {
 		global $sql;
-		$sql->execQuery("DELETE FROM {$this->_reference_table} WHERE {$this->_reference_item_field}='$item_id' AND {$this->_reference_tag_field}='$tag_id'");
+		$sql->execQuery("DELETE FROM `{$this->_reference_table}` WHERE `{$this->_reference_item_field}`='$item_id' AND `{$this->_reference_tag_field}`='$tag_id'");
 	}
 
 	/**
@@ -168,8 +168,8 @@ class Tagging {
 	 */
 	function removeTag($tag_id) {
 		global $sql;
-		$sql->execQuery("DELETE FROM {$this->_tag_table} WHERE {$this->_tag_id_field}='$tag_id'");
-		$sql->execQuery("DELETE FROM {$this->_reference_table} WHERE {$this->_reference_tag_field}='$tag_id'");
+		$sql->execQuery("DELETE FROM `{$this->_tag_table}` WHERE `{$this->_tag_id_field}`='$tag_id'");
+		$sql->execQuery("DELETE FROM `{$this->_reference_table}` WHERE `{$this->_reference_tag_field}`='$tag_id'");
 	}
 	
 	/**
@@ -188,7 +188,7 @@ class Tagging {
 			$insert_query[] = "($tag_id,$item_id)";
 		}
 		if($insert_query) {
-			$sql->execQuery("INSERT INTO {$this->_reference_table} ({$this->_reference_tag_field},{$this->_reference_item_field})"
+			$sql->execQuery("INSERT INTO `{$this->_reference_table}` (`{$this->_reference_tag_field}`,`{$this->_reference_item_field}`)"
 				. " VALUES " .implode(',',$insert_query));
 		}
 	}
@@ -200,10 +200,10 @@ class Tagging {
 	 */
 	function getTagsFor($item_id) {
 		global $sql;
-		$tags = $sql->getById("SELECT {$this->_tag_table}.{$this->_tag_id_field},{$this->_tag_table}.{$this->_tag_name_field} "
-			. " FROM {$this->_tag_table} INNER JOIN {$this->_reference_table} "
-			. " ON {$this->_reference_table}.{$this->_reference_tag_field}={$this->_tag_table}.{$this->_tag_id_field} "
-			. " WHERE {$this->_reference_table}.{$this->_reference_item_field}='$item_id'");
+		$tags = $sql->getById("SELECT `{$this->_tag_table}`.`{$this->_tag_id_field}`,`{$this->_tag_table}`.`{$this->_tag_name_field}` "
+			. " FROM `{$this->_tag_table}` INNER JOIN `{$this->_reference_table}` "
+			. " ON `{$this->_reference_table}`.`{$this->_reference_tag_field}`=`{$this->_tag_table}`.`{$this->_tag_id_field}` "
+			. " WHERE `{$this->_reference_table}`.`{$this->_reference_item_field}`='$item_id'");
 		return $tags;
 	}
 
@@ -214,7 +214,7 @@ class Tagging {
 	 */
 	function getItemsTaggedWith($tag_id) {
 		global $sql;
-		$items = $sql->getCol("SELECT {$this->_reference_item_field} FROM {$this->_reference_table} WHERE {$this->_reference_tag_field}='$tag_id'");
+		$items = $sql->getCol("SELECT `{$this->_reference_item_field}` FROM `{$this->_reference_table}` WHERE `{$this->_reference_tag_field}`='$tag_id'");
 		return $items;
 	}
 }
