@@ -28,6 +28,10 @@ class MVC {
 	var $includes	= array();
 	var $css_folder = 'css/';
 	var $js_folder	= 'js/';
+	
+	var $content	= array(
+		'head'		=>	''
+	);
 
 	/**
 	 * Constructor
