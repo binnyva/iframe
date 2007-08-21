@@ -1,0 +1,52 @@
+label {
+	width:100px;
+	display:block;
+	float:left;
+	text-align:right;
+	padding-right:5px;
+}
+
+inupt, select {
+	float:left;
+}
+fieldset,#information,#serialized-data {
+	margin:0 10px;
+}
+fieldset fieldset {
+	margin:0;
+}
+
+br {
+	clear:both;
+}
+
+.type_options {
+	display:none;
+}
+div {
+	clear:both;
+}
+.help a {
+	color:blue;
+	font-weight:bold;
+}
+.help {
+	vertical-align:top;
+}
+#tip-holder {
+	background-color:#eee;
+	position:absolute;
+	margin-left:10px;
+	width:300px;
+	display:none;
+}
+#tip {
+	padding:5px;
+	position:relative;
+}
+.rounded-corner .wrapper1 {background:none;}
+.rounded-corner .wrapper4 {background:none;}
+
+#serialized-data {
+	text-align:right;
+}

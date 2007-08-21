@@ -1,0 +1,36 @@
+body {
+	margin:0px;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:.8em;
+	background-color:#fff;
+	color:#000;
+}
+img {
+	border:0;
+}
+a {
+	text-decoration:none;
+}
+a:hover {
+	color:red;
+}
+code {
+	font-family:courier;
+	font-size:1.2em;
+}
+
+.rounded-corner .wrapper1 {background:url(/images/corners/top_left.gif) no-repeat top left;}
+.rounded-corner .wrapper2 {background:url(/images/corners/top_right.gif) no-repeat top right;}
+.rounded-corner .wrapper3 {background:url(/images/corners/bottom_left.gif) no-repeat bottom left;}
+.rounded-corner .wrapper4 {
+	background:url(/images/corners/bottom_right.gif) no-repeat bottom right;
+	padding:0 5px;
+} 
+
+#header {
+	background:url(/images/cap.png) no-repeat top left;
+	height:75px;
+}
+#header h1 {
+	display:none;
+}
