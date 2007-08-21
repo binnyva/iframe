@@ -1,5 +1,0 @@
-$Model['object_name']
-$Model['table']
-
-$Controller['name']
-$Controller['name_plural']
