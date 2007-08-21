@@ -36,6 +36,29 @@ END;
 	}
 }
 
+function showStatus() {
+	global $QUERY;
+	if($QUERY['success']) {
+		if(is_array($QUERY['success'])) {
+			print "<ul class='message-success'>\n";
+			foreach($QUERY['success'] as $msg) print "<li>$msg</li>\n";
+			print "</ul>\n";
+		} else {
+			print "<div class='message-success'>$QUERY[success]</div>\n";
+		}
+	}
+	
+	if($QUERY['error']) {
+		if(is_array($QUERY['error'])) {
+			print "<ul class='message-error'>\n";
+			foreach($QUERY['error'] as $msg) print "<li>$msg</li>\n";
+			print "</ul>\n";
+		} else {
+			print "<div class='message-error'>$QUERY[error]</div>\n";
+		}
+	}
+}
+
 function showMessage($message, $url="?", $status="success",$id=0) {
 	//If it is an ajax request, Just print the data
 	if(isset($_REQUEST['ajax'])) {
