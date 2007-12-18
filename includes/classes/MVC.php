@@ -128,7 +128,7 @@ class MVC {
 					$model_name = ucfirst($model_file);
 				} else {
 					//Go thru the model folder and find all the files, then make it all lower case and see if one matchs the current controller.
-					$all_models = ls($model_folder);
+					$all_models = ls("*.php", $model_folder, false, array('return_files', 'quiet'));
 					foreach($all_models as $mod) {
 						if(strtolower($mod) == strtolower($this->controller) . '.php') {
 							$this->model = $mod;

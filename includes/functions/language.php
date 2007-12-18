@@ -86,18 +86,3 @@ function array_remove_value() {
 	}
 	return $arr;
 }
-
-function ls($dir) {
-	$files = array();
-	if (is_dir($dir)) {
-		if ($dh = opendir($dir)) {
-			while (($file = readdir($dh)) !== false) {
-				//Skip over the folders if we don't need them.
-				if($file == 'CVS' || $file == '.' || $file =='..') continue;
-				$files[] = $file;
-			}
-			closedir($dh);
-		}
-	}
-	return $files;
-}

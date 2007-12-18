@@ -11,7 +11,7 @@
 ***************************************************************************************************/
 class Sql {
 	//All Variables - Public
-	public static $mode = 'p'; ///Mode - p = Production, d = Development and t = Testing
+	public static $mode = 'd'; ///Mode - p = Production, d = Development and t = Testing
 
 	//Private Variables
 	private $_row  = "";
@@ -46,7 +46,7 @@ class Sql {
 	 * Return   : The SQL Resource of the given query
 	 */
 	function getSql($query) {
-		if(Sql::$mode == 't') {
+		if(self::$mode == 't') {
 			print $query;
 			return false;
 		}
@@ -69,6 +69,8 @@ class Sql {
 	 */ 
 	function getAssoc($query) {
 		$result = $this->getSql($query);
+		if(!$result) return array();
+
 		$row = mysql_fetch_assoc($result);
 		return $this->_stripSlashes($row);
 	}
@@ -80,6 +82,7 @@ class Sql {
 	 */
 	function getList($query) {
 		$result = $this->getSql($query);
+		if(!$result) return array();
 		$row = mysql_fetch_row($result);
 		return $this->_stripSlashes($row);
 	}
@@ -91,6 +94,7 @@ class Sql {
 	 */
 	function getOne($query) {
 		$result = $this->getSql($query);
+		if(!$result) return array();
 		$res = mysql_fetch_row($result);
 		if(!$res) return '';
 		return stripslashes($res[0]);
@@ -103,6 +107,7 @@ class Sql {
 	 */
 	function getAll($query) {
 		$result = $this -> getSql($query);
+		if(!$result) return array();
 
 		$arr = array();
 		while ($row = mysql_fetch_assoc($result)) {
@@ -118,6 +123,7 @@ class Sql {
 	 */
 	function getCol($query) {
 		$result = $this -> getSql($query);
+		if(!$result) return array();
 
 		$arr = array();
 		while ($row = mysql_fetch_row($result)) {
@@ -133,11 +139,12 @@ class Sql {
 	 */
 	function getById($query) {
 		$result = $this -> getSql($query);
+		if(!$result) return array();
 
 		$arr = array();
 		while ($row = mysql_fetch_row($result)) {
 			if(count($row) == 2)
-				$arr[$row[0]] = stripslashes($row[1]);
+				$arr[$row[0]] = $this->_stripSlashes($row[1]);
 			else 
 				$arr[] = $row;
 		}
@@ -304,9 +311,9 @@ class Sql {
 	 */
 	private function _error($query) {
 		$error_message = "MySQL Error : <code>" . mysql_error() . "<code><br /><u>Query...</u><code>" . $query . "</code>";
-		if($this->mode == 'd') {
+		if(self::$mode == 'd') {
 			die($error_message);
-		} elseif($this->mode == 't') {
+		} elseif(self::$mode == 't') {
 			print($error_message);
 		}
 	}

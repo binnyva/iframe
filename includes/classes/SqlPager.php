@@ -170,6 +170,8 @@ class SqlPager {
 			$file = $parts[0];
 			$all_parameters = preg_split('/\&(amp;)?/',$parts[1]);
 			foreach($all_parameters as $param) {
+				if(empty($param)) continue;
+
 				$bits = explode('=',$param);
 				$url_parameters[$bits[0]] = $bits[1];
 			}
