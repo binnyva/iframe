@@ -27,9 +27,11 @@ if($config['mode'] == 'd') {
 	error_reporting(0);
 }
 
-// Connect to DB
-$sql = new Sql($config['db_host'],$config['db_user'],$config['db_password'],$config['db_database']);
-Sql::$mode = $config['mode'];
+if(isset($config['db_host']) and $config['db_host']) {
+	// Connect to DB
+	$sql = new Sql($config['db_host'],$config['db_user'],$config['db_password'],$config['db_database']);
+	Sql::$mode = $config['mode'];
+}
 
 //Otherways it is a mess with google
 ini_set('url_rewriter.tags',"");
