@@ -38,7 +38,8 @@ function escapeQuery($param_array = array(),$ignore_magic_quote_setting = false)
 		if(is_array($value)) { //Escape Arrays recursively
 			$QUERY[$key] = escapeQuery($value,$ignore_magic_quote_setting); //:RECURSION:
 		} else {
-			$QUERY[$key] = mysql_real_escape_string($value);
+			if($GLOBALS['sql']) $QUERY[$key] = mysql_real_escape_string($value); //If there is an SQL Connection,
+			else $QUERY[$key] = addslashes($value);
 		}
 	}
 	return $QUERY;

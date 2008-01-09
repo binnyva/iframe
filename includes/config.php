@@ -27,6 +27,8 @@ if($config['mode'] == 'd') {
 	error_reporting(0);
 }
 
+// Database connection is optional
+$sql = false;
 if(isset($config['db_host']) and $config['db_host']) {
 	// Connect to DB
 	$sql = new Sql($config['db_host'],$config['db_user'],$config['db_password'],$config['db_database']);
