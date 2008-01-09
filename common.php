@@ -2,11 +2,11 @@
 $rel = findRelation();
 include($rel . "configuration.php");
 
-$this_folder = dirname(__FILE__) . '/';
-include($this_folder . "includes/classes/Sql.php");
-include($this_folder . "includes/config.php");
-include($this_folder . "includes/functions.php");
-include($this_folder . "includes/classes/MVC.php");
+$iframe_folder = dirname(__FILE__) . '/';
+include($iframe_folder . "includes/classes/Sql.php");
+include($iframe_folder . "includes/config.php");
+include($iframe_folder . "includes/functions.php");
+include($iframe_folder . "includes/classes/MVC.php");
 
 $PARAM = unescapeQuery();
 $QUERY = escapeQuery($PARAM,true);
