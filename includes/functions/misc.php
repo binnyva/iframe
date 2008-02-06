@@ -360,7 +360,7 @@ function sendEMail($from_email,$to,$message,$subject) {
 }
  
 /**
- * See http://www.bin-co.com/php/scripts/load/
+ * Link: http://www.bin-co.com/php/scripts/load/
  * Version : 1.00.A
  */
 function load($url,$options=array('method'=>'get','return_info'=>false)) {

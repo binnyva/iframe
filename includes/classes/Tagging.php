@@ -1,5 +1,4 @@
 <?php
-
 class Tagging {
 	public $tags = array();		///Associative array of all the tags with the id of the tag as the key.
 	public $tags_hash = array();///Associative array of all the tags with the NAME of the tag as the key.

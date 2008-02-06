@@ -4,7 +4,6 @@
  * Return : The relation between the current page and the root of the site. Eg ../..
  */
 function getRelation() {
-	global $Config;
 	$url = "http://" . $_SERVER["HTTP_HOST"] . $_SERVER['PHP_SELF'];
 	$relative_path = str_replace($Config['site_url'],"",$url);
 	
@@ -88,4 +87,9 @@ function dump($data) {
 		print var_dump($data);
 		print "&lt;=========";
 	}
+}
+
+//http://php.net/autoload
+function __autoload($class_name) {
+	require_once $class_name . '.php';
 }

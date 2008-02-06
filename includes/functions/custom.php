@@ -1,5 +1,16 @@
-<?php 
-//10 has more priority than 1
+<?php
+/**
+ * This file contains some iFrame specific functions.
+ */
+
+/**
+ * Prints out an error message if there is an error
+ * Arguments:
+ * 	$msg - The error message
+ *	$file - The file at which the error happened [OPTIONAL]
+ *	$line - The line where the error occured [OPTIONAL]
+ *	$priority - The priority or the error - if its to high(>=10) the app will die. 10 has more priority than 1
+ */
 function error($msg, $file="", $line="", $priority=5) {
 	global $config,$abs;
 	
@@ -36,6 +47,11 @@ END;
 	}
 }
 
+/**
+ * Shows the status of the system. If there is many success message, it will show up as a list. If there is just 1, 
+ *		it shows as a div message. Same goes for error message - it uses a different classname. Success uses the classname
+ *		'message-success' and Errors use the classname 'message-error'
+ */
 function showStatus() {
 	global $QUERY;
 	if($QUERY['success']) {
@@ -59,6 +75,9 @@ function showStatus() {
 	}
 }
 
+/**
+ * Shows the final message - redirects to a new page with the message in the URL
+ */
 function showMessage($message, $url="?", $status="success",$id=0) {
 	//If it is an ajax request, Just print the data
 	if(isset($_REQUEST['ajax'])) {

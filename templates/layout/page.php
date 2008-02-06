@@ -2,17 +2,16 @@
 <html><head>
 <title><?=$title?></title>
 <link href="<?=$abs?>css/style.css" rel="stylesheet" type="text/css" />
-<!--[if IE]>
-<link rel="stylesheet" href="<?=$abs?>css/style_ie.css" type="text/css" media="all" />
-<![endif]-->
-<script src="<?=$abs?>js/script.js" type="text/javascript"></script>
+<script src="<?=$abs?>js/JSL.js" type="text/javascript"></script>
+<script src="<?=$abs?>js/application.js" type="text/javascript"></script>
 <?=$includes?>
 </head>
 <body>
 <div id="header">
 <h1 id="logo"><a href="<?=$abs?>"><?=$title?></a></h1>
+</div>
 
-
+<div id="content">
 <!-- Begin Content -->
 <?php 
 /////////////////////////////////// The Template file will appear here ////////////////////////////
@@ -22,7 +21,8 @@ include($GLOBALS['template']->template);
 /////////////////////////////////// The Template file will appear here ////////////////////////////
 ?>
 <!-- End Content -->
+</div>
 
-
+<div id="footer">An <a href="http://www.bin-co.com/php/scripts/iframe/">iFrame</a> Application</div>
 </body>
 </html>

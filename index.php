@@ -1,4 +1,6 @@
 <?php
-include('./common.php');
+include("./common.php");
+
+$message = "Hello World";
 
 render();

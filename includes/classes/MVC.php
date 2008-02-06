@@ -3,33 +3,31 @@
  * File		: classes/MVC.php
  * Version	: $Id: MVC.php,v 1.2 2007/03/08 17:37:05 binnyva Exp $
  * This file holds all the templating actions. 
- *
  ****************************************************************************/
-$template = new MVC();
-
+ 
 /**
  * Class : MVC
  * All MVC action are in this class - Templating and Model, anyway
  */
 class MVC {
-	var $page		= ""; ///This variable holds the location of the controller page.
-	var $template	= ""; ///Holds the location of the view(or template) page. This value can be deduced from the controller page or can be explicitly set using the setTemplate() funciton.
-	var $model		= "";
-	var $model_name = "";
-	var $controller = "";
+	public $page		= ''; ///This variable holds the location of the controller page.
+	public $template	= ''; ///Holds the location of the view(or template) page. This value can be deduced from the controller page or can be explicitly set using the setTemplate() funciton.
+	public $model		= '';
+	public $model_name	= '';
+	public $controller	= '';
 
-	var $title		= ""; ///The title of the page - use setTemplate() to set it.
-	var $layout		= 'page.php'; ///This should contain the layout of the site.
-	var $options	= array(
+	public $title		= ''; ///The title of the page - use setTemplate() to set it.
+	public $layout		= 'page.php'; ///This should contain the layout of the site.
+	public $options		= array(
 		'template_folder'	=> 'templates',
 		'model_folder'		=> 'models',
 		'insert_layout'		=> true
 	);
-	var $includes	= array();
-	var $css_folder = 'css/';
-	var $js_folder	= 'js/';
+	public $includes	= array();
+	public $css_folder	= 'css/';
+	public $js_folder	= 'js/';
 	
-	var $content	= array(
+	public $content	= array(
 		'head'		=>	''
 	);
 
@@ -37,8 +35,9 @@ class MVC {
 	 * Constructor
 	 * Finds the location of the current file - eg. 'advertise/myaccount.php'
 	 */
-	function MVC() {
-		$this->setPage($_SERVER["PHP_SELF"]);
+	function __construct() {
+		global $config;
+		$this->setPage($config["PHP_SELF"]);
 		$this->setController();
 		$this->setModel();
 	}
@@ -51,18 +50,18 @@ class MVC {
 	function setPage($file_name) {
 		global $config;
 		//Remove the absolute site path while conserving the directory structure in the URL
-		$file_name = str_replace($_SERVER['DOCUMENT_ROOT'],'',$file_name);
+		$file_name = str_replace($_SERVER['DOCUMENT_ROOT'], '', $file_name);
 		
-		$escaped_path = preg_replace('/([\/\\\.\?\~\\=\_\-\,])/','\\\$1',$config['absolute_path']);
-		$file_name = preg_replace('/' . $escaped_path . '/','',$file_name,1); //Replace just 1 time
-		$file_name = preg_replace('/controllers\//','',$file_name);//If we are following mvc architecture
-		if(strpos($file_name,'/') === 0) $file_name = substr($file_name,1);
+		$escaped_path = preg_replace('/([\/\\\.\?\~\\=\_\-\,])/','\\\$1', $config['site_absolute_path']);
+		$file_name = preg_replace('/' . $escaped_path . '/', '', $file_name, 1); //Replace just 1 time
+		$file_name = preg_replace('/controllers\//', '', $file_name);//If we are following mvc architecture
+		if(strpos($file_name,'/') === 0) $file_name = substr($file_name, 1);
 
 		//Remove the query parts		
-		$parts = explode('?',$file_name);
+		$parts = explode('?', $file_name);
 		$file_name = $parts[0];
 		//Make sure that it is a file call and not a directory
-		if(!strpos(basename($file_name),'.php')) { ///:TODO: This could be .php5 or something - could cause problems.
+		if(!strpos(basename($file_name), '.php')) { ///:TODO: This could be .php5 or something - could cause problems.
 			$file_name .= 'index.php';
 		}
 
@@ -84,12 +83,13 @@ class MVC {
 	 * Argument : $template_file - This is the template file to be used - it must be kept in the template folder.
 	 */
 	function setTemplate($template_file) {
+		global $config;
 		$this->_findResources($template_file);
 
 		$template_file = $GLOBALS['rel'] . $this->options['template_folder'] . '/' . $template_file;
 		
 		//Plugins are a special case.
-		if(strpos($_SERVER['PHP_SELF'],'plugins') !== false) {
+		if(strpos($config['PHP_SELF'],'plugins') !== false) {
 			$template_file = 'template.php';
 		}
 		
@@ -151,18 +151,18 @@ class MVC {
 	 * Finds all the CSS and JS files that must be included in this page.
 	 */
 	function _findResources($template_file) {
-		global $rel;
+		global $config;
 		$css_file = preg_replace('/.php$/','.css',$template_file);
-		$js_file = preg_replace('/.php$/','.js',$template_file);
+		$js_file  = preg_replace('/.php$/','.js', $template_file);
 		
-		if(file_exists($rel . $this->css_folder . $css_file)) $this->addResource( $css_file , 'css' , true);
-		if(file_exists($rel . $this->js_folder . $js_file)) $this->addResource( $js_file , 'js' , true);
+		if(file_exists($config['site_relative_path'] . $this->css_folder . $css_file)) $this->addResource($css_file, 'css', true);
+		if(file_exists($config['site_relative_path'] . $this->js_folder  . $js_file))  $this->addResource($js_file,  'js', true);
 	}
 
 	/**
-	This will set the title of the page.
-	Argument : $title - The string to be used inside the <title></title> tag.
-	*/
+	 * This will set the title of the page.
+	 * Argument : $title - The string to be used inside the <title></title> tag.
+	 */
 	function setTitle($title) {
 		if($title) $this->title = $title;
 	}
@@ -175,13 +175,13 @@ class MVC {
 	 */
 	function addResource($file,$type="",$force=false) {
 		if(!$file) return;
-		global $rel,$config;
+		global $config;
 		if(!$type) list($name,$type) = explode(".",$file);
 		$folder = ($type == 'js') ? $this->js_folder : $this->css_folder ;
 		
 		//Make sure that the file exists
 		if($force) {
-			if(file_exists($rel . $folder .  $file)) {
+			if(file_exists($config['site_relative_path'] . $folder .  $file)) {
 				$file = $folder . $file;
 			} else {
 				error("Template Error: File Include Error - '$rel$folder/$file' does not exists(Current folder : ".getcwd().")",__FILE__,__LINE__);
@@ -189,10 +189,10 @@ class MVC {
 		} else $file = $folder . $file;
 
 		if($type=='css' or $type=='stylesheet' or $type=='style' or $type=='stylesheets') {
-			$current_include = '<link href="' . $config['url'] . $file . '" type="text/css" rel="stylesheet" />';
+			$current_include = '<link href="' . $config['site_url'] . $file . '" type="text/css" rel="stylesheet" />';
 
 		} elseif($type=='js' or $type=='javascript' or $type=='jscript' or $type=='script') {
-			$current_include = '<script src="' . $config['url'] . $file . '" type="text/javascript"></script>';
+			$current_include = '<script src="' . $config['site_url'] . $file . '" type="text/javascript"></script>';
 
 		} else {
 			error("Template Error: $type not defined");

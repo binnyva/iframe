@@ -140,7 +140,7 @@ class DBTable {
 			$this->query = "UPDATE `{$this->table_name}` SET ";
 			$update_array = array();
 			foreach($this->field as $field_name => $field_value) {
-				if ($this->_isKeyword($field_value)) { //If the is values has a special meaning - like NOW() give it special consideration
+				if ($sql->isKeyword($field_value)) { //If the is values has a special meaning - like NOW() give it special consideration
 					$update_array[] = "`$field_name`=$field_value";
 				} else {
 					$update_array[] = "`$field_name`=" . $this->_escape($field_value);
@@ -159,7 +159,7 @@ class DBTable {
 			$field_values = array_values($this->field);
 
 			for($i=0; $i<count($field_values); $i++) {
-				if(!$this->_isKeyword($field_values[$i])) {//Quote the value if it is not a Function call
+				if(!$sql->isKeyword($field_values[$i])) {//Quote the value if it is not a Function call
 					$field_values[$i] = $this->_escape($field_values[$i]);
 				}
 			}
@@ -255,42 +255,6 @@ class DBTable {
 		}
 		return $arguments;
 	}
-
-	private function _isKeyword($value) {
-		$value = strtoupper($value);
-		if(preg_match('/^\s*(\w+)\((.*)\)\s*$/',$value,$match)) {
-			$function_name = $match[1];
-
-			//A list of all mysql functions - taken from http://dev.mysql.com/doc/refman/4.1/en/func-op-summary-ref.html
-			$mysql_functions = array('ABS','ACOS','ADDDATE','ADDTIME','AES_DECRYPT','AES_ENCRYPT','ASCII','ASIN',
-				'ATAN2,','ATAN','AVG','BENCHMARK','BIN','BIT_AND','BIT_COUNT','BIT_LENGTH','BIT_OR','BIT_XOR','CAST',
-				'CEILING,','CHAR_LENGTH','CHAR','CHARACTER_LENGTH','CHARSET','COALESCE','COERCIBILITY','COLLATION',
-				'COMPRESS','CONCAT_WS','CONCAT','CONNECTION_ID','CONV','CONVERT_TZ','COS','COT','COUNT','COUNT',
-				'CRC32','CURDATE','CURRENT_DATE,','CURRENT_TIME,','CURRENT_TIMESTAMP,','CURRENT_USER,','CURTIME',
-				'DATABASE','DATE_ADD','DATE_FORMAT','DATE_SUB','DATE','DATEDIFF','DAY','DAYNAME','DAYOFMONTH',
-				'DAYOFWEEK','DAYOFYEAR','DECODE','DEFAULT','DEGREES','DES_DECRYPT','DES_ENCRYPT','DIV','ELT',
-				'ENCODE','ENCRYPT','EXP','EXPORT_SET','FIELD','FIND_IN_SET','FLOOR','FORMAT','FOUND_ROWS',
-				'FROM_DAYS','FROM_UNIXTIME','GET_FORMAT','GET_LOCK','GREATEST','GROUP_CONCAT','HEX','HOUR','IF',
-				'IFNULL','INET_ATON','INET_NTOA','INSERT','INSTR','INTERVAL','IS_FREE_LOCK','IS_USED_LOCK','ISNULL',
-				'LAST_DAY','LAST_INSERT_ID','LCASE','LEAST','LEFT','LENGTH','LN','LOAD_FILE','LOCALTIME,',
-				'LOCALTIMESTAMP,','LOCATE','LOG10','LOG2','LOG','LOWER','LPAD','LTRIM','MAKE_SET','MAKEDATE',
-				'MAKETIME','MASTER_POS_WAIT','MAX','MD5','MICROSECOND','MID','MIN','MINUTE','MOD','MONTH','MONTHNAME',
-				'NOW','NULLIF','OCT','OCTET_LENGTH','OLD_PASSWORD','ORD','PASSWORD','PERIOD_ADD','PERIOD_DIFF','PI',
-				'POSITION','POW,','QUARTER','QUOTE','RADIANS','RAND','RELEASE_LOCK','REPEAT','REPLACE','REVERSE',
-				'RIGHT','ROUND','RPAD','RTRIM','SEC_TO_TIME','SECOND','SESSION_USER','SHA1,','SIGN','SIN','SOUNDEX',
-				'SOUNDS','SPACE','SQRT','STD,','STR_TO_DATE','STRCMP','SUBDATE','SUBSTRING_INDEX','SUBSTRING,',
-				'SUBTIME','SUM','SYSDATE','SYSTEM_USER','TAN','TIME_FORMAT','TIME_TO_SEC','TIME','TIMEDIFF',
-				'TIMESTAMP','TO_DAYS','TRIM','TRUNCATE','UCASE','UNCOMPRESS','UNCOMPRESSED_LENGTH','UNHEX',
-				'UNIX_TIMESTAMP','UPPER','USER','UTC_DATE','UTC_TIME','UTC_TIMESTAMP','UUID','VALUES','VARIANCE',
-				'WEEK','WEEKDAY','WEEKOFYEAR','YEAR','YEARWEEK');
-
-			if(in_array($function_name, $mysql_functions)) { //The function is a valid mysql keyword
-				return true;
-			}
-		}
-		return false;
-	}
-	
 	
 	/// The SQL is executed only here.
 	private function _execQuery($return_type) {

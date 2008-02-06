@@ -1,5 +1,4 @@
 <?php
-$html = new HTML();
 class HTML {
 	/**
 	* Creates a dropdown(select) menu using the given array and select what is $selected.
@@ -84,8 +83,8 @@ class HTML {
 		return $tag;
 	}
 	/**
-	* Returns the end tag for the tag given as the argument. Will anyone use this?
-	*/
+	 * Returns the end tag for the tag given as the argument. Will anyone use this?
+	 */
 	function getEndTag( $tag ) {
 		return "</$tag>";
 	}
