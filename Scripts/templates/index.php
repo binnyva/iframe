@@ -15,7 +15,7 @@
 
 <div id="content">
 
-<form action="" name="main_form" id="main_form">
+<form action="" name="main_form" id="main_form" method="post">
 <?php showStatus(); ?>
 <fieldset>
 <legend>Information</legend>
