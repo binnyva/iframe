@@ -2,17 +2,17 @@
 $rel = findRelation();
 if($rel !== false) include($rel . "configuration.php");
 
-$iframe_folder = dirname(__FILE__) . '/';
+$config['iframe_folder'] = dirname(__FILE__) . DIRECTORY_SEPARATOR;
 $config['site_relative_path'] = $rel;
-$config['iframe_folder'] = $iframe_folder;
 
-include($iframe_folder . "includes/functions.php");
-include($iframe_folder . "includes/config.php");
+include($config['iframe_folder'] . "includes/functions.php");
 
 $PARAM = unescapeQuery();
 $QUERY = escapeQuery($PARAM,true);
 if(!isset($QUERY['error']))	 $QUERY['error'] = '';
 if(!isset($QUERY['success']))$QUERY['success'] = '';
+
+include($config['iframe_folder'] . "includes/config.php");
 
 //Find the relation between the page we are in and the root folder.
 function findRelation() {

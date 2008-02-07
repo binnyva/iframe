@@ -44,3 +44,8 @@ session_start();
 $date_format = '%d %b, %Y';
 $abs = $config['site_absolute_path']; //The final '/' is a must
 $config['code_path'] = preg_replace("/includes/",'',dirname(__FILE__));
+
+//Auto-include the application.php file
+if(file_exists($config['site_relative_path'] . 'includes/application.php')) {
+	include($config['site_relative_path'] . 'includes/application.php');
+}
