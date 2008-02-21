@@ -353,7 +353,7 @@ class Sql {
 	 * Argument : $query - The SQL Query in which the error occured.
 	 */
 	private function _error($query) {
-		$error_message = "MySQL Error : <code>" . mysql_error() . "<code><br /><u>Query...</u><code>" . $query . "</code>";
+		$error_message = "MySQL Error : <code>" . mysql_error() . "</code><br /><br /><u>In Query...</u><br /><code>" . $query . "</code>";
 		if(self::$mode == 'd') {
 			die($error_message);
 		} elseif(self::$mode == 't') {

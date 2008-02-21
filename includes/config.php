@@ -12,6 +12,7 @@ if(!isset($config['site_absolute_path'])) {
 	}
 	$config['site_absolute_path'] = $path . DIRECTORY_SEPARATOR;
 }
+$config['current_page'] = str_replace($config['site_absolute_path'], '/', $config['PHP_SELF']);
 
 if(!isset($config['site_url'])) {
 	$config['site_url']	= "http://" . $_SERVER['HTTP_HOST'] . $config['site_absolute_path'];
@@ -34,7 +35,7 @@ if(isset($config['db_host']) and $config['db_host']) {
 	$sql = new Sql($config['db_host'],$config['db_user'],$config['db_password'],$config['db_database']); // Connect to DB
 	Sql::$mode = $config['mode'];
 }
-$template = new MVC;
+if(!isset($config['use_mvc']) or $config['use_mvc'] === false) $template = new MVC;
 
 //Otherways it is a mess with google
 ini_set('url_rewriter.tags',"");

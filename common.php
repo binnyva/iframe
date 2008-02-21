@@ -1,19 +1,5 @@
 <?php
-$rel = findRelation();
-if($rel !== false) include($rel . "configuration.php");
-
-$config['iframe_folder'] = dirname(__FILE__) . DIRECTORY_SEPARATOR;
-$config['site_relative_path'] = $rel;
-
-include($config['iframe_folder'] . "includes/functions.php");
-
-$PARAM = unescapeQuery();
-$QUERY = escapeQuery($PARAM,true);
-if(!isset($QUERY['error']))	 $QUERY['error'] = '';
-if(!isset($QUERY['success']))$QUERY['success'] = '';
-
-include($config['iframe_folder'] . "includes/config.php");
-
+if(!function_exists("findRelation")) {
 //Find the relation between the page we are in and the root folder.
 function findRelation() {
 	$rel = "";
@@ -24,5 +10,22 @@ function findRelation() {
 		$depth++;
 	}
 	if($depth == 10) return false;
+	
 	return $rel; 
 }
+}
+
+$rel = findRelation();
+if($rel !== false) require($rel . "configuration.php");
+
+$config['iframe_folder'] = dirname(__FILE__) . DIRECTORY_SEPARATOR;
+$config['site_relative_path'] = $rel;
+
+require($config['iframe_folder'] . "includes/functions.php");
+
+$PARAM = unescapeQuery();
+$QUERY = escapeQuery($PARAM,true);
+if(!isset($QUERY['error']))	 $QUERY['error'] = '';
+if(!isset($QUERY['success']))$QUERY['success'] = '';
+
+require($config['iframe_folder'] . "includes/config.php");

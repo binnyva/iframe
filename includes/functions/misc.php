@@ -508,6 +508,7 @@ function ls($pattern="*", $folder="", $recursivly=false, $options=array('return_
 	$get_files	= in_array('return_files', $options);
 	$get_folders= in_array('return_folders', $options);
 	$both = array();
+	$folders = array();
 	
 	// Get the all files and folders in the given directory.
 	if($get_files) $both = glob($pattern, GLOB_BRACE + GLOB_MARK);

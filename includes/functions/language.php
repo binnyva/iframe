@@ -86,3 +86,20 @@ function array_remove_value() {
 	}
 	return $arr;
 }
+
+/**
+ * The index function - Created this to avoid the extra isset() check. This will return false 
+ *		if the specified index of the specified function is not set. If it there,
+ *		this function will return that element.
+ * Arguments: $array - The array in which the item must be checked for
+ *				$index - The index to be seached.
+ * Example:
+ *	if(i($_REQUEST, 'item')) {	
+ *		instead of 
+ *	if(isset($_REQUEST['item']) and $_REQUEST['item']) {
+ */
+function i($array, $index) {
+	if(!isset($array[$index])) return false;
+	
+	return $array[$index];
+}

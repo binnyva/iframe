@@ -84,6 +84,8 @@ class Calendar {
 		$class='';
 		if($d == date('j') and $this->month == date('n') and $this->year == date('Y')) $class='today';
 		if(!$flag) $class .= ' overflow-days';
+		$weekdays = array('saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday');
+		$class .= " weekday-" . $weekdays[($column%7)];
 		
 		//See if the user wants to tag any date with a class - 
 		if(is_callable($this->_callback_cell_class_provider) and $flag) {

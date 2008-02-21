@@ -54,6 +54,10 @@ class SqlPager {
 
 		$offset = ($this->page - 1) * $this->items_per_page;
 		$this->_pager_query = $query . " LIMIT $offset," . $this->items_per_page;
+		
+		$total_items_sql = mysql_query($this->query);
+		$this->total_items = mysql_num_rows($total_items_sql);
+		$this->total_pages = ceil($this->total_items / $this->items_per_page);
 	}
 	
 	/**
@@ -66,9 +70,6 @@ class SqlPager {
 			$this->_error("Query error: ".mysql_error()."!<br />" . $this->_pager_query);
 			return false;
 		}
-		$total_items_sql = mysql_query($this->query);
-		$this->total_items = mysql_num_rows($total_items_sql);
-		$this->total_pages = ceil($this->total_items / $this->items_per_page);
 
 		return $this->_sql_resource;
 	}

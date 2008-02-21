@@ -80,7 +80,7 @@ function dump($data) {
 		print "-----------------------</pre>";
 	} elseif (is_object($data)) {
 		print "<pre>==========================\n";
-		var_dump($data);
+		var_export($data);
 		print "===========================</pre>";
 	} else {
 		print "=========&gt;";
