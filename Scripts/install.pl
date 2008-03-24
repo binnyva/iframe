@@ -17,12 +17,12 @@ my $iframe_folder_relative = File::Spec->abs2rel($iframe_folder);
 
 
 if($install eq 'link') {
-#	`cp -R $iframe_folder/Scripts/installation $project_name/`;
-# 	`cp -R $iframe_folder/css $project_name/css`;
-# 	`cp -R $iframe_folder/js $project_name/js`;
-# 	`cp -R $iframe_folder/templates $project_name/templates`;
-#	`cd $iframe_folder`
-#	`find -name ".svn" -exec rm -rf {} \;`
+	`cp -R $iframe_folder/Scripts/installation $project_name/`;
+	`cp -R $iframe_folder/css $project_name/css`;
+	`cp -R $iframe_folder/js $project_name/js`;
+	`cp -R $iframe_folder/templates $project_name/templates`;
+	`cd $iframe_folder`
+	`find -name ".svn" -exec rm -rf {} \;`
 }
 
 my %keywords = (
