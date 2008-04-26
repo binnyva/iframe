@@ -1,7 +1,5 @@
 <?php 
-///////////////////////////// Layout Fuctions //////////////////////////////////////////
-
-function render($file = '') {
+function render($file='') {
 	//If it is an ajax request, we don't have to render the page.
 	if(isset($_REQUEST['ajax'])) {
 		print '{"success":"Done","error":false}';
