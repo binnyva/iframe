@@ -94,11 +94,16 @@ function array_remove_value() {
  * Arguments: $array - The array in which the item must be checked for
  *				$index - The index to be seached.
  * Example:
- *	if(i($_REQUEST, 'item')) {	
+ *	if(i($_REQUEST, 'item')) {	OR if(i($_REQUEST['item'])) { 
  *		instead of 
  *	if(isset($_REQUEST['item']) and $_REQUEST['item']) {
  */
-function i($array, $index) {
+function i($array, $index=false) {
+	if($index === false) {
+		if(isset($array)) return $array;
+		return false;
+	}
+	
 	if(!isset($array[$index])) return false;
 	
 	return $array[$index];

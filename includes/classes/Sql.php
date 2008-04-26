@@ -2,7 +2,6 @@
 /** ************************************************************************************************
 * Class  : Sql
 * Author : Binny V A(binnyva@gmail.com | http://www.bin-co.com/)
-* Version: 1.00.B Beta
 * Date   : 1 Feb, 2007
 ***************************************************************************************************
 * Creates a Database abstration layer - using the most commonly used functions.
@@ -175,12 +174,19 @@ class Sql {
 		if(!$values) {
 			$values = ($GLOBALS['QUERY']) ? $GLOBALS['QUERY'] : $_REQUEST; //The $QUERY is iFrame Specific
 		}
-		$insert_query = "INSERT INTO $table(".join(',',$fields).") VALUES('";
+		$insert_query = "INSERT INTO `$table`(".join(',',$fields).") VALUES(";
+		$insert_values = array();
 		foreach($fields as $fld) {
-			if(isset($values[$fld])) $insert_query .= $values[$fld] . "','";
+			if(isset($values[$fld])) {
+				if ($this->isKeyword($field_value)) { //If the is values has a special meaning - like NOW() give it special consideration
+					$insert_values[] = $field_value;
+				} else {
+					$insert_values[] = "'$field_value'";
+				}
+			}
 		}
-		$insert_query = substr($insert_query,0,-3); //Remove the last three chars - ie. "','"
-		$insert_query .= "')";
+		$insert_query .= implode(',', $insert_values);
+		$insert_query .= ')';
 
 		$this->getSql($insert_query);
 		
@@ -265,7 +271,11 @@ class Sql {
 		$update_query = "UPDATE $table SET ";
 		$update_fields = array();
 		foreach($data as $field=>$value) {
-			$update_fields[] = "$field='$value'";
+			if ($this->isKeyword($value)) { //If the is values has a special meaning - like NOW() give it special consideration
+				$update_fields[] = "$field=$value";
+			} else {
+				$update_fields[] = "$field='$value'";
+			}
 		}
 		$update_query .= implode(',',$update_fields);
 	

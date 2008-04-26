@@ -78,7 +78,7 @@ function showStatus() {
 /**
  * Shows the final message - redirects to a new page with the message in the URL
  */
-function showMessage($message, $url="?", $status="success",$id=0) {
+function showMessage($message, $url="?", $status="success",$extra_data=array()) {
 	//If it is an ajax request, Just print the data
 	if(isset($_REQUEST['ajax'])) {
 		$success = '';
@@ -87,12 +87,21 @@ function showMessage($message, $url="?", $status="success",$id=0) {
 
 		if($status == 'success') $success = $message;
 		if($status == 'error') $error = $message;
-		if($id) $insert_id = ',"id":'.$id;
 
-		print '{"success":"'.$success.'","error":"'.$error.'"'.$insert_id.'}';
+		$data = array(
+			"success"	=> $success,
+			"error"		=> $error
+		) + $extra_data;
+
+		print array2json($data);
+
+	} elseif(isset($_REQUEST['layout']) and $_REQUEST['layout']==='cli') {
+		if($status === 'success') print $message . "\n";
+
 	} else {
 		if(strpos($url,'?') === false) $url .= '?';
-		header("Location:$url&$status=".urlencode($message));
+		$goto = getLink($url,array('status'=>urlencode($message)));
+		header("Location:$goto");
 	}
 	exit;
 }
