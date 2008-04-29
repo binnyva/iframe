@@ -16,10 +16,16 @@ function findRelation() {
 }
 
 $rel = findRelation();
-if($rel !== false) require($rel . "configuration.php");
 
-$config['iframe_folder'] = dirname(__FILE__) . DIRECTORY_SEPARATOR;
-$config['site_relative_path'] = $rel;
+$iframe_folder = dirname(__FILE__) . DIRECTORY_SEPARATOR;
+if($rel !== false) {
+	require($rel . "configuration.php");
+	$config['site_relative_path'] = $rel;
+} else {
+	require($iframe_folder . 'configuration.php');
+	$config['site_relative_path'] = '';
+}
+$config['iframe_folder'] = $iframe_folder;
 
 require($config['iframe_folder'] . "includes/functions.php");
 

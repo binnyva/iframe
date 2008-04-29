@@ -95,8 +95,8 @@ class MVC {
 		
 		if(!file_exists($template_file)) {
 			//Search the template folder for that file
-			if (file_exists( $this->options['template_folder'] . '/' . $template_file))
-				$this->template = $this->options['template_folder'] . '/' . $template_file;
+			if (file_exists( joinPath($this->options['template_folder'],$template_file) ))
+				$this->template = joinPath($this->options['template_folder'],$template_file);
 			else 
 				$this->template = '';
 		}
@@ -112,19 +112,19 @@ class MVC {
 			return;
 		}
 		$model_file = $this->controller . '.php';
-		$model_folder = $GLOBALS['rel'] . $this->options['model_folder'] . '/';
+		$model_folder = joinPath($GLOBALS['rel'], $this->options['model_folder'], '/');
 		$model_name = '';
 	
 		if(!file_exists($model_file)) {
 			//Search the template folder for that file
-			if (file_exists( $model_folder . $model_file)) {
-				$this->model = $model_folder . $model_file;
+			if (file_exists( joinPath($model_folder, $model_file))) {
+				$this->model = joinPath($model_folder, $model_file);
 				$model_name = $model_file;
 			} else {
 				//Try to find the model with newer methods.
 				//First, try to make the first letter uppercase
-				if (file_exists( $model_folder . ucfirst($model_file) )) {
-					$this->model = $model_folder . ucfirst($model_file);
+				if (file_exists( joinPath($model_folder, ucfirst($model_file)) )) {
+					$this->model = joinPath($model_folder, ucfirst($model_file));
 					$model_name = ucfirst($model_file);
 				} else {
 					//Go thru the model folder and find all the files, then make it all lower case and see if one matchs the current controller.
@@ -142,7 +142,7 @@ class MVC {
 		else $this->model = $model_file;
 
 		if($this->model) {
-			include($model_folder . $this->model);
+			include(joinPath($model_folder, $this->model));
 			$this->model_name = str_replace('.php','',$model_name);
 		}
 	}
@@ -152,11 +152,12 @@ class MVC {
 	 */
 	function _findResources($template_file) {
 		global $config;
-		$css_file = preg_replace('/.php$/','.css',$template_file);
-		$js_file  = preg_replace('/.php$/','.js', $template_file);
 		
-		if(file_exists($config['site_relative_path'] . $this->css_folder . $css_file)) $this->addResource($css_file, 'css', true);
-		if(file_exists($config['site_relative_path'] . $this->js_folder  . $js_file))  $this->addResource($js_file,  'js', true);
+		$css_file = preg_replace('/\.php$/','.css',$template_file);
+		$js_file  = preg_replace('/\.php$/','.js', $template_file);
+		
+		if(file_exists(joinPath($config['site_relative_path'], $this->css_folder, $css_file))) $this->addResource($css_file, 'css');
+		if(file_exists(joinPath($config['site_relative_path'], $this->js_folder, $js_file)))  $this->addResource($js_file,  'js');
 	}
 
 	/**
@@ -171,28 +172,23 @@ class MVC {
 	 * Add a resource file to the HTML page - like a css file or a javascript file.
 	 * Arguments :	$file - The file to be included in the output HTML file
 	 *				$type - The type of file - this says whether the file is a javascript or a css file. Must have the value('css' or 'js')
-	 *				$force(Boolean) - The file existance check will not be done if this is true.
+	 *				$use_exact_path(Boolean) - Uses the exact value given as the $file argument in the 'href' part. If this is false, the system will gusess a better value.
 	 */
-	function addResource($file,$type="",$force=false) {
+	function addResource($file, $type="", $use_exact_path=false) {
 		if(!$file) return;
 		global $config;
 		if(!$type) list($name,$type) = explode(".",$file);
 		$folder = ($type == 'js') ? $this->js_folder : $this->css_folder ;
+		$link = '';
 		
-		//Make sure that the file exists
-		if($force) {
-			if(file_exists($config['site_relative_path'] . $folder .  $file)) {
-				$file = $folder . $file;
-			} else {
-				error("Template Error: File Include Error - '$rel$folder/$file' does not exists(Current folder : ".getcwd().")",__FILE__,__LINE__);
-			}
-		} else $file = $folder . $file;
+		if($use_exact_path) $link = $file;
+		else $link = joinPath($config['site_url'], $folder, $file);
 
 		if($type=='css' or $type=='stylesheet' or $type=='style' or $type=='stylesheets') {
-			$current_include = '<link href="' . $config['site_url'] . $file . '" type="text/css" rel="stylesheet" />';
+			$current_include = '<link href="' . $link . '" type="text/css" rel="stylesheet" />';
 
 		} elseif($type=='js' or $type=='javascript' or $type=='jscript' or $type=='script') {
-			$current_include = '<script src="' . $config['site_url'] . $file . '" type="text/javascript"></script>';
+			$current_include = '<script src="' . $link . '" type="text/javascript"></script>';
 
 		} else {
 			error("Template Error: $type not defined");
@@ -221,7 +217,7 @@ class MVC {
 		$title = ($this->title) ? $this->title : $config['site_title'];
 		$includes = implode($this->includes,"\n");
 
-		include($rel . $this->options['template_folder'] . "/layout/" . $this->layout);
+		include(joinPath($rel, $this->options['template_folder'], "/layout/", $this->layout));
 	}
 	
 	//////////////////////////////// Action functions ////////////////////////////////

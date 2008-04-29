@@ -35,7 +35,32 @@ function unformat($value) {
 		$value);
 	return strtolower($value);
 }
- 
+
+/**
+ * Takes one or more file names and combines them, using the correct path separator for the 
+ * 		current platform and then return the result.
+ * Arguments: The parts that make the final path.
+ * Example: joinPath('/var','www/html/','try.php'); // returns '/var/www/html/try.php'
+ */
+function joinPath() {
+	$path = '';
+	$arguments = func_get_args();
+	$args = array();
+	foreach($arguments as $a) if($a !== '') $args[] = $a;//Removes the empty elements
+	
+	$arg_count = count($args);
+	for($i=0; $i<$arg_count; $i++) {
+		$folder = $args[$i];
+		
+		if($i != 0 and $folder[0] == DIRECTORY_SEPARATOR) $folder = substr($folder,1); //Remove the first char if it is a '/' - and its not in the first argument
+		if($i != $arg_count-1 and substr($folder,-1) == DIRECTORY_SEPARATOR) $folder = substr($folder,0,-1); //Remove the last char - if its not in the last argument
+		
+		$path .= $folder;
+		if($i != $arg_count-1) $path .= DIRECTORY_SEPARATOR; //Add the '/' if its not the last element.
+	}
+	return $path;
+}
+
 /**
  * A small function to remove an element from a list(numerical array)
  * Arguments: $arr	- The array that should be edited
@@ -91,10 +116,10 @@ function array_remove_value() {
  * The index function - Created this to avoid the extra isset() check. This will return false 
  *		if the specified index of the specified function is not set. If it there,
  *		this function will return that element.
- * Arguments: $array - The array in which the item must be checked for
+ * Arguments:	$array - The array in which the item must be checked for
  *				$index - The index to be seached.
  * Example:
- *	if(i($_REQUEST, 'item')) {	OR if(i($_REQUEST['item'])) { 
+ *	if(i($_REQUEST, 'item')) {
  *		instead of 
  *	if(isset($_REQUEST['item']) and $_REQUEST['item']) {
  */
