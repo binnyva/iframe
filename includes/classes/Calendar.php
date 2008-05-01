@@ -82,7 +82,7 @@ class Calendar {
 		else if($column>=$start_day and !$flag) $flag=1;//If the first day of this month has come, start the date writing
 		
 		$class='';
-		if($d == date('j') and $this->month == date('n') and $this->year == date('Y')) $class='today';
+		if($d == date('j') and $this->month == date('n') and $this->year == date('Y') and $flag) $class='today';
 		if(!$flag) $class .= ' overflow-days';
 		$weekdays = array('saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday');
 		$class .= " weekday-" . $weekdays[($column%7)];
@@ -113,6 +113,7 @@ class Calendar {
 		} else {
 			print "&nbsp;";
 		}
+		print "</td>";
 		$column++;
 		
 		return $d;
