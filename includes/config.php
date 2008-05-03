@@ -1,8 +1,10 @@
 <?php
 set_include_path(get_include_path() . PATH_SEPARATOR . $config['iframe_folder'] . 'includes/classes'); //Make including classes easier
 
+//Find all path info
 $config['PHP_SELF'] = ($PHP_SELF) ? $PHP_SELF : $_SERVER["PHP_SELF"];
 
+//Absolute Path
 if(!isset($config['site_absolute_path'])) {
 	$path = dirname($config['PHP_SELF']);
 	//Go up until the correct path is found
@@ -42,8 +44,9 @@ ini_set('url_rewriter.tags',"");
 ini_set('session.use_trans_sid',false); 
 session_start();
 
-$date_format = '%d %b, %Y';
-$abs = $config['site_absolute_path']; //The final '/' is a must
+$config['date_format']	= '%d %b %Y';
+$config['time_format']	= '%d %b %Y, %h:%i %p';
+$abs = $config['site_absolute_path'];
 $config['code_path'] = preg_replace("/includes/",'',dirname(__FILE__));
 
 //Auto-include the application.php file

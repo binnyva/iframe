@@ -1,7 +1,6 @@
 <?php
 /** *************************************************************************
  * File		: classes/MVC.php
- * Version	: $Id: MVC.php,v 1.2 2007/03/08 17:37:05 binnyva Exp $
  * This file holds all the templating actions. 
  ****************************************************************************/
  
@@ -86,7 +85,7 @@ class MVC {
 		global $config;
 		$this->_findResources($template_file);
 
-		$template_file = $GLOBALS['rel'] . $this->options['template_folder'] . '/' . $template_file;
+		$template_file = joinPath($config['site_folder'], $this->options['template_folder'], $template_file);
 		
 		//Plugins are a special case.
 		if(strpos($config['PHP_SELF'],'plugins') !== false) {
@@ -217,7 +216,7 @@ class MVC {
 		$title = ($this->title) ? $this->title : $config['site_title'];
 		$includes = implode($this->includes,"\n");
 
-		include(joinPath($rel, $this->options['template_folder'], "/layout/", $this->layout));
+		include(joinPath($config['site_folder'], $this->options['template_folder'], "/layout/", $this->layout));
 	}
 	
 	//////////////////////////////// Action functions ////////////////////////////////
@@ -235,7 +234,7 @@ class MVC {
 			$this->setTemplate($this->page);
 		}
 		
- 		if(!$this->template) error('The template file "' . $this->template . '" does not exist.');
+ 		if(!$this->template) error('The template file for "' . $this->page . '" does not exist.');
 		
 		if($this->options['insert_layout']) $this->printLayout();
 		else include($this->template);

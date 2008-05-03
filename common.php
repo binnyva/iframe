@@ -1,4 +1,6 @@
 <?php
+//iFrame(http://www.bin-co.com/php/scripts/iframe/) Common File.
+
 if(!function_exists("findRelation")) {
 //Find the relation between the page we are in and the root folder.
 function findRelation() {
@@ -17,21 +19,27 @@ function findRelation() {
 
 $rel = findRelation();
 
+// App's root path(absolute)
 $iframe_folder = dirname(__FILE__) . DIRECTORY_SEPARATOR;
-if($rel !== false) {
+if($rel !== false) { //If the 'configuration.php' file is found, use that
 	require($rel . "configuration.php");
+	
+	$config['site_folder'] = realpath($rel);
 	$config['site_relative_path'] = $rel;
 } else {
 	require($iframe_folder . 'configuration.php');
+	
+	$config['site_folder'] = $config['iframe_folder'];
 	$config['site_relative_path'] = '';
 }
 $config['iframe_folder'] = $iframe_folder;
 
 require($config['iframe_folder'] . "includes/functions.php");
 
+// This is $_REQUERST without the problems asssociated with magic quotes
 $PARAM = unescapeQuery();
 $QUERY = escapeQuery($PARAM,true);
 if(!isset($QUERY['error']))	 $QUERY['error'] = '';
 if(!isset($QUERY['success']))$QUERY['success'] = '';
 
-require($config['iframe_folder'] . "includes/config.php");
+require(joinPath($config['iframe_folder'], "includes/config.php"));
