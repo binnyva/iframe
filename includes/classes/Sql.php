@@ -178,6 +178,7 @@ class Sql {
 		$insert_values = array();
 		foreach($fields as $fld) {
 			if(isset($values[$fld])) {
+				$field_value = $values[$fld];
 				if ($this->isKeyword($field_value)) { //If the is values has a special meaning - like NOW() give it special consideration
 					$insert_values[] = $field_value;
 				} else {

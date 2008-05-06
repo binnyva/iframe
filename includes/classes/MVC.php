@@ -1,6 +1,6 @@
 <?php
 /** *************************************************************************
- * File		: classes/MVC.php
+ * File	: classes/MVC.php
  * This file holds all the templating actions. 
  ****************************************************************************/
  
@@ -125,16 +125,12 @@ class MVC {
 				if (file_exists( joinPath($model_folder, ucfirst($model_file)) )) {
 					$this->model = joinPath($model_folder, ucfirst($model_file));
 					$model_name = ucfirst($model_file);
-				} else {
-					//Go thru the model folder and find all the files, then make it all lower case and see if one matchs the current controller.
-					$all_models = ls("*.php", $model_folder, false, array('return_files', 'quiet'));
-					foreach($all_models as $mod) {
-						if(strtolower($mod) == strtolower($this->controller) . '.php') {
-							$this->model = $mod;
-							$model_name = $mod;
-							break;
-						}
-					}
+					
+				//If thats not there, look for all lowercase model name.
+				} elseif(file_exists( joinPath($model_folder, strtolower($this->controller) . '.php') )) {
+					$this->model = joinPath($model_folder, strtolower($this->controller) . '.php');
+					$model_name = strtolower($this->controller) . '.php';
+					break;
 				}
 			}
 		}
@@ -156,12 +152,12 @@ class MVC {
 		$js_file  = preg_replace('/\.php$/','.js', $template_file);
 		
 		if(file_exists(joinPath($config['site_relative_path'], $this->css_folder, $css_file))) $this->addResource($css_file, 'css');
-		if(file_exists(joinPath($config['site_relative_path'], $this->js_folder, $js_file)))  $this->addResource($js_file,  'js');
+		if(file_exists(joinPath($config['site_relative_path'], $this->js_folder, $js_file))) $this->addResource($js_file,  'js');
 	}
 
 	/**
 	 * This will set the title of the page.
-	 * Argument : $title - The string to be used inside the <title></title> tag.
+	 * Argument : $title - The string to be used inside the &lt;title>&lt;/title> tag.
 	 */
 	function setTitle($title) {
 		if($title) $this->title = $title;
@@ -190,7 +186,7 @@ class MVC {
 			$current_include = '<script src="' . $link . '" type="text/javascript"></script>';
 
 		} else {
-			error("Template Error: $type not defined");
+			error("Template Error: Type(2nd argument of addResource) '$type' not provided.");
 		}
 
 		if(!in_array($current_include,$this->includes)) {

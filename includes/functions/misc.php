@@ -203,7 +203,8 @@ function check($conditions,$show=1) {
  * Link : http://www.bin-co.com/php/scripts/array2json/
  */
 function array2json($arr) {
-	///:TODO: check for native json_encode function first.
+	if(function_exists('json_encode')) return json_encode($arr);
+	
     $parts = array();
     $is_list = false;
 
@@ -497,6 +498,7 @@ function load($url,$options=array('method'=>'get','return_info'=>false)) {
  */
 function ls($pattern="*", $folder="", $recursivly=false, $options=array('return_files','return_folders')) {
 	if($folder) {
+		$current_folder = realpath('.');
 		if(in_array('quiet', $options)) { // If quiet is on, we will suppress the 'no such folder' error
 			if(!file_exists($folder)) return array();
 		}
@@ -533,13 +535,15 @@ function ls($pattern="*", $folder="", $recursivly=false, $options=array('return_
 			
 			if($recursivly) {
 				// Continue calling this function for all the folders
-				$deep_items = ls($pattern, "$folder/$this_folder", $recursivly, $options); # :RECURSION:
+				$deep_items = ls($pattern, $this_folder, $recursivly, $options); # :RECURSION:
 				foreach ($deep_items as $item) {
 					array_push($all, $this_folder . $item);
 				}
 			}
 		}
 	}
+	
+	if($folder) chdir($current_folder);
 	return $all;
 }
 
