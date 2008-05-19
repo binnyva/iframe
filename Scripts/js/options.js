@@ -8,7 +8,8 @@ function newField() {
 	//InnerHTML is propabily the safest approch - cloneNode is possible - but we need to change the ids and everything.
 	field.innerHTML = code.replace(/%COUNT%/g,field_count);
 	$('extra_fields').appendChild(field);
-	
+	$("total_fields").value++; //Yes, it works. I am surprised too
+
 	registerEventHandles(field_count);
 	makeHelpText(field_count);
 }
@@ -20,20 +21,21 @@ function fieldOptions(ele) {
 
 	var fc = getFieldCount(ele);
 
-	var field = $('field_'+fc);
-	var options = document.getElementsByClassName('type_options', field);
+	var options = $('#field_'+fc+' .type_options').get();
 	for(var i=0; i<options.length; i++) {
-		Element.hide(options[i]);
+		$(options[i]).hide();
 	};
-
+	
 	if(type == 'file') {
-		document.getElementsByClassName('file_options',field)[0].style.display = 'block';
+		$("#"+field.id+" .file_options").show();
 	} else if(type == 'date') {
-		document.getElementsByClassName('date_options',field)[0].style.display = 'block';
+		$("#"+field.id+" .date_options").show();
 	} else if(type == 'list') {
-		document.getElementsByClassName('list_options',field)[0].style.display = 'block';
+		$("#"+field.id+" .list_options").show();
 	} else if(type == 'password') {
-		document.getElementsByClassName('password_options',field)[0].style.display = 'block';
+		$("#"+field.id+" .password_options").show();
+	} else if(type == 'foreign_key') {
+		$("#"+field.id+" .foreign_key_options").show();
 	}
 }
 
@@ -41,27 +43,36 @@ function fieldOptions(ele) {
 function autoFillFieldDetails(ele) {
 	if(!ele) return;
 	var fc = getFieldCount(ele);
+	
+	if($("auto_handle_on_"+fc) && $("auto_handle_on_"+fc).checked) { // Its on auto mode - hide the rest of the options...
+		$("field_details_"+fc).hide();
+	}
+	
 	var field = $("field_title_"+fc).value;
 	if($("field_"+fc).value) return;
 	$("field_"+fc).value = unformat(field);
 	
 	var list = $("field_list_"+fc); //Wether or not this field should be listed.
 	field = field.toLowerCase();
+	
 	//Auto Select the validations
-	var validations = $("field_validation_"+fc).getElementsByTagName("option");
+	var validations = $("#field_validation_"+fc +" option").get();
 	if((field.indexOf("username") + 1) || (field.indexOf("id") + 1) || (field.indexOf("login") + 1)) {
 		validations[0].selected = true; //Mandatory validation.
 		validations[4].selected = true; //Unique validation 
 	}
-	if(field.indexOf("mail") + 1) {
+	else if(field.indexOf("mail") + 1) {
 		validations[1].selected = true; //Turn on the email validation. Yup, we hard codded the '[1]' part "This is a sad day for Science"(Dexter)
 	}
-	if((field.indexOf("price") + 1) || (field.indexOf("number") + 1) || (field.indexOf("amount") + 1)) {
+	else if((field.indexOf("price") + 1) || (field.indexOf("number") + 1) || (field.indexOf("amount") + 1)) {
 		validations[3].selected = true; //Turn on the Number validation.
+	}
+	else if(field.indexOf("name")+1 || field.indexOf("title")+1) {
+		validations[0].selected = true; //Mandatory validation.
 	}
 	
 	//Select types
-	var type = $("field_type_"+fc)
+	var type = $("field_type_"+fc);
 	if(field.indexOf("date") + 1) {
 		type.value = "date";
 		fieldOptions(ele);
@@ -77,6 +88,10 @@ function autoFillFieldDetails(ele) {
 	else if(field.indexOf("content") + 1) {
 		type.value = "editor";
 		list.checked = false;
+	}
+	else if(field.indexOf("_id") + 1) {
+		type.value = "foreign_key";
+		fieldOptions(ele);
 	}
 	else if(field.indexOf("pass") + 1) {
 		type.value = "password";
@@ -104,19 +119,30 @@ function autoFillFieldDetails(ele) {
 // Makes sure all the event handles handles for the new fields are set
 function registerEventHandles() {
 	for (var i = 0; fc=arguments[i], i<arguments.length; i++) {
-		if(!$('field_type_'+fc)) continue;
+		if(!$("field_type_"+fc)) continue;
 
 		//Upon entering the title, this function will automatically fill in the field name
-		$('field_title_'+fc).onchange = function(e) {
+		$("field_title_"+fc).onchange = function(e) {
 			if(!e) e = window.event;
 			var ele = this || e.src;
 			autoFillFieldDetails(ele);
 		}
 
-		$('field_type_'+fc).onchange = function(e) {
+		$("field_type_"+fc).onchange = function(e) {
 			if(!e) e = window.event;
 			var ele = this || e.src;
 			fieldOptions(ele);
+		}
+		
+		if($("auto_handle_on_"+fc)) { //The Auto Handle toogle
+			$("auto_handle_on_"+fc).click(function() {
+				var fc = this.id.replace(/[^\d]/g,"");//Remove all the non numbers - get just the rumbers
+				$("field_details_"+fc).hide();
+			});
+			$("auto_handle_off_"+fc).click(function() {
+				var fc = this.id.replace(/[^\d]/g,"");
+				$("field_details_"+fc).show();
+			});
 		}
 	}
 }
@@ -127,30 +153,30 @@ function registerEventHandles() {
 function makeHelpText(field_count) {
 	var helps = []
 	if(field_count) {
-		helps = document.getElementsByClassName("help",$('field_'+field_count));
+		helps = $("#field_"+field_count+" .help").get();
 	} else {
-		helps = document.getElementsByClassName("help");
+		helps = $(".help").get();
 	}
 	
 	for(var i=0; i<helps.length; i++) {
 		var help_text = helps[i].innerHTML;
+		if(help_text.match('^<a href="#" ')) return;
 		helps[i].innerHTML = "<a href='#' onmouseover='tip(this,\""+escape(help_text)+"\")' onmouseout='clearTip()'> ? </a>"
 	}
 }
 //Shows the tip by positioning the 'tip' div next to the '?' that was mouseover'ed and giving it the help text
 function tip(ele,help_text) {
-	if(!$('tip-holder') || !$('tip')) return;
-	$('tip-holder').style.display = "block";
-	var xy = Position.cumulativeOffset(ele)
-	$('tip-holder').style.left = (xy[0] + 10) + 'px';
-	$('tip-holder').style.top = xy[1] + 'px';
+	if(!$("tip-holder") || !$("tip")) return;
+	$("tip-holder").show();
+	var xy = $(ele).getPosition();
+	$("tip-holder").setStyle({"left":(xy["left"] + 10) + 'px',"top":xy["top"] + 'px'});
 
-	$('tip').innerHTML = unescape(help_text);
+	$("tip").innerHTML = unescape(help_text);
 }
 //Hide the tip - happens on mouseout
 function clearTip() {
 	if(!$('tip-holder') || !$('tip')) return;
-	$('tip-holder').style.display = "none";
+	$('tip-holder').hide();
 	$('tip').innerHTML = ''
 }
 
@@ -187,7 +213,7 @@ function unformat(str) {
  * This funciton will take a JSON string generated at code creation time and use it to auto fill the fields next time.
  */
 function parseSerializedData() {
-	var data = eval("(" + $F("serialized") + ")");
+	var data = eval("(" + $("serialized").value + ")");
 
 	//Create fields before inserting the data.
 	var fc = data['field_count'];
@@ -197,7 +223,7 @@ function parseSerializedData() {
 	
 	for(var id in data) { //Handle each element
 		var value = data[id];
-		var ele = $("" + id);
+		var ele = $(id);
 		
 		if(!ele && id.match(/_\d$/) && value) { //This data should be in a higher field.
 			//We got issues
@@ -237,24 +263,23 @@ function init() {
 	code = code.replace(/_1/g,"_%COUNT%");
 	code = code.replace(/Field 1/g,"Field %COUNT%");
 	
-	field_count = $("fields_area").getElementsByTagName("fieldset").length;
+	field_count = $("#fields_area fieldset").get().length;
 
 	//Set up the handlers
-	$("parse-serialized-data").onclick = parseSerializedData;
-	$("clearer").onclick = function(e) { //Clear the fields
+	$("parse-serialized-data").click(parseSerializedData);
+	$("clearer").click(function(e) { //Clear the fields
 		var e = e || window.event;
 		if(field_count > 1) {//If more than one field is set, ask for confirmation before deleting everything
-			if(!confirm("Are you sure?")) {
-				Event.stop(e);
-			}
+			if(!confirm("Are you sure?")) JSL.event(e).stop();
 		}
-	}
-	$('title').onchange = function() {
-		var title = $F('title');
-		if( !$F('table') ) $('table').value = unformat($F('title'));
-		if( !$F('file')  ) $('file').value  = $F('table') + ".php";
-		if( !$F('single')) $('single').value= $F('title').replace(/e?s$/i,'');
-	}
+	});
+	
+	$("#title").on("change",function() {
+		var title = $('#title').value;
+		if( !$('#table').value ) $('#table').value = unformat(title);
+		if( !$('#file').value  ) $('#file').value  = $('#table').value + ".php";
+		if( !$('single').value) $('single').value= title.replace(/e?s$/i,'');
+	});
 	
 	for(var i=1; i<=field_count; i++) {
 		registerEventHandles(i);
@@ -263,4 +288,4 @@ function init() {
 		makeHelpText(i-1);
 	}
 }
-Event.observe(window, 'load', init, false);
+$(window).load(init);

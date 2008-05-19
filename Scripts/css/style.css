@@ -27,10 +27,3 @@ code {
 	padding:0 5px;
 } 
 
-#header {
-	background:url(/images/cap.png) no-repeat top left;
-	height:75px;
-}
-#header h1 {
-	display:none;
-}

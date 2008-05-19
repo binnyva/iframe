@@ -2,7 +2,7 @@
 <html><head>
 <title><?=$title?></title>
 <link href="<?=$abs?>css/style.css" rel="stylesheet" type="text/css" />
-<script src="<?=$abs?>js/JSL.js" type="text/javascript"></script>
+<script src="/iframe/js/jsl.js" type="text/javascript"></script>
 <script src="<?=$abs?>js/application.js" type="text/javascript"></script>
 <?=$includes?>
 </head>
