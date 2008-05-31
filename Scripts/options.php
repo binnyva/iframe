@@ -86,9 +86,14 @@ if(isset($table)) {
 $field_data = array();
 if(!$_POST) {
 	$field_data['title'] = format($table);
-	$field_data['file'] = strtolower($table) . '.php';
+	$field_data['class_name'] = str_replace(' ', '', $field_data['title']);
+	$field_data['object_name'] = '$' . $field_data['class_name'];
 	$field_data['table'] = $table;
 	$field_data['name_single'] = $field_data['title'];
+	$field_data['name_plural'] = $field_data['title'] . 's';
+	
+	$field_data['model_file'] = ucfirst($table) . '.php';
+	$field_data['controller_name'] = strtolower($table);
 	
 	$field_data['add_funcionality'] = 1;
 	$field_data['edit_funcionality'] = 1;

@@ -118,18 +118,19 @@ function array_remove_value() {
  *		this function will return that element.
  * Arguments:	$array - The array in which the item must be checked for
  *				$index - The index to be seached.
+ *				$default_value - The value that must be returned if the item is not set
  * Example:
  *	if(i($_REQUEST, 'item')) {
  *		instead of 
  *	if(isset($_REQUEST['item']) and $_REQUEST['item']) {
  */
-function i($array, $index=false) {
+function i($array, $index=false, $default_value=false) {
 	if($index === false) {
 		if(isset($array)) return $array;
-		return false;
+		return $default_value;
 	}
 	
-	if(!isset($array[$index])) return false;
+	if(!isset($array[$index])) return $default_value;
 	
 	return $array[$index];
 }

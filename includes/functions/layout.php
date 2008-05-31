@@ -26,7 +26,7 @@ function showHead($title='') {
 <html><head>
 <title><?=$title?></title>
 <link href="<?=joinPath($config['site_absolute_url'],'/')?>css/style.css" rel="stylesheet" type="text/css" />
-<script src="<?=joinPath($config['site_absolute_url'],'/')?>js/JSL.js" type="text/javascript"></script>
+<script src="<?=joinPath($config['site_absolute_url'],'/')?>js/jsl.js" type="text/javascript"></script>
 <script src="<?=joinPath($config['site_absolute_url'],'/')?>js/application.js" type="text/javascript"></script>
 <?=implode($template->includes,"\n");?>
 <?php

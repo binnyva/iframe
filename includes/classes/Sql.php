@@ -223,7 +223,7 @@ class Sql {
 	
 	/**
 	 * Builds and executes an INSERT command - by taking a table name and an array holding all the data in an associative array - the key being the field name and the value being the data.
-	 * Arugments :	$table	- Name of the table
+	 * Arguments :	$table	- Name of the table
 	 * 				$data	- An array holding all the data in an associative array - the key being the field name and the value being the data.
 	 * Example : <pre>insert("Data",array(
 	 *				'name' => 'Binny',
@@ -256,7 +256,7 @@ class Sql {
 
 	/**
 	 * Builds and executes an UPDATE command - by taking a table name and an array holding all the data in an associative array - the key being the field name and the value being the data.
-	 * Arugments :	$table	- Name of the table
+	 * Arguments :	$table	- Name of the table
 	 * 				$data	- An array holding all the data in an associative array - the key being the field name and the value being the data.
 	 *				$where	- The WHERE clause should be given here.
 	 * Example : <pre>update("Data",array(

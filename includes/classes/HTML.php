@@ -16,8 +16,8 @@ class HTML {
 	*/
 	function buildDropDownArray($array, $name, $selected="", $extra=array()) {
 		$attributes = '';
-	
-		print $this->getBeginTag("select",array('name'=>$name,'id'=>$name)+$extra);
+		
+		print $this->getBeginTag("select",$extra + array('name'=>$name,'id'=>$name));// The $extra must go first to make sure that user specified name/id will overwrite the default ones.
 		foreach ($array as $key=>$value) {
 			$attrbs = array('value'=>$key);
 			if($key == $selected) $attrbs['selected']="selected";

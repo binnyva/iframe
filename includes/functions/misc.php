@@ -44,7 +44,7 @@ function getLink($url,$params=array(),$use_existing_arguments=false) {
  *			client side validaiton - both in the same package
  * :TODO: This function is not fully tested. It is not even partaily tested.
  * :TODO: Documentation needed desperatly
- 
+ * :TODO: Change this function to a class.
  The first argument - $conditions is an array with all the validaiton rule
  Each element of the array is one rule.
  Each rule is an associative array. The following keys are supported
@@ -56,7 +56,7 @@ function getLink($url,$params=array(),$use_existing_arguments=false) {
  value	: The programmer provided value. Some rules must have an additional value to be matched against. For example the '<' condition must have a value - the user inputed value and the value given in this index will be compared
  when	: This is a method to short-circut the validation. If this is false, or '0' validaiton will NOT take place. The rule will just be ignored.
  
- Example
+ Example :
  $conditions = array(
  	array(
  		'name'	=>	'username',
@@ -75,12 +75,15 @@ function check($conditions,$show=1) {
 	$errors = array();
 	$field_errors = array();
 	foreach($conditions as $cond) {
-		unset($title,$default_error,$error,$when,$input,$is,$value,$name);
+		unset($title,$default_error,$error,$when,$input,$is,$value,$name, $value_field);
 		extract($cond);
 
 		if(!isset($title))$title= format($name);
 		if(!isset($name)) $name = unformat($title);
 		$input = $_REQUEST[$name];
+		if(isset($value_field)) {
+			$value = $_REQUEST[$value_field];
+		}
 		
 		$default_error = "Error in '$title' field!";
 		if(!isset($error)) $error = $default_error;

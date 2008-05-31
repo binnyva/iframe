@@ -47,7 +47,7 @@ function escapeQuery($param_array = array(),$ignore_magic_quote_setting = false)
 /**
  * This function will undo the damage made by magic quotes. This will go thru the request array and unescape all the data.
  * Argument : $param_array - [OPTIONAL] The array that must be unescaped. If empty, the function uses $_POST + $_GET
- *			  $ignore_magic_quote_setting - [OPTIONAL] If set to true, this will escape the given array no matter what the get_magic_quotes_gpc() returns. Defaults to 'true'
+ *			  $ignore_magic_quote_setting - [OPTIONAL] If set to true, this will escape the given array no matter what the get_magic_quotes_gpc() returns. Defaults to 'false'
  * Return	: The proper format of the array - unescaped.
  */
 function unescapeQuery($param_array = array(),$ignore_magic_quote_setting = false) {

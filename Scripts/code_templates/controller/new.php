@@ -1,11 +1,14 @@
-<?='<'?>?php
+<?php
+$queries = array();
+foreach($field_names as $fn) {
+	$queries[] = '$QUERY[\'' . $fn . '\']';
+}
+?><?='<'?>?php
 include('../common.php');
 
 if(isset($QUERY['action']) and $QUERY['action']=='Create') {
-	if(!$QUERY['name'])	showMessage("Please provide the name of the new <?= $Controller['name'] ?>",'','error');
-
-	if($id = <?= $Model['object_name'] ?>->create($QUERY['name'])) {
-		showMessage("<?= ucfirst($Controller['name']) ?> '$PARAM[name]' created successfully","index.php",'success',$id);
+	if($id = <?= $object_name ?>->create(<?=implode(', ', $queries)?>)) {
+		showMessage("<?= $title ?> created successfully","index.php",'success',$id);
 	}
 }
 

@@ -1,14 +1,16 @@
-<?='<'?>?php
+<?php
+$queries = array();
+foreach($field_names as $fn) {
+	$queries[] = '$QUERY[\'' . $fn . '\']';
+}
+?><?='<'?>?php
 include('../common.php');
 
-$<?= $Controller['name'] ?>_data = $<?= $Controller['name'] ?>_name = $<?= $Model['object_name'] ?>->find($QUERY['<?= $Controller['name'] ?>'],array('select'=>array('id','name'),'result_type'=>'assoc')));
-
 if(isset($QUERY['action']) and $QUERY['action']=='Edit') {
-	if(!$QUERY['name'])	showMessage("Please provide the new name",'?project='.$QUERY['<?= $Controller['name'] ?>'],'error');
-
-	if($<?= $Model['object_name'] ?>->edit($QUERY['<?= $Controller['name'] ?>'], $QUERY['name'])) {
-		showMessage("<?= ucfirst($Controller['name']) ?> '" . $<?= $Controller['name_plural'] ?>[$QUERY['<?= $Controller['name'] ?>']] . "' updated successfully",'index.php');
+	if(<?= $object_name ?>->edit($QUERY['id'], <?=implode(', ', $queries)?>)) {
+		showMessage("<?=$title?> updated successfully",'index.php');
 	}
 } else {
+	$data = <?=$object_name?>->find($QUERY['id']);
 	render();
 }

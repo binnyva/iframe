@@ -1,12 +1,4 @@
-<?php
-header("Content-type:text/plain");
-$field_names = array();
-foreach($fields as $f) {
-	if($f['auto_handler'] === false)
-		$field_names[] = $f['field'];
-}
-
-?><?='<'?>?php
+<?='<'?>?php
 include_once('../includes/classes/ORM.php');
 
 class <?=$class_name?> extends DBTable {
@@ -22,9 +14,9 @@ class <?=$class_name?> extends DBTable {
 	 * This will create a new <?= $name_single ?> and returns the id of the newly created row.
 	 */
 	function create($<?=implode(', $', $field_names) ?>) {
+		$validation_rules = $this->getValidationRules();
 <?php
 		$field_values = array();
-		$validation_rules = "array(\n";
 		foreach($fields as $f) {
 			$fn = $f['field'];
 			$value = '';
@@ -35,12 +27,9 @@ class <?=$class_name?> extends DBTable {
 		$this->checkDuplicate('<?=$fn?>', $<?=$fn?>);
 <?php			}
 				
-				if(in_array('must',		$f['validation'])) $validation_rules .= "array('name'=>'$fn', 'is'=>'empty', 'error'=>'The $f[title] cannot be empty'),\n";
-				if(in_array('email',	$f['validation'])) $validation_rules .= "array('name'=>'$fn', 'is'=>'not_email', 'error'=>'Please provide a valid $f[title]'),\n";
-				if(in_array('number',	$f['validation'])) $validation_rules .= "array('name'=>'$fn', 'is'=>'nan', 'error'=>'$f[title] must be a number'),\n";
-				
 				// Type based diffenences
 				if($f['type'] == 'password') {
+					print "		\$validation_rules[] = array('name'=>'$fn', 'is'=>'empty', 'error'=>'Please provide a password');\n";
 					if($f['password_encryption_algorithm']) $value = $f['password_encryption_algorithm'] . "(\$$fn . '$f[password_salt]')";
 					else $value = "\$$fn";
 				
@@ -48,19 +37,16 @@ class <?=$class_name?> extends DBTable {
 			}
 			elseif($f['auto_handler'] === 'time_of_insert' || $f['auto_handler'] === 'current_time') $value = "'NOW()'";
 			elseif($f['auto_handler'] === 'current_user') $value = '$_SESSION["user_id"]';
-		
+			elseif($f['auto_handler'] !== 'none' and $f['auto_handler']) continue; //Some unknown or invalid auto_handler - don't bother with that.
+			
 			if($value) $field_values[$fn] = $value;
 		}
-		$validation_rules .= ')';
 		
-		//Generate the validation checking call.
-		if($validation_rules != "array(\n)") {
 		?>
-		$validation_errors = check(<?=$validation_rules?>);
+		$validation_errors = check($validation_rules);
 		if($validation_errors) {
 			showMessage("Please correct the errors before continuing...", "", "error", $validation_errors);
 		}
-<?php	} ?>
 		
 		$this->newRow();
 <?php	foreach($field_values as $fn=>$value) { ?>
@@ -74,13 +60,47 @@ class <?=$class_name?> extends DBTable {
 	 * You can edit an existing <?= $title ?> using this function. The first argument 
 	 * 		must be the id of the row to be edited
 	 */
-	function edit($id, $new_name) {
-		if(!$id or !$new_name) return -1;
+	function edit($id, $<?=implode(', $', $field_names) ?>) {
+		if(!$id) return -1;
 		
-		$this->checkDuplicate($new_name, $id);
-
+<?php
+		$field_values = array();
+		foreach($fields as $f) {
+			$fn = $f['field'];
+			$value = '';
+			if($f['auto_handler'] === false) {
+				
+				//Validation
+				if(in_array('unique', $f['validation'])) { ?>
+		$this->checkDuplicate('<?=$fn?>', $<?=$fn?>);
+<?php			}
+			}
+		}
+		
+		?>
+		$validation_errors = check($this->getValidationRules());
+		if($validation_errors) {
+			showMessage("Please correct the errors before continuing...", "", "error", $validation_errors);
+		}
+		
 		$this->newRow($id);
-		$this->field['name'] = $new_name;
+<?php	foreach($fields as $f) {
+			$fn = $f['field'];
+			
+			if($f['auto_handler'] === 'time_of_update' || $f['auto_handler'] === 'current_time') $value = "'NOW()'";
+			elseif($f['auto_handler'] === 'current_user') $value = '$_SESSION["user_id"]';
+			elseif($f['auto_handler'] !== 'none' and $f['auto_handler']) continue; //Some unknown auto_handler - don't bother with that.
+
+			// Type based diffenences
+			if($f['type'] == 'password') {
+				if($f['password_encryption_algorithm']) $value = $f['password_encryption_algorithm'] . "(\$$fn . '$f[password_salt]')";
+				else $value = "\$$fn";
+				print "		if($value) ";
+			} else $value = '$' . $f['field'];
+		?>
+		$this->field['<?=$fn?>'] = <?=$value?>;
+<?php	} ?>
+
 		
 		return $this->save();
 	}
@@ -91,17 +111,22 @@ class <?=$class_name?> extends DBTable {
 	 */
 	function remove($id) {
 		if(!$id) return -1;
-		global $sql;
-	
-		$this->where("user_id='$_SESSION[user]'", "id=$id");
+		
+<?php
+		$user_field = '';
+		foreach($fields as $f) {
+			if($f['auto_handler'] === 'current_user') $user_field = "\$$f[field]=$_SESSION[user_id], ";
+		}
+		?>
+
+		$this->where(<?=$user_field?>"id=$id");
 		$this->delete();
-		if(!$sql->fetchAffectedRows()) return 0;
 	}
 	
 	/**
 	 * Checks to make sure that there is no other row with the same value in the specified name.
 	 * Example: <?=$class_name?>.checkDuplicate("username", "binnyva", 4);
-	 * 			<?=$class_name?>.checkDuplicate("email", "binnyva@gmail.com");
+	 * 			<?=$class_name?>.checkDuplicate("email", "binnyva@email.com");
 	 */
 	function checkDuplicate($field, $value, $not_id=0) {
 		//See if an item with that name is already there.
@@ -113,5 +138,21 @@ class <?=$class_name?> extends DBTable {
 		}
 		return false;
 	}
+	
+	function getValidationRules() {
+<?php
+		$validation_rules = "array(\n";
+		foreach($fields as $f) {
+			$fn = $f['field'];
+			if($f['auto_handler'] === false) {
+				if(in_array('must',		$f['validation'])) $validation_rules .= "\t\t\tarray('name'=>'$fn', 'is'=>'empty', 'error'=>'The $f[title] cannot be empty'),\n";
+				if(in_array('email',	$f['validation'])) $validation_rules .= "\t\t\tarray('name'=>'$fn', 'is'=>'not_email', 'error'=>'Please provide a valid $f[title]'),\n";
+				if(in_array('number',	$f['validation'])) $validation_rules .= "\t\t\tarray('name'=>'$fn', 'is'=>'nan', 'error'=>'$f[title] must be a number'),\n";
+				if(in_array('password',	$f['validation'])) $validation_rules .= "\t\t\tarray('name'=>'$fn', 'is'=>'not', 'value_field'=>'confirm_password', 'error'=>'Password and confirmation dont match'),\n";
+			}
+		}
+		$validation_rules .= "\t\t)";
+?>		return <?=$validation_rules?>;
+	}
 }
-
+<?=$object_name?> = new <?=$class_name?>;

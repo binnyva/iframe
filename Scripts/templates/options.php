@@ -5,9 +5,19 @@
 
 <?php 
 $html->buildInput('title', 'Title', 'text', $field_data['title'], array(), '<span class="help">The title of the page (Eg. Users)</span>');
-$html->buildInput('file', 'File', 'text', $field_data['file'], array(), '<span class="help">This filename will be used in all applications (Eg. users.php)</span>');
+$html->buildInput('class_name', 'Class Name', 'text', $field_data['class_name'], array(), '<span class="help">The class of the model for this Table (Eg. User</span>');
+$html->buildInput('object_name', 'Object Name', 'text', $field_data['object_name'], array(), '<span class="help">The name of the model object(Eg. $User)</span>');
 $html->buildInput('table', 'Table', 'text', $field_data['table'], array(), '<span class="help">Use this database table for all operations (Eg. users)</span>');
 $html->buildInput('name_single', 'Single', 'text', $field_data['name_single'], array(), '<span class="help">The singular of the page title  (Eg. User)</span>');
+$html->buildInput('name_plural', 'Plural', 'text', $field_data['name_plural'], array(), '<span class="help">The plural of the page title  (Eg. Users)</span>');
+?>
+</fieldset>
+
+<fieldset>
+<legend>Files</legend>
+<?php
+$html->buildInput('controller_name', 'Controller Name', 'text', $field_data['controller_name'], array(), '<span class="help">This will be the name of the controller/template folders (Eg. user)</span>');
+$html->buildInput('model_file', 'Model File', 'text', $field_data['model_file'], array(), '<span class="help">This filename will be the file name of the model file. (Eg. Users.php)</span>');
 ?>
 </fieldset>
 

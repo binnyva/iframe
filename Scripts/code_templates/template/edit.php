@@ -1,4 +1,4 @@
-<h1>Edit <?= ucfirst($Controller['name']) ?> '<?='<'?>?=$<?= $Controller['name'] ?>_data['name']?>'</h1>
+<h1>Edit <?= $title ?> '<?='<'?>?=$data['name']?>'</h1>
 
 <?='<'?>?php
 $action = 'Edit';

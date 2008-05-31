@@ -3,9 +3,12 @@ include('../common.php');
 
 $details = array();
 $details['title'] = $PARAM['title'];
-$details['class_name'] = str_replace(' ', '', $details['title']);
+$details['class_name'] = $PARAM['class_name'];
+$details['object_name'] = $PARAM['object_name'];
+
 $details['table'] = $PARAM['table'];
 $details['name_single'] = $PARAM['name_single'];
+$details['name_plural'] = $PARAM['name_plural'];
 
 $details['functionality'] = array(
 		'add'	=> i($PARAM, 'add_funcionality'),
@@ -34,12 +37,23 @@ for($i=1; $i<$PARAM['total_fields']; $i++) {
 		'password_salt'	=> i($PARAM,"field_password_salt_$i"),
 		'filetype'		=> i($PARAM,"field_filetype_$i"),
 		'values'		=> i($PARAM,"field_values_$i"),
-		'forign_key_ref'=> i($PARAM,"field_foreign_key_reference_$i")
+		'forign_key_ref'=> i($PARAM,"field_foreign_key_reference_$i"),
+		'list_values'	=> i($PARAM,"list_values_$i"),
 	);
 }
 
 extract($details);
-include('code_templates/model.php');
+
+$field_names = array();
+$all_fields_names = array();
+foreach($fields as $f) {
+	$all_field_names[] = $f['field'];
+	if($f['auto_handler'] === false) $field_names[] = $f['field'];
+}
+
+header("Content-type:text/plain");
+//include('code_templates/model.php');
+include('code_templates/template/_form.php');
 
 //print get_include_contents('code_templates/model.php');
 

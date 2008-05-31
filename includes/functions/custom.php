@@ -93,14 +93,13 @@ function showMessage($message, $url="?", $status="success",$extra_data=array()) 
 			"error"		=> $error
 		) + $extra_data;
 
-		print array2json($data);
+		print json_encode($data);
 
 	} elseif(isset($_REQUEST['layout']) and $_REQUEST['layout']==='cli') {
 		if($status === 'success') print $message . "\n";
 
 	} else {
-		if(strpos($url,'?') === false) $url .= '?';
-		$goto = getLink($url,array('status'=>urlencode($message)));
+		$goto = str_replace('&amp;', '&', getLink($url, array($status=>$message), true));
 		header("Location:$goto");
 	}
 	exit;
