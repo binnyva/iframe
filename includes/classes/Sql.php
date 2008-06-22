@@ -142,7 +142,7 @@ class Sql {
 
 		$arr = array();
 		while ($row = mysql_fetch_array($result)) {
-			if(count($row) == 2)
+			if(count($row) == 4) // Just 2 items actually - it is mysql_fetch_array - so both index and name is there in the array
 				$arr[$row[0]] = $this->_stripSlashes($row[1]);
 			else // SELECT id, name, username FROM Users - will be handled by creating an array like {1:{"id":1, "name":"Binny", "username": "binnyva", "0":1, "1":"Binny", "2": "binnyva"}}
 				$arr[$row[0]] = $row;
