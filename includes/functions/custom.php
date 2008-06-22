@@ -86,7 +86,7 @@ function showMessage($message, $url="?", $status="success",$extra_data=array()) 
 		$insert_id = '';
 
 		if($status == 'success') $success = $message;
-		if($status == 'error') $error = $message;
+		if($status == 'error' or $status == 'failure') $error = $message;
 
 		$data = array(
 			"success"	=> $success,

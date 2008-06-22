@@ -2,9 +2,7 @@
 <html><head>
 <title><?=$title?></title>
 <link href="<?=$abs?>css/style.css" rel="stylesheet" type="text/css" />
-<script src="<?=$abs?>js/jsl.js" type="text/javascript"></script>
-<script src="<?=$abs?>js/application.js" type="text/javascript"></script>
-<?=$includes?>
+<?=$css_includes?>
 </head>
 <body>
 <div id="header">
@@ -24,5 +22,9 @@ include($GLOBALS['template']->template);
 </div>
 
 <div id="footer">An <a href="http://www.bin-co.com/php/scripts/iframe/">iFrame</a> Application</div>
+
+<script src="<?=$abs?>js/jsl.js" type="text/javascript"></script>
+<script src="<?=$abs?>js/application.js" type="text/javascript"></script>
+<?=$js_includes?>
 </body>
 </html>

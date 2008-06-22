@@ -23,6 +23,8 @@ class MVC {
 		'insert_layout'		=> true
 	);
 	public $includes	= array();
+	public $css_includes= array();
+	public $js_includes = array();
 	public $css_folder	= 'css/';
 	public $js_folder	= 'js/';
 	
@@ -181,9 +183,11 @@ class MVC {
 
 		if($type=='css' or $type=='stylesheet' or $type=='style' or $type=='stylesheets') {
 			$current_include = '<link href="' . $link . '" type="text/css" rel="stylesheet" />';
+			if(!in_array($current_include,$this->css_includes)) array_push($this->css_includes, $current_include);
 
 		} elseif($type=='js' or $type=='javascript' or $type=='jscript' or $type=='script') {
 			$current_include = '<script src="' . $link . '" type="text/javascript"></script>';
+			if(!in_array($current_include,$this->js_includes)) array_push($this->js_includes, $current_include);
 
 		} else {
 			error("Template Error: Type(2nd argument of addResource) '$type' not provided.");

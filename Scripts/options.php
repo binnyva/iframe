@@ -7,6 +7,23 @@ $html = new HTML;
 //$table = $argv[1];
 
 $table = $PARAM['table'];
+
+$field_data = array();
+$field_data['title'] = format($table);
+$field_data['class_name'] = str_replace(' ', '', $field_data['title']);
+$field_data['object_name'] = '$' . $field_data['class_name'];
+$field_data['table'] = $table;
+$field_data['name_single'] = $field_data['title'];
+$field_data['name_plural'] = $field_data['title'] . 's'; // :TODO: 'ies', 'es' etc.
+
+$field_data['model_file'] = ucfirst($table) . '.php';
+$field_data['controller_name'] = strtolower($table);
+
+$field_data['add_funcionality'] = 1;
+$field_data['edit_funcionality'] = 1;
+$field_data['delete_funcionality'] = 1;
+$field_data['status_funcionality'] = 0;
+
 if(isset($table)) {
 	$Fields = array();
 
@@ -53,8 +70,6 @@ if(isset($table)) {
 			$auto_handle = 'status_holder';
 		}
 		else $type = 'text';
-
-
 		
 		//Try to guess all the validation rules
 		$validation = array();
@@ -83,57 +98,36 @@ if(isset($table)) {
 	}
 }
 
-$field_data = array();
-if(!$_POST) {
-	$field_data['title'] = format($table);
-	$field_data['class_name'] = str_replace(' ', '', $field_data['title']);
-	$field_data['object_name'] = '$' . $field_data['class_name'];
-	$field_data['table'] = $table;
-	$field_data['name_single'] = $field_data['title'];
-	$field_data['name_plural'] = $field_data['title'] . 's';
+$field_count = 1;
+foreach($Fields as $f) {
+	$list = 0;
+	if(findWord($f['name'], array('name','username','login','title','url','website'))) $list = 1; //Stuff that must be listed.
 	
-	$field_data['model_file'] = ucfirst($table) . '.php';
-	$field_data['controller_name'] = strtolower($table);
+	$date_format = '';
+	if($f['type'] == 'date') $date_format = '%d %b %Y';
+	elseif($f['type'] == 'datetime') $date_format = '%d %b %Y, %h:%i %p';
 	
-	$field_data['add_funcionality'] = 1;
-	$field_data['edit_funcionality'] = 1;
-	$field_data['delete_funcionality'] = 1;
-	$field_data['status_funcionality'] = 0;
+	$filetypes = '';
+	if(findWord($f['name'], array('image','pic','photo','img','logo'))) $filetypes = 'jpg,jpeg,png,gif';
 	
-	$field_count = 1;
-	foreach($Fields as $f) {
-		$list = 0;
-		if(findWord($f['name'], array('name','username','login','title','description','url','website'))) $list = 1; //Stuff that must be listed.
-		
-		$date_format = '';
-		if($f['type'] == 'date') $date_format = '%d %b %Y';
-		elseif($f['type'] == 'datetime') $date_format = '%d %b %Y, %h:%i %p';
-		
-		$filetypes = '';
-		if(findWord($f['name'], array('image','pic','photo','img','logo'))) $filetypes = 'jpg,jpeg,png,gif';
-		
-		$field_data["field_title_$field_count"]				= format($f['name']);
-		$field_data["field_name_$field_count"]				= $f['name'];
-		$field_data["field_list_$field_count"]				= $list;
-		$field_data["field_type_$field_count"]				= $f['type'];
-		
-		$field_data["field_date_format_$field_count"]		= $date_format;
-		$field_data["field_show_time_$field_count"]			= ($f['type'] == 'datetime') ? 1 : 0;
-		$field_data["field_password_encrypt_$field_count"]	= '';
-		$field_data["field_password_salt_$field_count"]		= '';
-		$field_data["field_filetype_$field_count"]			= $filetypes;
-		$field_data["list_values_$field_count"]				= $f['values'];
-		$field_data["field_validation_$field_count"]		= $f['validation'];
-		$field_data["field_auto_handle_$field_count"]		= $f['auto_handle'];
-		$field_data["field_foreign_key_reference_$field_count"]		= str_replace('_', '.', $f['name']);
-		$field_count++;
-	}
-	$total_fields = $field_count - 1;
+	$field_data["field_title_$field_count"]				= format($f['name']);
+	$field_data["field_name_$field_count"]				= $f['name'];
+	$field_data["field_list_$field_count"]				= $list;
+	$field_data["field_type_$field_count"]				= $f['type'];
 	
-} else {
-	$field_data = $_POST;
+	$field_data["field_date_format_$field_count"]		= $date_format;
+	$field_data["field_show_time_$field_count"]			= ($f['type'] == 'datetime') ? 1 : 0;
+	$field_data["field_password_encrypt_$field_count"]	= '';
+	$field_data["field_password_salt_$field_count"]		= '';
+	$field_data["field_filetype_$field_count"]			= $filetypes;
+	$field_data["list_values_$field_count"]				= $f['values'];
+	$field_data["field_validation_$field_count"]		= $f['validation'];
+	$field_data["field_auto_handle_$field_count"]		= $f['auto_handle'];
+	$field_data["field_foreign_key_reference_$field_count"]		= str_replace('_', '.', $f['name']);
+	$field_count++;
 }
-
+$total_fields = $field_count - 1;
+	
 function findWord($needle, $haystack) {
 	foreach($haystack as $str) {
 		if(preg_match("/\b$needle\b/i", $str)) return true;
