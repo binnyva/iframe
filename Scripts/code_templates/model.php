@@ -1,5 +1,5 @@
 <?='<'?>?php
-include_once('../includes/classes/ORM.php');
+require_once(joinPath($GLOBALS['config']['iframe_folder'], 'includes/classes/ORM.php'));
 
 class <?=$class_name?> extends DBTable {
 	/**
@@ -43,17 +43,17 @@ class <?=$class_name?> extends DBTable {
 		}
 		
 		?>
-		$validation_errors = check($validation_rules);
+		$validation_errors = check($validation_rules,2);
 		if($validation_errors) {
-			showMessage("Please correct the errors before continuing...", "", "error", $validation_errors);
+			$GLOBALS['QUERY']['error'] =  "Please correct the errors before continuing...<br />" . $validation_errors;
+			return false;
 		}
 		
 		$this->newRow();
 <?php	foreach($field_values as $fn=>$value) { ?>
 		$this->field['<?=$fn?>'] = <?=$value?>;
 <?php	} ?>
-		$id = $this->save();
-		return $id;
+		return $this->save();
 	}
 	
 	/**
@@ -78,9 +78,10 @@ class <?=$class_name?> extends DBTable {
 		}
 		
 		?>
-		$validation_errors = check($this->getValidationRules());
+		$validation_errors = check($this->getValidationRules(),2);
 		if($validation_errors) {
-			showMessage("Please correct the errors before continuing...", "", "error", $validation_errors);
+			$GLOBALS['QUERY']['error'] =  "Please correct the errors before continuing...<br />" . $validation_errors;
+			return false;
 		}
 		
 		$this->newRow($id);
@@ -101,7 +102,6 @@ class <?=$class_name?> extends DBTable {
 		$this->field['<?=$fn?>'] = <?=$value?>;
 <?php	} ?>
 
-		
 		return $this->save();
 	}
 	
@@ -155,4 +155,4 @@ class <?=$class_name?> extends DBTable {
 ?>		return <?=$validation_rules?>;
 	}
 }
-<?=$object_name?> = new <?=$class_name?>;
+$GLOBALS['<?=str_replace('$','',$object_name)?>'] = new <?=$class_name?>;

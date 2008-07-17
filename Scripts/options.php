@@ -3,9 +3,6 @@ include('../common.php');
 
 $html = new HTML;
 
-//if(!isset($argv[1])) {print "Please provide the name of the table as the first argument\n";exit;}
-//$table = $argv[1];
-
 $table = $PARAM['table'];
 
 $field_data = array();

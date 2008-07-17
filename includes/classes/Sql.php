@@ -38,7 +38,8 @@ class Sql {
 	function disconnect() {
 		mysql_close($this->_db_connection);
 	}
-
+	
+	//////////////////////////////////////// Raw SQL Functions ///////////////////////////////////////
 	/**
 	 * Executes the given query and returns the resource. If an error has occured, passes the error data to $Sql->_error()
 	 * Argument : $query - SQL query

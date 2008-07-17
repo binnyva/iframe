@@ -7,7 +7,7 @@ use Cwd;
 # Arguments
 # 1 project name
 # 2 Action - full or link
-my $project_name = 'ifr';
+my $project_name = 'Chromics';
 my $install = 'link';
 
 my ($volume,$iframe_folder,$file) = File::Spec->splitpath( File::Basename::dirname($0) );
@@ -17,12 +17,11 @@ my $iframe_folder_relative = File::Spec->abs2rel($iframe_folder);
 
 
 if($install eq 'link') {
-	`cp -R $iframe_folder/Scripts/installation $project_name/`;
-	`cp -R $iframe_folder/css $project_name/css`;
-	`cp -R $iframe_folder/js $project_name/js`;
-	`cp -R $iframe_folder/templates $project_name/templates`;
-	`cd $iframe_folder`
-	`find -name ".svn" -exec rm -rf {} \;`
+	`cp -R $iframe_folder/Scripts/installation/* .`;
+	`cp -R $iframe_folder/css css`;
+	`cp -R $iframe_folder/js js`;
+	`cp -R $iframe_folder/templates templates`;
+	print "Please execute this command...\nfind -name .svn -exec rm -rf {} \\;";
 }
 
 my %keywords = (
@@ -38,7 +37,7 @@ print "\n";
 ############################################## Functions #############################################
 #Read the given file and replace all instance of the given keyword with the replacement.
 sub replaceInFile {
-	my $file = "$project_name/" . shift;
+	my $file = shift;
 	my %keywords = @_;
 	my $contents = getFileContents($file);
 	

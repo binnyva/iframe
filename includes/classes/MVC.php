@@ -119,24 +119,22 @@ class MVC {
 		if(!file_exists($model_file)) {
 			//Search the template folder for that file
 			if (file_exists( joinPath($model_folder, $model_file))) {
-				$this->model = joinPath($model_folder, $model_file);
-				$model_name = $model_file;
+				$this->model = $model_file;
 			} else {
 				//Try to find the model with newer methods.
 				//First, try to make the first letter uppercase
 				if (file_exists( joinPath($model_folder, ucfirst($model_file)) )) {
-					$this->model = joinPath($model_folder, ucfirst($model_file));
-					$model_name = ucfirst($model_file);
+					$this->model = ucfirst($model_file);
 					
 				//If thats not there, look for all lowercase model name.
 				} elseif(file_exists( joinPath($model_folder, strtolower($this->controller) . '.php') )) {
-					$this->model = joinPath($model_folder, strtolower($this->controller) . '.php');
-					$model_name = strtolower($this->controller) . '.php';
+					$this->model = strtolower($this->controller) . '.php';
 					break;
 				}
 			}
 		}
 		else $this->model = $model_file;
+		$model_name = $this->model;
 
 		if($this->model) {
 			include(joinPath($model_folder, $this->model));
@@ -215,6 +213,8 @@ class MVC {
 
 		$title = ($this->title) ? $this->title : $config['site_title'];
 		$includes = implode($this->includes,"\n");
+		$css_includes = implode($this->css_includes,"\n");
+		$js_includes = implode($this->js_includes,"\n");
 
 		include(joinPath($config['site_folder'], $this->options['template_folder'], "/layout/", $this->layout));
 	}

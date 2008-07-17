@@ -9,6 +9,9 @@ class DBTable {
 	private $offset = 0;
 	private $order = '';
 	private $group = '';
+	private $join_type = 'INNER';
+	private $join_table = '';
+	private $join_on = '';
 	private $query_result_type = 'all';
 
 	public $field = array();
@@ -28,6 +31,14 @@ class DBTable {
 	 */
 	function createQuery() {
 		$query = "SELECT {$this->select} FROM {$this->table_name}";
+		
+		if($this->join_table and $this->join_on) {
+			$query .=  " {$this->join_type} JOIN {$this->join_table} ";
+			if(strpos($this->join_on, "=") === false)  //If it does not have an '=' sign in the on condition, it just the name of the forign key field instead of the entire condition.
+				$query .=  " ON `{$this->table_name}`.`{$this->primary_key_field}`=`{$this->join_table}`.`{$this->join_on}`";
+			else
+				$query .=  " ON {$this->join_on}";
+		}
 		
 		if(count($this->conditions)) $query .= ' WHERE ' . implode(' AND ',$this->conditions);
 		if($this->order) $query .= ' ORDER BY ' . $this->order;
@@ -74,21 +85,7 @@ class DBTable {
 		if($ids)
 			return $this->findById($ids);
 		
-		return $this->createExecQuery('all');
-	}
-	
-	/** 
-	 * Specify the WHERE statements here. 
-	 * Arguments : A list of all the conditions
-	 * Example: $User->where(array("name='Binny'","age=23"));
-	 *			$User->where("name='Binny'","age=23");
-	 */
-	function where() {
-		$conditions = $this->_getArguments(func_get_args());
-		foreach($conditions as $cond) {
-			if(is_string($cond))
-				if(!in_array($cond,$this->conditions)) $this->conditions[] = $cond;
-		}
+		return $this->createExecQuery();
 	}
 	
 	/// Returns the results of all the rows whose IDs are provided
@@ -111,21 +108,6 @@ class DBTable {
 		}
 
 		return $data;
-	}
-	
-	/// Pass which all fields must be selected into this function
-	function select() {
-		$arguments = func_get_args();
-		
-		$select = '*';
-		if(count($arguments)) {
-			if(count($arguments) == 1 and is_array($arguments[0])) { //If the first argument is the list of fields
-				$arguments = $arguments[0];
-			}
-			
-			$select = '`' . implode('`,`',$arguments) . '`';
-		}
-		$this->select = $select;
 	}
 	
 	/// Write the changes to the DB. If its a new row, an insert will happen. If it is an existing row, an update
@@ -246,6 +228,94 @@ class DBTable {
 		}
 	}
 
+	//////////////////////////////////////// Chainable Functions ////////////////////////////////////
+	/**
+	 * Pass which all fields must be selected into this function
+	 * Example: $User->select('id', 'name')->get();
+	 * 		OR  $User->select(array('id', 'name'))->get();
+	 * 		OR	 $User->select('id,name')->get();
+	 */
+	function select() {
+		$arguments = $this->_addTableName(func_get_args());
+		
+		if($arguments) {
+			$this->select = $arguments;
+		}
+		return $this;
+	}
+	
+	/**
+	 * Specify the WHERE statements here. 
+	 * Arguments : A list of all the conditions
+	 * Example: $User->where(array("name='Binny'","age=23"));
+	 *			$User->where("name='Binny'","age=23")->get();
+	 */
+	function where() {
+		$conditions = $this->_getArguments(func_get_args()); // Don't call _addTableName for this - it may mess things up
+		
+		foreach($conditions as $cond) {
+			if(is_string($cond))
+				if(!in_array($cond,$this->conditions)) $this->conditions[] = $cond;
+		}
+		return $this;
+	}
+	
+	/**
+	 * Inserts a ORDER BY clause into the query.
+	 * Argument: A list of fields that must be used to sort the data.
+	 * Example : $Comic->sort('added_on DESC','name')->get('all');
+	 */
+	function sort() {
+		$arguments = $this->_addTableName(func_get_args());
+		if($arguments) $this->order = $arguments;
+		
+		return $this;
+	}
+	
+	/**
+	 * You can use this function to join tables togetget - inserting the JOIN clause.
+	 * Example: $User->join('Article', 'Article.user_id=User.id') ...
+	 */
+	function join($table, $on, $type = '') {
+		$this->join_table = $table;
+		$this->join_on = $on;
+		if(!$type) $this->join_type = $type;
+		
+		return $this;
+	}
+	
+	/**
+	 * Inserts a GROUP BY clause into the query.
+	 * Argument: A list of fields that must be used to group the data.
+	 * Example : $Comic->group('category_id')->get('all');
+	 */
+	function group() {
+		$arguments = $this->_addTableName(func_get_args());
+		if($arguments) $this->order = $arguments;
+		
+		return $this;
+	}
+	
+	/** 
+	 * Inserts a LIMIT clause.
+	 * Arguments: $limit - The number of results to be returned
+	 * 			  $offset - The number of the row to start the fetch.
+	 * Example: $User->select('name')->where('age=24')->limit(1)->get('one');
+	 */
+	function limit($limit, $offset=0) {
+		$this->limit = $limit;
+		$this->offset = $offset;
+		return $this;
+	}
+	
+	/**
+	 * This function returns the data after all the chaining.
+	 * Argument: $type - Return type - can be 'all', 'one', 'byid', 'assoc'. Defaults to 'all'.
+	 * Example : $Comic->select('name')->get('one');
+	 */
+	function get($type=false) {
+		return $this->createExecQuery($type);
+	}
 
 	//////////////////////////////////////////// The Privates /////////////////////////////////////
 	private function _getArguments($id_list) {
@@ -272,6 +342,8 @@ class DBTable {
 				$result = $sql->getAll($this->query);
 			} elseif($return_type == 'one') {
 				$result = $sql->getOne($this->query);
+			} elseif($return_type == 'col') {
+				$result = $sql->getCol($this->query);
 			} elseif($return_type == 'byid') {
 				$result = $sql->getById($this->query);
 			} else { //exec
@@ -283,7 +355,33 @@ class DBTable {
 		return $result;
 	}
 	
+	/// This function adds the name of the table to the beginning of each field name. For eg, 'name' will become "`User`.`name`"
+	private function _addTableName($arguments) {
+		$arguments = $this->_getArguments($arguments);
+		
+		$argument_count = count($arguments);
+		if($argument_count == 1 and strpos($arguments[0], ',') !== false) { //Someone may call this function like this: $User->select('id, name')->get(); This code handles it.
+			$arguments = explode(',', $arguments[0]);
+			$argument_count = count($arguments);
+		}
+		
+		for($i=0; $i<$argument_count; $i++) {
+			if(strpos($arguments[$i], '.') === false //If the table name is not specified in the field name, add the table name. Otherwise there will be problems when joining tables.
+					and strpos($arguments[$i], '(') === false) { //Function calls must not be modified.
+				$arguments[$i] = "`{$this->table_name}`.{$arguments[$i]}"; //Adding the `s around the field name may mess stuff like "sort('name DESC')"
+			}
+			else $arguments[$i] = $arguments[$i];
+		}
+
+		return implode(',',$arguments);;
+	}
+	
 	private function _escape($string) {
 		return "'" . mysql_real_escape_string($string) . "'";
 	}
 }
+
+/*
+ * :TODO:
+ * Support for OR in WHERE conditions
+ */
