@@ -1,6 +1,6 @@
-<h1>New <?= ucfirst($Controller['name']) ?></h1>
+<h1>New <?= $PARAM['name_single'] ?></h1>
 
 <?='<'?>?php
-$action = 'Create';
-include("_form.php");
+$action = 'Add';
+require("../templates/<?= $PARAM['controller_name'] ?>/_form.php");
 ?>

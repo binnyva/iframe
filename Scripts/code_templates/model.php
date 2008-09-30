@@ -111,15 +111,18 @@ class <?=$class_name?> extends DBTable {
 	 */
 	function remove($id) {
 		if(!$id) return -1;
-		
-<?php
+		<?php
 		$user_field = '';
 		foreach($fields as $f) {
 			if($f['auto_handler'] === 'current_user') $user_field = "\$$f[field]=$_SESSION[user_id], ";
 		}
+		if($user_field) {
+			print '$this->where("' . $user_field. 'id=$id");';
+		} else {
+			print '$this->newRow($id);';
+		}
 		?>
-
-		$this->where(<?=$user_field?>"id=$id");
+		
 		$this->delete();
 	}
 	
@@ -156,3 +159,8 @@ class <?=$class_name?> extends DBTable {
 	}
 }
 $GLOBALS['<?=str_replace('$','',$object_name)?>'] = new <?=$class_name?>;
+
+/*
+Controllor Constructor Code(JSON):
+<?php print json_encode($PARAM); ?>
+*/

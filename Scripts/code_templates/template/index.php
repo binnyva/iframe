@@ -1,12 +1,12 @@
 <?php
-$var = '$' . strtolower($name_single);
+$var = '$' . strtolower($PARAM['name_single']);
 ?>
-<h1><?=$name_plural?></h1>
+<h1><?= $PARAM['name_plural'] ?></h1>
 
-<table>
+<table class="listing-table">
 <?='<'?>?php
 $row = 0;
-foreach($<?=strtolower($name_plural)?> as <?=$var?>) {
+foreach($<?=strtolower($PARAM['name_plural'])?> as <?=$var?>) {
 	$class = ($row++ % 2) ? 'even' : 'odd';
 	$id = <?=$var?>['<?=$primary_key?>'];
 ?>
@@ -19,7 +19,6 @@ foreach($<?=strtolower($name_plural)?> as <?=$var?>) {
 <?php } ?>
 
 <?php if($functionality['edit']) { ?><td class="action"><a class="icon edit" href="edit.php?id=<?='<'?>?=$id?>">Edit</a></td><?php } ?>
-
 <?php if($functionality['delete']) { ?><td class="action"><a class="icon delete" href="delete.php?id=<?='<'?>?=$id?>">Delete</a></td><?php } ?>
 </tr>
 <?='<'?>?php } ?>
@@ -28,3 +27,10 @@ foreach($<?=strtolower($name_plural)?> as <?=$var?>) {
 
 
 <?php if($functionality['add']) { ?><a class="icon new" href="new.php">New <?=$title?></a><?php } ?>
+
+<?php
+/* :TODO
+ * Table Headers.
+ * User Dependant Functionality changes(edit,delete,add)
+ * Support for different format data.
+ */
