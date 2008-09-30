@@ -57,6 +57,7 @@ $html->buildInput('field_list_' . $field_count, 'List', 'checkbox', $field_data[
 		'file'		=> 'File',
 		'date'		=> 'Date',
 		'time'		=> 'Time',
+		'url'		=> 'URL',
 		'password'	=> 'Password',
 		'editor'	=> 'Editor',
 		'foreign_key'=> 'Foreign Key',
@@ -98,7 +99,8 @@ $html->buildInput('field_list_' . $field_count, 'List', 'checkbox', $field_data[
 		'email'		=> 'Email',
 		'filetype'	=> 'File Type',
 		'number'	=> 'Number',
-		'unique'	=> 'Unique'
+		'unique'	=> 'Unique',
+		'url'		=> 'URL',
 	);
 	$html->buildDropDownArray($all_algorithms, 'field_validation_' . $field_count,'',array('multiple'=>'multiple','name'=>'field_validation_' . $field_count . '[]')); ?>
 <span class="help">Which all validation should be applied to the field.</span><br />
@@ -114,32 +116,35 @@ $html->buildInput('field_list_' . $field_count, 'List', 'checkbox', $field_data[
 <input type="hidden" name="total_fields" id="total_fields" value="<?=$total_fields?>"  />
 </fieldset>
 
-<!--
-<?php $html->buildInput('', '', 'text', '', array(), '<span class="help"></span>'); ?>
 
 <fieldset>
 <legend>Extra Information</legend>
-<div class="entry"><label for="adm_status_field">Status Field</label>
-<%= text_field 'adm', 'status_field', {"value"=>'status'}  %>
-<span class="help">The name of the status field in the database.</span></div>
 
-<div class="entry"><label for="adm_pager">Show Pager</label>
-<%= check_box 'adm', 'pager', {'checked' => 'checked'}, "true", "false" %>
-<span class="help">Enable the pager</span></div>
+<?php 
+$html->buildInput('status_field', 'Status Field', 'text', 'status', array(), '<span class="help">The name of the status field in the database.</span>');
+$html->buildInput('pager_status', 'Enable Pager?', 'checkbox', '1', array('checked'=>'checked'), '<span class="help">Enable the pager</span>');
+$html->buildInput('upload_path', 'Upload Location', 'text', '../uploads', array(), '<span class="help">The folder where all the files must be upload to. Make sure that there is a "/" at the end.</span>');
+$html->buildInput('mandatory_text', 'Mandatory Text', 'text', '*', array(), '<span class="help">The text that should be shown next the each mandateory field (Eg. *)</span>');
+$html->buildInput('main_query', 'Main Query', 'textarea', '', array(), '<span class="help">The query that must be used when creating the display. If empty, this will default to "SELECT * FROM &lt;Table&gt;"</span>');
+?>
+</fieldset>
 
-<div class="entry"><label for="adm_upload">Upload Location</label>
-<%= text_field 'adm', 'upload',  {"value"=>'../uploads'}  %>
-<span class="help">The folder where all the files must be upload to. Make sure that there is a '/' at the end.</span></div>
+<fieldset class="normal-form">
+<legend>Files to Generate</legend>
 
-<div class="entry"><label for="adm_mandatory_text">Mandatory Text</label>
-<%= text_field 'adm', 'mandatory_text',  {"value"=>' <span class="mandatory">*</span>'}  %>
-<span class="help">The text that should be shown next the each mandateory field (Eg. *)</span></div>
+<?php foreach($available_templates as $template_file) {
+	$dependancy_functionality = '';
+	
+	if(strpos($template_file, 'add')) $dependancy_functionality = 'Make sure the "Add" functionality is turned on for this.';
+	if(strpos($template_file, 'edit')) $dependancy_functionality = 'Make sure the "Edid" functionality is turned on for this to work as intended.';
+	if(strpos($template_file, 'delete')) $dependancy_functionality = 'Turn on the "Delete" functionality or this may not work.';
+	
+	$html->buildInput(str_replace(array('/','.'),'_', $template_file), $template_file, 'checkbox', $template_file, 
+		array('checked'=>'checked', 'name'=>'generate_files[]'),
+		'<span class="help">Makes sure that this file is generated. ' . $dependancy_functionality . '</span>');
+} ?>
 
-<div class="entry"><label for="adm_main_query">Main Query</label>
-<%= text_area 'adm', 'main_query', { 'rows' => "5" } %>
-<span class="help">The query that must be used when creating the display. If empty, this will default to 'SELECT * FROM &lt;Table&gt;'</span></div>
-
--->
+</fieldset>
 
 <div id="information">
 <input type="submit" value="Create Code" name="action" />
@@ -147,7 +152,6 @@ $html->buildInput('field_list_' . $field_count, 'List', 'checkbox', $field_data[
 <br /><br />
 </div>
 
-<div id="tip-holder" class="rounded-corner"><div id="tip">Help!</div></div>
 </form>
 
 <hr />
@@ -159,3 +163,5 @@ $html->buildInput('field_list_' . $field_count, 'List', 'checkbox', $field_data[
 <input type="button" value="Parse Serialized Data" id="parse-serialized-data" />
 </div>
 
+
+<div id="tip-holder" class="rounded-corner"><div id="tip">Help!</div></div>

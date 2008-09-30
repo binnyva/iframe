@@ -19,11 +19,15 @@ code {
 	font-size:1.2em;
 }
 
-.rounded-corner .wrapper1 {background:url(/images/corners/top_left.gif) no-repeat top left;}
-.rounded-corner .wrapper2 {background:url(/images/corners/top_right.gif) no-repeat top right;}
-.rounded-corner .wrapper3 {background:url(/images/corners/bottom_left.gif) no-repeat bottom left;}
+.rounded-corner {
+	border-radius: .3em;
+	-moz-border-radius: .3em;
+}
+/*.rounded-corner .wrapper1 {background:url(../../images/corners/ul.gif) no-repeat top left;}
+.rounded-corner .wrapper2 {background:url(../../images/corners/ur.gif) no-repeat top right;}
+.rounded-corner .wrapper3 {background:url(../../images/corners/ll.gif) no-repeat bottom left;}
 .rounded-corner .wrapper4 {
-	background:url(/images/corners/bottom_right.gif) no-repeat bottom right;
+	background:url(../../images/corners/lr.gif) no-repeat bottom right;
 	padding:0 5px;
 } 
-
+*/

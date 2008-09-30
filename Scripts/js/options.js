@@ -99,6 +99,12 @@ function autoFillFieldDetails(ele) {
 		validations[0].selected = true; //Mandatory
 		fieldOptions(type);
 	}
+	else if(field.indexOf("url") + 1 || field.indexOf("link") + 1 || field.indexOf("feed") + 1) {
+		type.value = "url";
+		list.checked = false;
+		validations[5].selected = true;
+	
+	}
 	//All types of file uploads are handled here.
 	else if((field.indexOf("file") + 1) || (field.indexOf("upload") + 1) || (field.indexOf("logo") + 1) || 
 				(field.indexOf("image") + 1) || (field.indexOf("img") + 1) || (field.indexOf("picture") + 1) || 
@@ -287,5 +293,17 @@ function init() {
 		fieldOptions($('field_type_'+i));
 		makeHelpText(i-1);
 	}
+	
+	//If the user don't want add functionality, don't generate the adding file either.
+	$("add_funcionality").click(function() {
+		$("#templates_add_php").checked = this.checked;
+		$("#controllers_add_php").checked = this.checked;
+	});
+	$("edit_funcionality").click(function() {
+		$("#templates_edit_php").checked = this.checked;
+		$("#controllers_edit_php").checked = this.checked;
+	});
+	$("delete_funcionality").click(function() {
+		$("#controllers_delete_php").checked = this.checked;
+	});
 }
-$(window).load(init);

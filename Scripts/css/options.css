@@ -50,3 +50,8 @@ div {
 #serialized-data {
 	text-align:right;
 }
+
+.normal-form label,input { /*Ordinary form*/
+	float:none;
+	display:inline;
+}
