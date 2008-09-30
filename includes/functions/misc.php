@@ -373,6 +373,7 @@ function load($url,$options=array()) {
 	if(!isset($options['cache'])) $options['cache'] = false;
 
     $url_parts = parse_url($url);
+    $ch = false;
     $info = array(//Currently only supported by curl.
         'http_code'    => 200
     );
@@ -403,16 +404,34 @@ function load($url,$options=array()) {
     ///////////////////////////// Curl /////////////////////////////////////
     //If curl is available, use curl to get the data.
     if(function_exists("curl_init") 
-                and (!(isset($options['use']) and $options['use'] == 'fsocketopen'))) { //Don't user curl if it is specifically stated to user fsocketopen in the options
-        if(isset($options['method']) and $options['method'] == 'post') {
-            $page = $url_parts['scheme'] . '://' . $url_parts['host'] . $url_parts['path'];
+                and (!(isset($options['use']) and $options['use'] == 'fsocketopen'))) { //Don't use curl if it is specifically stated to use fsocketopen in the options
+        
+        if(isset($options['post_data'])) { //There is an option to specify some data to be posted.
+        	$page = $url;
+        	$options['method'] = 'post';
+        	
+        	if(is_array($options['post_data'])) { //The data is in array format.
+				$post_data = array();
+				foreach($options['post_data'] as $key=>$value) {
+					$post_data[] = "$key=" . urlencode($value);
+				}
+				$url_parts['query'] = implode('&', $post_data);
+			
+			} else { //Its a string
+	        	$url_parts['query'] = $options['post_data'];
+			}
         } else {
-            $page = $url;
-        }
+			if(isset($options['method']) and $options['method'] == 'post') {
+				$page = $url_parts['scheme'] . '://' . $url_parts['host'] . $url_parts['path'];
+			} else {
+				$page = $url;
+			}
+		}
 
-        $ch = curl_init($url_parts['host']);
-
-        curl_setopt($ch, CURLOPT_URL, $page);
+        if(!isset($options['curl_handle']) or !$options['curl_handle']) $ch = curl_init($url_parts['host']);
+        else $ch = $options['curl_handle'];
+        
+        curl_setopt($ch, CURLOPT_URL, $page) or die("Invalid cURL Handle Resouce");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); //Just return the data - not print the whole thing.
         curl_setopt($ch, CURLOPT_HEADER, true); //We need the headers
         curl_setopt($ch, CURLOPT_NOBODY, false); //The content - if true, will not download the contents
@@ -438,7 +457,7 @@ function load($url,$options=array()) {
 
         $response = curl_exec($ch);
         $info = curl_getinfo($ch); //Some information on the fetch
-        curl_close($ch);
+        if(!isset($options['curl_handle'])) curl_close($ch); //Dont close the curl session if the curl handle is passed. We may need it later.
 
     //////////////////////////////////////////// FSockOpen //////////////////////////////
     } else { //If there is no curl, use fsocketopen
@@ -510,7 +529,7 @@ function load($url,$options=array()) {
     	file_put_contents($cache_file, $body);
     }
 
-    if($options['return_info']) return array('headers' => $headers, 'body' => $body, 'info' => $info);
+    if($options['return_info']) return array('headers' => $headers, 'body' => $body, 'info' => $info, 'curl_handle'=>$ch);
     return $body;
 } 
 

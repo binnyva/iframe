@@ -67,11 +67,13 @@ class Sql {
 	 * Argument : $query - SQL query
 	 * Return   : First row in the query result - as an associative array.
 	 */ 
-	function getAssoc($query) {
+	function getAssoc($query, $options=array()) {
 		$result = $this->getSql($query);
 		if(!$result) return array();
 
 		$row = mysql_fetch_assoc($result);
+		
+		if(isset($options['strip_slashes']) and $options['strip_slashes'] == false) return $row;
 		return $this->_stripSlashes($row);
 	}
 
@@ -409,3 +411,9 @@ class Sql {
 		return mysql_affected_rows();
 	}
 }
+
+/*
+ * :TODO:
+ * Combine insertFields() and insert() - add the $fields list as the third argument of insert(). Also combine update() and updateFields()
+ * The options argument - as in the getAssoc() function.
+ */

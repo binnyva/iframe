@@ -99,6 +99,11 @@ function showMessage($message, $url="?", $status="success",$extra_data=array()) 
 		if($status === 'success') print $message . "\n";
 
 	} else {
+		if(strpos($url, 'http://') === false) {
+			global $config;
+			$url = joinPath($config['site_url'], $url);
+		}
+		
 		$goto = str_replace('&amp;', '&', getLink($url, array($status=>$message), true));
 		header("Location:$goto");
 	}

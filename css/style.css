@@ -8,14 +8,14 @@ a {
 	text-decoration:none;
 	color:blue;
 }
-label {
+.form-area label {
 	width:100px;
 	display:block;
 	float:left;
 	text-align:right;
 	padding-right:5px;
 }
-inupt, select {
+.form-area inupt, select {
 	float:left;
 }
 br {
@@ -23,15 +23,15 @@ br {
 }
 
 /*Messages*/
-#warning-message,.warning {
+#warning-message,	.warning-message,	.warning {
 	font-weight:bold;
 	color:red;
 }
-#error-message,.error {
+#error-message,		.error-message,		.error {
 	font-weight:bold;
 	color:red;
 }
-#success-message,.success {
+#success-message,	.success-message,	.success {
 	font-weight:bold;
 	color:darkgreen;
 }

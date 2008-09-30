@@ -133,8 +133,8 @@ class DBTable {
 			$this->where("`{$this->primary_key_field}`={$this->primary_key_value}");
 			$this->query .= ' WHERE ' . implode(' AND ',$this->conditions);
 
-			$this->_execQuery('exec');
-			$return_value = $sql->fetchAffectedRows();
+ 			$this->_execQuery('exec');
+ 			$return_value = $sql->fetchAffectedRows();
 
 		} else { //New row - do an insert
 			$field_names = array_keys($this->field);

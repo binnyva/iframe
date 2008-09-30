@@ -46,7 +46,7 @@ function joinPath() {
 	$path = '';
 	$arguments = func_get_args();
 	$args = array();
-	foreach($arguments as $a) if($a !== '') $args[] = $a;//Removes the empty elements
+	foreach($arguments as $a) if($a) $args[] = $a;//Removes the empty elements
 	
 	$arg_count = count($args);
 	for($i=0; $i<$arg_count; $i++) {

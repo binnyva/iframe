@@ -24,8 +24,10 @@ $iframe_folder = dirname(__FILE__) . DIRECTORY_SEPARATOR;
 if($rel !== false) { //If the 'configuration.php' file is found, use that
 	require($rel . "configuration.php");
 	
-	$config['site_folder'] = realpath($rel);
+	if($rel == '') $config['site_folder'] = realpath('.');
+	else $config['site_folder'] = realpath($rel);
 	$config['site_relative_path'] = $rel;
+
 } else {
 	require($iframe_folder . 'configuration.php');
 	
@@ -39,7 +41,7 @@ require($config['iframe_folder'] . "includes/functions.php");
 // This is $_REQUERST without the problems asssociated with magic quotes
 $PARAM = unescapeQuery();
 $QUERY = escapeQuery($PARAM,true);
-if(!isset($QUERY['error']))	 $QUERY['error'] = '';
-if(!isset($QUERY['success']))$QUERY['success'] = '';
+if(!isset($QUERY['error']))	 {$QUERY['error'] = ''; $PARAM['error'] = '';}
+if(!isset($QUERY['success'])){$QUERY['success'] ='';$PARAM['success'] = '';}
 
 require(joinPath($config['iframe_folder'], "includes/config.php"));

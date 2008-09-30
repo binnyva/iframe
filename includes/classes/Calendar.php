@@ -16,6 +16,10 @@ class Calendar {
 	public $limit;
 	public $link_template = "?year=%YEAR%&amp;month=%MONTH%"; /// The template that will be used to create the link to each month page
 	
+	public $date_field;
+	public $query;
+	public $items; //Cache for all the items
+	
 	private $_callback; /// The callback function that the user have to provide - this will be called for every day - from within the day's cell
 	private $_callback_cell_class_provider;
 	private $_month_days;
@@ -64,6 +68,68 @@ class Calendar {
 	 */
 	function setCellClassProvider($func) {
 		$this->_callback_cell_class_provider = $func;
+	}
+	
+	///////////////////////////////// Controller Helper functions ////////////////////////
+	/**
+	 * This field will be treated as the date field in the table.
+	 * Argument: $field - the name of the field.
+	 * Example: $calendar->setDateField("Duration.from_time");
+	 */
+	function setDateField($field) {
+		$this->date_field = $field;
+	}
+	
+	/**
+	 * This sets the query that will be used for this calendar.
+	 * Arguments: $query_main - The first part of the query - the select, From, inner join etc.
+	 * 				$query_where - The condition part of the query.
+	 * 				$query_end - The final part of the query - Order By, Group by, limit etc.
+	 * Example: $calendar->setDateField("Duration.from_time");
+	 *		$calendar->setQuery("SELECT Task.id,Task.name,Duration.from_time,Duration.to_time "
+	 *			. " FROM Task INNER JOIN Duration ON Duration.task_id=Task.id ", "Task.status='1'",
+	 *			" ORDER BY Duration.from_time")
+	 */
+	function setQuery($query_main, $query_where, $query_end) {
+		$this->query = $query_main;
+		
+		if(!trim($query_where)) $query_where = " WHERE ";
+		else {
+			$query_where .= " AND ";
+			if(!preg_match('/^\s*WHERE/i', $query_where)) $query_where = " WHERE " . $query_where; //Prepend the where keyword if its not there.
+		}
+		
+		$filled_month = (($this->month < 10) ? '0' : '') . $this->month;
+		$query_where .= " DATE_FORMAT({$this->date_field}, '%Y-%m')='{$this->year}-$filled_month' ";
+		
+		$this->query = $query_main . $query_where . $query_end;
+		
+		//Now that we have the query, execute it and cache the results...
+		$this->execQuery();
+	}
+	
+	/**
+	 * This function will execute the 'Calender::query' SQL query and cache the results that will be used later.
+	 */
+	function execQuery() {
+		global $sql;
+		$all_items = $sql->getAll($this->query);
+		
+		$date_field = $this->date_field;
+		if(strpos($date_field, '.') !== false) { //There is a . in the field name - so its Table.field - we need just the field name
+			$parts = explode('.', $date_field);
+			$date_field = $parts[1];
+		}
+		
+		foreach($all_items as $item) {
+			$date_index = date('d', strtotime($item[$date_field])); //The day is the index (its 0 filled)
+			$this->items[$date_index][] = $item;
+		}
+	}
+	
+	function getData($day) {
+		if(isset($this->items[$day])) return $this->items[$day];
+		else return array();
 	}
 	
 	//////////////////////////////////////// Private Functions ///////////////////////////

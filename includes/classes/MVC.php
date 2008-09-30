@@ -225,11 +225,11 @@ class MVC {
 	 * Arguments : $template_file - The template file for the current page - if nothing is given it uses the 
 	 *					template with the same name as the current page. OPTIONAL
 	 */
-	function render($template_file = "") {
+	function render($__template_file = "") { // The __ to make sure a global variable don't overwrite it.
 		extract($GLOBALS); //Make sure that all variables are accessable from the template.
 
-		if($template_file) {
-			$this->setTemplate($template_file);
+		if($__template_file) {
+			$this->setTemplate($__template_file);
 		} elseif(!$this->template) {
 			$this->setTemplate($this->page);
 		}

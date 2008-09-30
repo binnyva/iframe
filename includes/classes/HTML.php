@@ -14,21 +14,32 @@ class HTML {
 	* );
 	* buildDropDownArray($list,'countries','IN',array('class'=>'dropdown','multiple'=>'multiple'));
 	*/
-	function buildDropDownArray($array, $name, $selected="", $extra=array()) {
+	function buildDropDownArray($array, $name, $selected="", $extra=array(), $print_select=true) {
 		$attributes = '';
 		
-		print $this->getBeginTag("select",$extra + array('name'=>$name,'id'=>$name));// The $extra must go first to make sure that user specified name/id will overwrite the default ones.
+		$select = $this->getBeginTag("select",$extra + array('name'=>$name,'id'=>$name));// The $extra must go first to make sure that user specified name/id will overwrite the default ones.
 		foreach ($array as $key=>$value) {
 			$attrbs = array('value'=>$key);
 			if($key == $selected) $attrbs['selected']="selected";
-			$this->buildTag('option',$attrbs,$value);
+			$select .= $this->getTag('option',$attrbs,$value);
 		}
-		print $this->getEndTag("select");
+		$select .= $this->getEndTag("select");
+		
+		if($print_select) print $select;
+		return $select;
 	}
 	
 	/**
-	* Create a input row with label and an input field.
-	*/
+	 * Create a input row with label and an input field.
+	 * If its an SELECT input, then you must specify the options array in the $extra array with the index 'options' - like this...
+	 * <pre><code class="php">
+	 * $html->buildInput("country", "Country", 'select', 'IN', //IN is the selected option
+	 *		array('options' => array(
+	 * 			'US'	=>	'United State of America',
+	 *			'IN'	=>	'India',
+	 *			'RU'	=>	'Russia'), 'class'=>'dropdown' //Extra attributes for the select tag.
+	 * ));</code></pre>
+	 */
 	function buildInput($name, $title='', $type='text', $data='', $extra=array(), $info='') {
 		global $PARAM;
 	
@@ -49,14 +60,15 @@ class HTML {
 				$attributes['checked'] = 'checked';
 				$attributes['value'] = $data;
 			}
-		}
-		else if ($type == 'textarea' ) { //Textarea
+			
+		} else if ($type == 'textarea' ) { //Textarea
 			$tag = 'textarea';
 			unset($attributes['type']);
 			$attributes['rows'] = 5;
 			$attributes['cols'] = 50;
 			$value = $data;
 		}
+		
 		if($data) $attributes['value'] = $data;
 		elseif(isset($PARAM[$name]) and !isset($attributes['value'])) {
 			$attributes['value'] = $value = $PARAM[$name];
@@ -64,9 +76,24 @@ class HTML {
 	
 		//Create all the attributes that is to be appended at the end of the tag.
 		$all_attributes = $extra + $attributes;
+		if($tag == 'textarea' and isset($all_attributes['value'])) unset($all_attributes['value']); //Textarea don't have a value attribute.
+		
+		$label = $this->getTag('label', array('for'=>$all_attributes['id']), $title);
+		
+		if($type == 'select') {
+			$options = array();
+			if(isset($extra['options'])) {
+				$options = $extra['options'];
+				unset($extra['options']);
+			}
+			
+			$input = $this->buildDropDownArray($options, $name, $data, $extra, false);
+		} else {
+			$input = $this->getTag( $tag, $all_attributes, $value );
+		}
 	
 	
-		print "<label for='$all_attributes[id]'>$title</label>" . $this->getTag( $tag, $all_attributes, $value ) . $info . "<br />\n";
+		print $label . $input . $info . "<br />\n";
 	}
 	
 	

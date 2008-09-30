@@ -1,5 +1,8 @@
 <?php
-set_include_path(get_include_path() . PATH_SEPARATOR . $config['iframe_folder'] . 'includes/classes'); //Make including classes easier
+//Make including classes easier
+set_include_path(get_include_path() . PATH_SEPARATOR .  joinPath($config['iframe_folder'], 'includes/classes')); 
+if(file_exists(joinPath($config['site_folder'] , 'models'))) set_include_path(get_include_path() . PATH_SEPARATOR .  joinPath($config['site_folder'] , 'models'));
+
 
 //Find all path info
 $config['PHP_SELF'] = ($PHP_SELF) ? $PHP_SELF : $_SERVER["PHP_SELF"];
@@ -12,7 +15,7 @@ if(!isset($config['site_absolute_path'])) {
 		if(file_exists($_SERVER["DOCUMENT_ROOT"] . $path . DIRECTORY_SEPARATOR . 'configuration.php')) break;
 		else $path = dirname($path);
 	}
-	$config['site_absolute_path'] = $path . DIRECTORY_SEPARATOR;
+	$config['site_absolute_path'] = str_replace('//','/', $path . DIRECTORY_SEPARATOR);
 }
 $config['current_page'] = str_replace($config['site_absolute_path'], '/', $config['PHP_SELF']);
 
