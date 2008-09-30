@@ -5,8 +5,10 @@ foreach($field_names as $fn) {
 }
 ?><?='<'?>?php
 include('../common.php');
+include('_form.php');
 
-if(isset($QUERY['action']) and $QUERY['action']=='Create') {
+$data = array();
+if(isset($QUERY['action']) and $QUERY['action']=='Add') {
 	if($id = <?= $object_name ?>->create(<?=implode(', ', $queries)?>)) {
 		showMessage("<?= $title ?> created successfully","index.php",'success',$id);
 	}

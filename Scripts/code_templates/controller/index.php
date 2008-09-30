@@ -1,13 +1,13 @@
 <?='<'?>?php
 include('../common.php');
-include('../includes/classes/SqlPager.php');
 
 //The pager.
-$pager = new SqlPager("SELECT <?= implode(',', $all_fields_names) ?>) ?> FROM <?= $table ?>");
-$<?=strtolower($name_plural)?>_sql = $pager->getSql();
-$<?=strtolower($name_plural)?> = array();
-while($parts = $sql->fetchRow($<?=strtolower($plural)?>_sql)) {
-	$<?=strtolower($name_plural)?>[] = $parts;
+$pager = new SqlPager("SELECT <?= implode(',', $all_field_names) ?> FROM <?= $table ?><?php
+
+if($functionality['status'] and $status_field) {
+	print " WHERE $status_field='1'";
 }
+?>");
+$<?=strtolower($name_plural)?> = $pager->getPage();
 
 render();

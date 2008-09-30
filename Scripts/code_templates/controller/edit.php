@@ -5,6 +5,7 @@ foreach($field_names as $fn) {
 }
 ?><?='<'?>?php
 include('../common.php');
+include('_form.php');
 
 if(isset($QUERY['action']) and $QUERY['action']=='Edit') {
 	if(<?= $object_name ?>->edit($QUERY['id'], <?=implode(', ', $queries)?>)) {
