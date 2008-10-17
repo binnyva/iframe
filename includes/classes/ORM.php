@@ -169,6 +169,7 @@ class DBTable {
 
 		$this->query = "DELETE FROM `{$this->table_name}` ";
 		$ids = $this->_getArguments(func_get_args());
+		
 		if(count($ids)) {
 			if(count($ids) == 1) {
 				$this->query .= " WHERE `{$this->primary_key_field}` = " . $ids[0];
@@ -178,8 +179,10 @@ class DBTable {
 			if(count($this->conditions)) $this->query .= ' AND ' . implode(' AND ',$this->conditions);
 
 		} else { //Remove muliptle rows at once
+			if($this->primary_key_value) $this->query .= " WHERE `{$this->primary_key_field}` = {$this->primary_key_value}"; // If the user made an newRow() call before the delete.
 			if(count($this->conditions)) $this->query .= ' WHERE ' . implode(' AND ',$this->conditions);
 		}
+		
 		$this->_execQuery('exec');
 		return $sql->fetchAffectedRows();
 	}
@@ -196,6 +199,16 @@ class DBTable {
 		$this->order = '';
 		$this->group = '';
 		$this->query_result_type = 'all';
+		
+		return $this;
+	}
+	
+	/** Sets the data for this save
+	 * Example: $Task->newRow(14)->set(array('name'=>'Implement Chainable interfaces in ORM', 'status'=>'done'))->save();
+	 */
+	function set($field_data) {
+		$this->field = $field_data;
+		return $this;
 	}
 	
 	function setRequirement($arg) {

@@ -31,7 +31,16 @@ if(!isset($config['site_url'])) {
  */
 if(!isset($config['mode'])) $config['mode']	= 'd'; //Default Config Mode
 
-if($config['mode'] == 'd') error_reporting(E_ALL);
+if($config['mode'] == 'd') {
+	error_reporting(E_ALL);
+	
+	$Logger = false;
+	if(i($QUERY,'debug') == 'log') {
+		include("Development/Logger.php");
+		$Logger = new Logger;
+		$Logger->log("\nRendering Request: $_SERVER[REQUEST_URI]");
+	}
+}
 elseif($config['mode'] == 'p') error_reporting(0);
 
 // Database connection is optional

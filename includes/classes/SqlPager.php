@@ -77,8 +77,9 @@ class SqlPager {
 		$offset = ($this->page - 1) * $this->items_per_page;
 		$this->_pager_query = $query . " LIMIT $offset," . $this->items_per_page;
 		
-		$total_items_sql = mysql_query($this->query);
-		$this->total_items = mysql_num_rows($total_items_sql);
+		global $sql;
+		$total_items_sql = $sql->getSql($this->query);
+		$this->total_items = $sql->fetchNumRows($total_items_sql);
 		$this->total_pages = ceil($this->total_items / $this->items_per_page);
 	}
 	
@@ -87,13 +88,9 @@ class SqlPager {
 	 * Return : The SQL resource of the pager.
 	 */
 	function getSql() {
-		//:TODO: Use DB abstraction
-		$this->_sql_resource = mysql_query($this->_pager_query);
-		if(!$this->_sql_resource) {
-			$this->_error("Query error: ".mysql_error()."!<br />" . $this->_pager_query);
-			return false;
-		}
-
+		global $sql;
+		$this->_sql_resource = $sql->getSql($this->_pager_query);
+		
 		return $this->_sql_resource;
 	}
 	
@@ -102,12 +99,8 @@ class SqlPager {
 	 * Returns : All the items for one page in a list.
 	 */
 	function getPage() {
-		$resource = $this->getSql();
-		$result = array();
-		while($row = mysql_fetch_assoc($resource)) {
-			$result[] = $row;
-		}
-		return $result;
+		global $sql;
+		return $sql->getAll($this->_pager_query);
 	}
 
 	//////////////////////////////////// Functions that print ///////////////////////////////////////
@@ -374,6 +367,8 @@ function goToPage(page) {
 		
 		$params_arr = array();
 		foreach($params as $key=>$value) {
+			if($key == 'success' or $key == 'error') continue; // Success or Error message don't have to be shown.
+			
 			if(gettype($value) == 'array') { //Handle array data properly
 				foreach($value as $val) {
 					$params_arr[] = $key . '[]=' . urlencode($val);

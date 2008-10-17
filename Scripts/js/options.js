@@ -7,7 +7,7 @@ function newField() {
 	var field = document.createElement("div");
 	//InnerHTML is propabily the safest approch - cloneNode is possible - but we need to change the ids and everything.
 	field.innerHTML = code.replace(/%COUNT%/g,field_count);
-	$('extra_fields').appendChild(field);
+	$("extra_fields").appendChild(field);
 	$("total_fields").value++; //Yes, it works. I am surprised too
 
 	registerEventHandles(field_count);
@@ -44,9 +44,7 @@ function autoFillFieldDetails(ele) {
 	if(!ele) return;
 	var fc = getFieldCount(ele);
 	
-	if($("auto_handle_on_"+fc) && $("auto_handle_on_"+fc).checked) { // Its on auto mode - hide the rest of the options...
-		$("field_details_"+fc).hide();
-	}
+	if($("auto_handler_"+fc).value != "off") $("field_details_"+fc).hide();
 	
 	var field = $("field_title_"+fc).value;
 	if($("field_"+fc).value) return;
@@ -140,16 +138,11 @@ function registerEventHandles() {
 			fieldOptions(ele);
 		}
 		
-		if($("auto_handle_on_"+fc)) { //The Auto Handle toogle
-			$("auto_handle_on_"+fc).click(function() {
-				var fc = this.id.replace(/[^\d]/g,"");//Remove all the non numbers - get just the rumbers
-				$("field_details_"+fc).hide();
-			});
-			$("auto_handle_off_"+fc).click(function() {
-				var fc = this.id.replace(/[^\d]/g,"");
-				$("field_details_"+fc).show();
-			});
-		}
+		$("auto_handler_"+fc).on("change", function() {
+			var fc = this.id.replace(/[^\d]/g,"");
+			if(this.value != "off") $("field_details_"+fc).hide();
+			else $("field_details_"+fc).show();
+		});
 	}
 }
 
@@ -222,14 +215,24 @@ function parseSerializedData() {
 	var data = eval("(" + $("serialized").value + ")");
 
 	//Create fields before inserting the data.
-	var fc = data['field_count'];
-	for(var j=1;j<fc-1;j++) {
+	var fc = data['total_fields'];
+	var current_field_count = $("total_fields").value;
+	for(var j=current_field_count; j<fc; j++) {
 		newField(); //Create the new fields
 	}
 	
 	for(var id in data) { //Handle each element
 		var value = data[id];
-		var ele = $(id);
+		var ele = $("#"+id);
+		
+		if(!ele) {
+			ele = $("[name="+id+"]");
+			
+			if(!ele.get()) {
+				p("Cannot get element " + id + " with value '"+value+"'");
+				continue;
+			}
+		}
 		
 		if(!ele && id.match(/_\d$/) && value) { //This data should be in a higher field.
 			//We got issues
@@ -237,12 +240,14 @@ function parseSerializedData() {
 		
 		if(ele) {
 			if(ele.tagName=="INPUT") {
-				if(ele.type=="checkbox") { //Handle checkboxes
+				if(ele.type == "checkbox") { //Handle checkboxes
 					ele.checked = (value) ? true : false;
+				
+				} else if(ele.type == "radio") {
+					ele.checked = true;
 				} else {
 					ele.value = value;
 				}
-				// :TODO: Radio buttons?
 
 			} else if(ele.tagName=="SELECT") {
 				if(typeof(value) == "object") { //Multiple select cases.

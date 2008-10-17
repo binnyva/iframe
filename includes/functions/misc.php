@@ -19,6 +19,8 @@ function getLink($url,$params=array(),$use_existing_arguments=false) {
 	
 	$params_arr = array();
 	foreach($params as $key=>$value) {
+		if($use_existing_arguments and ($key == 'success' or $key == 'error')) continue; // Success or Error message don't have to be shown.
+		
 		if(gettype($value) == 'array') { //Handle array data properly
 			foreach($value as $val) {
 				$params_arr[] = $key . '[]=' . urlencode($val);
@@ -601,7 +603,9 @@ function ls($pattern="*", $folder="", $recursivly=false, $options=array('return_
  * Arguments : $contents - The XML text
  *				$get_attributes - 1 or 0. If this is 1 the function will get the attributes as well as the tag values - this results in a different array structure in the return value.
  *				$priority - Can be 'tag' or 'attribute'. This will change the way the resulting array sturcture. For 'tag', the tags are given more importance.
- * Return: The parsed XML in an array form.
+ * Return: The parsed XML in an array form. Use print_r() to see the resulting array structure.
+ * Examples: $array =  xml2array(file_get_contents('feed.xml');
+ * 			 $array =  xml2array(file_get_contents('feed.xml', 1, 'attribute');
  */
 function xml2array($contents, $get_attributes=1, $priority = 'tag') {
     if(!$contents) return array();

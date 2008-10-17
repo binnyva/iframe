@@ -32,38 +32,42 @@ $html->buildInput('model_file', 'Model File', 'text', $field_data['model_file'],
 <fieldset id="fields_area">
 <legend>Fields</legend>
 
-<?php for($field_count = 1; $field_count < $total_fields; $field_count++) { ?>
+<?php for($field_count = 1; $field_count <= $total_fields; $field_count++) { ?>
 <fieldset class="field" id="field_<?=$field_count?>">
 <legend>Field <?=$field_count?></legend>
 <?php
 $html->buildInput('field_name_' . $field_count, 'Field', 'text', $field_data['field_name_' . $field_count], array(), '<span class="help">The database field name (Eg. user_first_name)</span>');
-if($field_data['field_auto_handle_'.$field_count] != 'off') {
-	?>
-	<label for="auto_handle_off_<?=$field_count?>">Manual Handling</label> <input type="radio" name="field_auto_handle_<?=$field_count?>" id="auto_handle_off_<?=$field_count?>" value="off" /><br />
-	<label for="auto_handle_on_<?=$field_count?>"><?=format($field_data["field_auto_handle_$field_count"])?></label>
-		<input type="radio" name="field_auto_handle_<?=$field_count?>" id="auto_handle_on_<?=$field_count?>" value="<?=$field_data["field_auto_handle_$field_count"]?>" checked="checked" /> 
-	<br />
-	<?php } ?>
+
+$all_auto_handler = array(
+	'off'			=>	'None(Manual Handling)',
+	'primary_key'	=>	'Primary Key Field',
+	'time_of_insert'=>	'Insertion Time',
+	'time_of_update'=>	'Time of Update',
+	'status_holder'	=>	'Status Field',
+	'current_user'	=>	'User ID Field',
+);
+$html->buildInput("auto_handler_$field_count", "Auto Handling", "select", $field_data['auto_handler_' . $field_count], array("options"=>$all_auto_handler), '<span class="help">You will get moore option on how to handle this field if its set to manual.</span>');
+?>
+
 <div id="field_details_<?=$field_count?>">
 <?php
 $html->buildInput('field_title_' . $field_count,'Title', 'text', $field_data['field_title_' . $field_count], array(), '<span class="help">The name of the field (Eg. First Name)</span>');
 $html->buildInput('field_list_' . $field_count, 'List', 'checkbox', $field_data['field_list_' . $field_count], array(), '<span class="help">If checked, this field will be shown in the listing page.</span>');
+
+$all_types = array(
+	'text'		=> 'Text',
+	'textarea'	=> 'Textarea',
+	'list'		=> 'List',
+	'file'		=> 'File',
+	'date'		=> 'Date',
+	'time'		=> 'Time',
+	'url'		=> 'URL',
+	'password'	=> 'Password',
+	'editor'	=> 'Editor',
+	'foreign_key'=> 'Foreign Key',
+);
+$html->buildInput("field_type_$field_count", "Type", "select", $field_data['field_type_' . $field_count], array("options"=>$all_types), '<span class="help">The field type - what kind of data will be stored in the field.</span>');
 ?>
-<label for="field_type_<?=$field_count?>">Type</label><?php 
-	$all_types = array(
-		'text'		=> 'Text',
-		'textarea'	=> 'Textarea',
-		'list'		=> 'List',
-		'file'		=> 'File',
-		'date'		=> 'Date',
-		'time'		=> 'Time',
-		'url'		=> 'URL',
-		'password'	=> 'Password',
-		'editor'	=> 'Editor',
-		'foreign_key'=> 'Foreign Key',
-	);
-	$html->buildDropDownArray($all_types, 'field_type_' . $field_count, $field_data['field_type_' . $field_count]); ?>
-<span class="help">The field type - what kind of data will be stored in the field.</span><br />
 
 <div class="date_options type_options">
 <?php $html->buildInput('field_date_format_' . $field_count, 'Date Format', 'text', $field_data['field_date_format_' . $field_count], array(), '<span class="help">The date format - MySQL Format. If empty defaults to %Y-%m-%d (Eg. %d %b, %Y)</span>'); ?>
@@ -120,9 +124,9 @@ $html->buildInput('field_list_' . $field_count, 'List', 'checkbox', $field_data[
 <fieldset>
 <legend>Extra Information</legend>
 
-<?php 
-$html->buildInput('status_field', 'Status Field', 'text', 'status', array(), '<span class="help">The name of the status field in the database.</span>');
+<?php
 $html->buildInput('pager_status', 'Enable Pager?', 'checkbox', '1', array('checked'=>'checked'), '<span class="help">Enable the pager</span>');
+$html->buildInput('pager_items_per_page', 'Items Per Page', 'text', '20', array(), '<span class="help">The number of items that should be shown in each page</span>');
 $html->buildInput('upload_path', 'Upload Location', 'text', '../uploads', array(), '<span class="help">The folder where all the files must be upload to. Make sure that there is a "/" at the end.</span>');
 $html->buildInput('mandatory_text', 'Mandatory Text', 'text', '*', array(), '<span class="help">The text that should be shown next the each mandateory field (Eg. *)</span>');
 $html->buildInput('main_query', 'Main Query', 'textarea', '', array(), '<span class="help">The query that must be used when creating the display. If empty, this will default to "SELECT * FROM &lt;Table&gt;"</span>');
@@ -158,7 +162,8 @@ $html->buildInput('main_query', 'Main Query', 'textarea', '', array(), '<span cl
 
 <div id="serialized-data">
 <div class="entry"><label for="adm_upload">Serialized Data Input</label>
-<textarea name="serialized" id="serialized" rows="10" cols='100'></textarea>
+<textarea name="serialized" id="serialized" rows="10" cols='100'>
+</textarea>
 <span class="help">Enter the data at the end of the generated PHP file here to re-populate the form with the old page details.</span></div>
 <input type="button" value="Parse Serialized Data" id="parse-serialized-data" />
 </div>

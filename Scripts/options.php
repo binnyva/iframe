@@ -29,13 +29,14 @@ if(isset($table)) {
 		$values = '';
 		$field_name = $f['Field'];
 		$data_type = preg_replace('/^([a-z]+).*$/',"$1", $f['Type']); //Get the data type of the field
-		$auto_handle = 'off';
+		$auto_handler = 'off';
 		$type = 'text';
 		
 		if($field_name == 'id' and $f['Key'] == 'PRI') {
 			$type = 'primary_key';
-			$auto_handle = 'primary_key';
+			$auto_handler = 'primary_key';
 		}
+		elseif($field_name == 'user_id' and $data_type == 'int') $auto_handler = 'current_user';
 		elseif($data_type == 'varchar' or $data_type == 'text') $type = 'text';
 		elseif($data_type == 'longtext' or $data_type == 'mediumtext') $type = 'editor';
 		elseif(strpos($data_type,'int')!==false and strpos($f['Type'],'unsigned')!==false) $type = 'list'; //If has an unsigned in it it means that it is a forign key
@@ -52,10 +53,10 @@ if(isset($table)) {
 		}
 		elseif($data_type == 'datetime') {
 			if($field_name=='added_on' or $field_name=='created_on' or $field_name=='inserted_on') {
-				$auto_handle = 'time_of_insert';
+				$auto_handler = 'time_of_insert';
 				
 			} elseif($field_name=='edited_on' or $field_name=='updated_on' or $field_name=='modified_on') {
-				$auto_handle = 'time_of_update';
+				$auto_handler = 'time_of_update';
 			
 			}
 			
@@ -64,7 +65,7 @@ if(isset($table)) {
 		elseif($data_type == 'date') $type = 'date';
 		elseif((($data_type == 'enum' or $data_type == 'int' or $data_type == 'smallint') and $field_name == 'status')) {
 			$field_data['status_funcionality'] = 1;
-			$auto_handle = 'status_holder';
+			$auto_handler = 'status_holder';
 		}
 		else $type = 'text';
 		
@@ -90,7 +91,7 @@ if(isset($table)) {
 			'info'			=> $f,
 			'data_type'		=> $data_type,
 			'values'		=> $values,
-			'auto_handle'	=> $auto_handle,
+			'auto_handler'	=> $auto_handler,
 		);
 	}
 }
@@ -119,7 +120,7 @@ foreach($Fields as $f) {
 	$field_data["field_filetype_$field_count"]			= $filetypes;
 	$field_data["list_values_$field_count"]				= $f['values'];
 	$field_data["field_validation_$field_count"]		= $f['validation'];
-	$field_data["field_auto_handle_$field_count"]		= $f['auto_handle'];
+	$field_data["auto_handler_$field_count"]			= $f['auto_handler'];
 	$field_data["field_foreign_key_reference_$field_count"]		= str_replace('_', '.', $f['name']);
 	$field_count++;
 }

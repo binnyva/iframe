@@ -91,5 +91,5 @@ function dump($data) {
 
 //http://php.net/autoload
 function __autoload($class_name) {
-	require_once $class_name . '.php';
+	require_once($class_name . '.php');
 }

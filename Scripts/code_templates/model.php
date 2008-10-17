@@ -13,36 +13,21 @@ class <?=$class_name?> extends DBTable {
 	/**
 	 * This will create a new <?= $name_single ?> and returns the id of the newly created row.
 	 */
-	function create($<?=implode(', $', $field_names) ?>) {
+	function create(<?php printArgumentList() ?>) {
 		$validation_rules = $this->getValidationRules();
 <?php
 		$field_values = array();
 		foreach($fields as $f) {
-			$fn = $f['field'];
-			$value = '';
 			if($f['auto_handler'] === false) {
 				
 				//Validation
 				if(in_array('unique', $f['validation'])) { ?>
-		$this->checkDuplicate('<?=$fn?>', $<?=$fn?>);
+		$this->checkDuplicate('<?=$f['field']?>', $<?=$f['field']?>);
 <?php			}
-				
-				// Type based diffenences
-				if($f['type'] == 'password') {
-					print "		\$validation_rules[] = array('name'=>'$fn', 'is'=>'empty', 'error'=>'Please provide a password');\n";
-					if($f['password_encryption_algorithm']) $value = $f['password_encryption_algorithm'] . "(\$$fn . '$f[password_salt]')";
-					else $value = "\$$fn";
-				
-				} else $value = '$' . $f['field'];
 			}
-			elseif($f['auto_handler'] === 'time_of_insert' || $f['auto_handler'] === 'current_time') $value = "'NOW()'";
-			elseif($f['auto_handler'] === 'current_user') $value = '$_SESSION["user_id"]';
-			elseif($f['auto_handler'] !== 'none' and $f['auto_handler']) continue; //Some unknown or invalid auto_handler - don't bother with that.
-			
-			if($value) $field_values[$fn] = $value;
 		}
-		
 		?>
+		
 		$validation_errors = check($validation_rules,2);
 		if($validation_errors) {
 			$GLOBALS['QUERY']['error'] =  "Please correct the errors before continuing...<br />" . $validation_errors;
@@ -50,9 +35,27 @@ class <?=$class_name?> extends DBTable {
 		}
 		
 		$this->newRow();
-<?php	foreach($field_values as $fn=>$value) { ?>
-		$this->field['<?=$fn?>'] = <?=$value?>;
-<?php	} ?>
+		<?php
+		foreach($fields as $f) {
+			$fn = $f['field'];
+			$value = '';
+			// Type based diffenences
+			if($f['type'] == 'password') {
+				print "		\$validation_rules[] = array('name'=>'$fn', 'is'=>'empty', 'error'=>'Please provide a password');\n";
+				if($f['password_encryption_algorithm']) $value = $f['password_encryption_algorithm'] . "(\$$fn . '$f[password_salt]')";
+				else $value = "\$$fn";
+			
+			} else $value = '$' . $f['field'];
+			
+			if($f['auto_handler']) { //Auto handled values
+				if($f['auto_handler'] === 'time_of_insert' || $f['auto_handler'] === 'current_time') $value = "'NOW()'";
+				elseif($f['auto_handler'] === 'current_user') $value = '$_SESSION["user_id"]';
+				elseif($f['auto_handler'] !== 'none' and $f['auto_handler']) continue; //Some unknown or invalid auto_handler - don't bother with that.
+			}
+		
+		if(!in_array('must',$f['validation']) and $f['auto_handler'] === false) { ?>if($<?=$fn?> !== false) <?php } ?>$this->field['<?=$fn?>'] = <?=$value?>;
+		<?php } ?>
+		
 		return $this->save();
 	}
 	
@@ -60,7 +63,7 @@ class <?=$class_name?> extends DBTable {
 	 * You can edit an existing <?= $title ?> using this function. The first argument 
 	 * 		must be the id of the row to be edited
 	 */
-	function edit($id, $<?=implode(', $', $field_names) ?>) {
+	function edit($id, <?php printArgumentList(); ?>) {
 		if(!$id) return -1;
 		
 <?php
@@ -69,8 +72,7 @@ class <?=$class_name?> extends DBTable {
 			$fn = $f['field'];
 			$value = '';
 			if($f['auto_handler'] === false) {
-				
-				//Validation
+				//Uniqe Validation
 				if(in_array('unique', $f['validation'])) { ?>
 		$this->checkDuplicate('<?=$fn?>', $<?=$fn?>);
 <?php			}
@@ -91,15 +93,12 @@ class <?=$class_name?> extends DBTable {
 			if($f['auto_handler'] === 'time_of_update' || $f['auto_handler'] === 'current_time') $value = "'NOW()'";
 			elseif($f['auto_handler'] === 'current_user') $value = '$_SESSION["user_id"]';
 			elseif($f['auto_handler'] !== 'none' and $f['auto_handler']) continue; //Some unknown auto_handler - don't bother with that.
-
-			// Type based diffenences
-			if($f['type'] == 'password') {
+			else if($f['type'] == 'password') { // Type based diffenences
 				if($f['password_encryption_algorithm']) $value = $f['password_encryption_algorithm'] . "(\$$fn . '$f[password_salt]')";
 				else $value = "\$$fn";
 				print "		if($value) ";
-			} else $value = '$' . $f['field'];
-		?>
-		$this->field['<?=$fn?>'] = <?=$value?>;
+			} else $value = '$' . $f['field'];?>
+		<?php if(!in_array('must',$f['validation']) and $f['auto_handler'] === false) { ?>if($<?=$fn?> !== false) <?php } ?>$this->field['<?=$fn?>'] = <?=$value?>;
 <?php	} ?>
 
 		return $this->save();
@@ -163,4 +162,23 @@ $GLOBALS['<?=str_replace('$','',$object_name)?>'] = new <?=$class_name?>;
 /*
 Controllor Constructor Code(JSON):
 <?php print json_encode($PARAM); ?>
+
 */
+<?php
+
+function printArgumentList() {
+	global $fields;
+	
+	$length = count($fields);
+	for($i=0; $i<$length; $i++) {
+		$f = $fields[$i];
+		
+		if($f['auto_handler'] !== false) continue; // Autohandled stuff will not be sent by the code
+		
+		print '$'.$f['field'];
+		if(!in_array('must', $f['validation'])) { //Make it an optional argument if it don't have the 'must' validation
+			print "=false";
+		}
+		if($i < $length-1) print ', ';
+	}
+}

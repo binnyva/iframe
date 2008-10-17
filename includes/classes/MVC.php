@@ -137,7 +137,7 @@ class MVC {
 		$model_name = $this->model;
 
 		if($this->model) {
-			include(joinPath($model_folder, $this->model));
+			include_once(joinPath($model_folder, $this->model));
 			$this->model_name = str_replace('.php','',$model_name);
 		}
 	}

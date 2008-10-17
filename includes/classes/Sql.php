@@ -27,16 +27,15 @@ class Sql {
 	 *				$db_name - The database that must be used.
 	 */
 	function __construct($db_host,$db_user,$db_password,$db_name,$options=array()) {
-		$this->_db_connection = mysql_connect($db_host, $db_user, $db_password);
-		
-		if(!$this->_db_connection) $this->_error("Cannot connect to Database Host '".$db_host."'");
-		mysql_select_db($db_name) or $this->_error("Cannot use Database '" . $db_name . "'.");
+		$this->_db_connection = mysqli_connect($db_host, $db_user, $db_password, $db_name);
+		if(!$this->_db_connection) $this->_error("Cannot connect to Database Host '".$db_host."': " . mysqli_connect_error());
 	}
+	
 	/**
 	 * Disconnects from the currently open database connection
 	 */
 	function disconnect() {
-		mysql_close($this->_db_connection);
+		mysqli_close($this->_db_connection);
 	}
 	
 	//////////////////////////////////////// Raw SQL Functions ///////////////////////////////////////
@@ -49,9 +48,11 @@ class Sql {
 		if(self::$mode == 't') {
 			print $query;
 			return false;
+		} else if(self::$mode == 'd') { // Log the query if we are in the Development mode.
+			if($GLOBALS['Logger']) $GLOBALS['Logger']->log("Query: $query");
 		}
 
-		if(is_string($query)) $this->_resource = mysql_query($query,$this->_db_connection);
+		if(is_string($query)) $this->_resource = mysqli_query($this->_db_connection, $query);
 		else $this->_resource = $query;
 		
 		if(!$this->_resource) {
@@ -71,7 +72,7 @@ class Sql {
 		$result = $this->getSql($query);
 		if(!$result) return array();
 
-		$row = mysql_fetch_assoc($result);
+		$row = mysqli_fetch_assoc($result);
 		
 		if(isset($options['strip_slashes']) and $options['strip_slashes'] == false) return $row;
 		return $this->_stripSlashes($row);
@@ -85,7 +86,7 @@ class Sql {
 	function getList($query) {
 		$result = $this->getSql($query);
 		if(!$result) return array();
-		$row = mysql_fetch_row($result);
+		$row = mysqli_fetch_row($result);
 		return $this->_stripSlashes($row);
 	}
 
@@ -97,7 +98,7 @@ class Sql {
 	function getOne($query) {
 		$result = $this->getSql($query);
 		if(!$result) return array();
-		$res = mysql_fetch_row($result);
+		$res = mysqli_fetch_row($result);
 		if(!$res) return '';
 		return stripslashes($res[0]);
 	}
@@ -112,7 +113,7 @@ class Sql {
 		if(!$result) return array();
 
 		$arr = array();
-		while ($row = mysql_fetch_assoc($result)) {
+		while ($row = mysqli_fetch_assoc($result)) {
 			array_push($arr,$row);
 		}
 		return $this->_stripSlashes($arr);
@@ -128,7 +129,7 @@ class Sql {
 		if(!$result) return array();
 
 		$arr = array();
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			array_push($arr,stripslashes($row[0]));
 		}
 		return $arr;
@@ -144,8 +145,8 @@ class Sql {
 		if(!$result) return array();
 
 		$arr = array();
-		while ($row = mysql_fetch_array($result)) {
-			if(count($row) == 4) // Just 2 items actually - it is mysql_fetch_array - so both index and name is there in the array
+		while ($row = mysqli_fetch_array($result)) {
+			if(count($row) == 4) // Just 2 items actually - it is mysqli_fetch_array - so both index and name is there in the array
 				$arr[$row[0]] = $this->_stripSlashes($row[1]);
 			else // SELECT id, name, username FROM Users - will be handled by creating an array like {1:{"id":1, "name":"Binny", "username": "binnyva", "0":1, "1":"Binny", "2": "binnyva"}}
 				$arr[$row[0]] = $row;
@@ -162,7 +163,7 @@ class Sql {
 	 */ 
 	function execQuery($query) {
 		$this -> getSql($query);
-		return mysql_affected_rows();
+		return $this->fetchAffectedRows();
 	}	
 	
 	/////////////////////////////////// Editing Functions /////////////////////////////////
@@ -315,7 +316,7 @@ class Sql {
 		foreach($datas as $value) {
 			$pos = strpos($qry,'?');
 			if($pos === false) break;
-			$value = mysql_real_escape_string($value);
+			$value = mysqli_real_escape_string($value);
 
 			if(is_string($value)) {
 				$value = "'".$value."'";
@@ -367,7 +368,7 @@ class Sql {
 	 * Argument : $query - The SQL Query in which the error occured.
 	 */
 	private function _error($query) {
-		$error_message = "MySQL Error : <code>" . mysql_error() . "</code><br /><br /><u>In Query...</u><br /><code>" . $query . "</code>";
+		$error_message = "MySQL Error : <code>" . mysqli_error($this->_db_connection) . "</code><br /><br /><u>In Query...</u><br /><code>" . $query . "</code>";
 		if(self::$mode == 'd') {
 			die($error_message);
 		} elseif(self::$mode == 't') {
@@ -392,28 +393,33 @@ class Sql {
 	}
 	
 	/*****************************************************************************/
+	function escape($string) {
+		return mysqli_real_escape_string($this->_db_connection, $string);
+	}
+	
 	function fetchAssoc($resource = false) {
 		if(!$resource) $resource = $this->_resource;
-		return mysql_fetch_assoc($resource);
+		return mysqli_fetch_assoc($resource);
 	}
 	function fetchRow($resource = false) {
 		if(!$resource) $resource = $this->_resource;
-		return mysql_fetch_row($resource);
+		return mysqli_fetch_row($resource);
 	}
 	function fetchNumRows($resource = false) {
 		if(!$resource) $resource = $this->_resource;
-		return mysql_num_rows($resource);
+		return mysqli_num_rows($resource);
 	}
 	function fetchInsertId() {
-		return mysql_insert_id();
+		return mysqli_insert_id($this->_db_connection);
 	}
 	function fetchAffectedRows() {
-		return mysql_affected_rows();
+		return mysqli_affected_rows($this->_db_connection);
 	}
 }
 
 /*
  * :TODO:
+ * Change this to OOPS mysqli - not procedural. Do something like 'class Sql extends mysqli {'
  * Combine insertFields() and insert() - add the $fields list as the third argument of insert(). Also combine update() and updateFields()
  * The options argument - as in the getAssoc() function.
  */
