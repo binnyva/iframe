@@ -1,4 +1,36 @@
-<?php 
+<?php
+/**
+ * Transilation function
+ * Arguments: $message - First argument is the string to be translated - this will be translated if a corresponding value is present in the locale file.
+ *            The rest of the arguments will be passed to an sprintf() with the message - use this to put variables inside the sting.
+ * Return: The translated string according to the current locale.
+ * Example: t("Thanks for your input");
+ *          t("Project '%s' has been deleted", 'Death Ray');
+ */
+function t() {
+	global $config, $locale, $locales;
+	
+	$arguments = func_get_args();
+	$message = $arguments[0];
+	$vars = array_splice($arguments, 1); //Gets all the arguments after the 1st argument.
+	
+	if(isset($locale) and isset($locales[$message])) {
+		return call_user_func_array('sprintf', array_merge(array($locales[$message]), $vars));
+    
+    } else { // The necessary translation was not found.
+		if ($config['mode'] == 'd' and $locale and $locale != 'en_EN') {
+			if (isset($locale)) {
+				error_log("l10n error: LANG: $locale, message: '$message'");
+			} else {
+				error_log("l10n error: LANG: no locale, message: '$message'");
+			}
+			return call_user_func_array('sprintf', array_merge(array($message . "[translate_me]"), $vars));
+		}
+		return call_user_func_array('sprintf', array_merge(array($message), $vars));
+    }
+}
+
+
 /**
  * Another way of doing the finding the relation between the current file and the document root - but I think findRelation() is a better way(defined in common.php). This function will give us a custom relation based on the contents of $Config global array
  * Return : The relation between the current page and the root of the site. Eg ../..
@@ -37,8 +69,10 @@ function escapeQuery($param_array = array(),$ignore_magic_quote_setting = false)
 		if(is_array($value)) { //Escape Arrays recursively
 			$QUERY[$key] = escapeQuery($value,$ignore_magic_quote_setting); //:RECURSION:
 		} else {
-			if($GLOBALS['sql']) $QUERY[$key] = mysql_real_escape_string($value); //If there is an SQL Connection,
+			if($GLOBALS['sql']) $QUERY[$key] = $GLOBALS['sql']->escape($value); //If there is an SQL Connection,
 			else $QUERY[$key] = addslashes($value);
+			
+			$QUERY[$key] = htmlspecialchars($value);
 		}
 	}
 	return $QUERY;
@@ -47,7 +81,7 @@ function escapeQuery($param_array = array(),$ignore_magic_quote_setting = false)
 /**
  * This function will undo the damage made by magic quotes. This will go thru the request array and unescape all the data.
  * Argument : $param_array - [OPTIONAL] The array that must be unescaped. If empty, the function uses $_POST + $_GET
- *			  $ignore_magic_quote_setting - [OPTIONAL] If set to true, this will escape the given array no matter what the get_magic_quotes_gpc() returns. Defaults to 'false'
+ *			  $ignore_magic_quote_setting - [OPTIONAL] If set to true, this will escape the given array no matter what the get_magic_quotes_gpc() returns. Defaults to 'true'
  * Return	: The proper format of the array - unescaped.
  */
 function unescapeQuery($param_array = array(),$ignore_magic_quote_setting = false) {
@@ -91,5 +125,5 @@ function dump($data) {
 
 //http://php.net/autoload
 function __autoload($class_name) {
-	require_once($class_name . '.php');
+	require_once $class_name . '.php';
 }

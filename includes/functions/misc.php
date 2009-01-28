@@ -19,7 +19,10 @@ function getLink($url,$params=array(),$use_existing_arguments=false) {
 	
 	$params_arr = array();
 	foreach($params as $key=>$value) {
-		if($use_existing_arguments and ($key == 'success' or $key == 'error')) continue; // Success or Error message don't have to be shown.
+		if($use_existing_arguments) {// Success or Error message don't have to be shown.
+			if(($key == 'success' and isset($_GET['success']) and $_GET['success'] == $value)
+			 	or ($key == 'error' and isset($_GET['error']) and $_GET['error'] == $value)) continue;
+		}
 		
 		if(gettype($value) == 'array') { //Handle array data properly
 			foreach($value as $val) {
@@ -370,9 +373,20 @@ function sendEMail($from_email,$to,$message,$subject) {
  * Version : 2.00.A
  */
 function load($url,$options=array()) {
-	if(!isset($options['method'])) $options['method'] = 'get';
-	if(!isset($options['return_info'])) $options['return_info'] = false;
-	if(!isset($options['cache'])) $options['cache'] = false;
+	$default_options = array(
+		'method'		=> 'get',
+		'return_info'	=> false,
+		'return_body'	=> true,
+		'cache'			=> false,
+		'referer'		=> '',
+		'headers'		=> array(),
+		'session'		=> false,
+		'session_close'	=> false,
+	);
+	// Sets the default options.
+	foreach($default_options as $opt=>$value) {
+		if(!isset($options[$opt])) $options[$opt] = $value;
+	}
 
     $url_parts = parse_url($url);
     $ch = false;
@@ -384,22 +398,36 @@ function load($url,$options=array()) {
     $send_header = array(
         'Accept' => 'text/*',
         'User-Agent' => 'BinGet/1.00.A (http://www.bin-co.com/php/scripts/load/)'
-    );
+    ) + $options['headers']; // Add custom headers provided by the user.
     
     if($options['cache']) {
     	$cache_folder = '/tmp/php-load-function/';
-    	if(!file_exists($cache_folder)) mkdir($cache_folder, 0777);
     	if(isset($options['cache_folder'])) $cache_folder = $options['cache_folder'];
+    	if(!file_exists($cache_folder)) {
+    		$old_umask = umask(0); // Or the folder will not get write permission for everybody.
+    		mkdir($cache_folder, 0777);
+    		umask($old_umask);
+    	}
     	
-    	$cache_file_name = str_replace(array('http://', 'https://'),'', $url);
-    	$cache_file_name = str_replace(
-    		array('/','\\',':','?','&','='), 
-    		array('_','_','-','.','-','_'), $cache_file_name);
+    	$cache_file_name = md5($url) . '.cache';
     	$cache_file = joinPath($cache_folder, $cache_file_name); //Don't change the variable name - used at the end of the function.
-    	
+    	    	
     	if(file_exists($cache_file)) { // Cached file exists - return that.
-    		if(!$options['return_info']) return file_get_contents($cache_file);
-    		else return array('headers' => array('cached'=>true), 'body' => file_get_contents($cache_file), 'info' => array('cached'=>true));
+    		$response = file_get_contents($cache_file);
+    		
+    		 //Seperate header and content
+			$separator_position = strpos($response,"\r\n\r\n");
+			$header_text = substr($response,0,$separator_position);
+			$body = substr($response,$separator_position+4);
+			
+			foreach(explode("\n",$header_text) as $line) {
+				$parts = explode(": ",$line);
+				if(count($parts) == 2) $headers[$parts[0]] = chop($parts[1]);
+			}
+			$headers['cached'] = true;
+			
+    		if(!$options['return_info']) return $body;
+    		else return array('headers' => $headers, 'body' => $body, 'info' => array('cached'=>true));
     	}
     }
 
@@ -430,13 +458,13 @@ function load($url,$options=array()) {
 			}
 		}
 
-        if(!isset($options['curl_handle']) or !$options['curl_handle']) $ch = curl_init($url_parts['host']);
-        else $ch = $options['curl_handle'];
+        if($options['session'] and isset($GLOBALS['_binget_curl_session'])) $ch = $GLOBALS['_binget_curl_session']; //Session is stored in a global variable
+        else $ch = curl_init($url_parts['host']);
         
         curl_setopt($ch, CURLOPT_URL, $page) or die("Invalid cURL Handle Resouce");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); //Just return the data - not print the whole thing.
         curl_setopt($ch, CURLOPT_HEADER, true); //We need the headers
-        curl_setopt($ch, CURLOPT_NOBODY, false); //The content - if true, will not download the contents
+        curl_setopt($ch, CURLOPT_NOBODY, !($options['return_body'])); //The content - if true, will not download the contents. There is a ! operation - don't remove it.
         if(isset($options['method']) and $options['method'] == 'post' and isset($url_parts['query'])) {
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $url_parts['query']);
@@ -447,10 +475,12 @@ function load($url,$options=array()) {
         if(isset($options['modified_since']))
             array_push($custom_headers,"If-Modified-Since: ".gmdate('D, d M Y H:i:s \G\M\T',strtotime($options['modified_since'])));
         curl_setopt($ch, CURLOPT_HTTPHEADER, $custom_headers);
+        if($options['referer']) curl_setopt($ch, CURLOPT_REFERER, $options['referer']);
 
         curl_setopt($ch, CURLOPT_COOKIEJAR, "/tmp/binget-cookie.txt"); //If ever needed...
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_MAXREDIRS, 5);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
         if(isset($url_parts['user']) and isset($url_parts['pass'])) {
             $custom_headers = array("Authorization: Basic ".base64_encode($url_parts['user'].':'.$url_parts['pass']));
@@ -459,10 +489,12 @@ function load($url,$options=array()) {
 
         $response = curl_exec($ch);
         $info = curl_getinfo($ch); //Some information on the fetch
-        if(!isset($options['curl_handle'])) curl_close($ch); //Dont close the curl session if the curl handle is passed. We may need it later.
+        
+        if($options['session'] and !$options['session_close']) $GLOBALS['_binget_curl_session'] = $ch; //Dont close the curl session. We may need it later - save it to a global variable
+        else curl_close($ch);  //If the session option is not set, close the session.
 
     //////////////////////////////////////////// FSockOpen //////////////////////////////
-    } else { //If there is no curl, use fsocketopen
+    } else { //If there is no curl, use fsocketopen - but keep in mind that most advanced features will be lost with this approch.
         if(isset($url_parts['query'])) {
             if(isset($options['method']) and $options['method'] == 'post')
                 $page = $url_parts['path'];
@@ -471,8 +503,9 @@ function load($url,$options=array()) {
         } else {
             $page = $url_parts['path'];
         }
-
-        $fp = fsockopen($url_parts['host'], 80, $errno, $errstr, 30);
+        
+		if(!isset($url_parts['port'])) $url_parts['port'] = 80;
+        $fp = fsockopen($url_parts['host'], $url_parts['port'], $errno, $errstr, 30);
         if ($fp) {
             $out = '';
             if(isset($options['method']) and $options['method'] == 'post' and isset($url_parts['query'])) {
@@ -517,9 +550,8 @@ function load($url,$options=array()) {
         $headers['Status'] = 404;
     } else {
         //Seperate header and content
-        $separator_position = strpos($response,"\r\n\r\n");
-        $header_text = substr($response,0,$separator_position);
-        $body = substr($response,$separator_position+4);
+        $header_text = substr($response, 0, $info['header_size']);
+        $body = substr($response, $info['header_size']);
         
         foreach(explode("\n",$header_text) as $line) {
             $parts = explode(": ",$line);
@@ -528,7 +560,7 @@ function load($url,$options=array()) {
     }
     
     if(isset($cache_file)) { //Should we cache the URL?
-    	file_put_contents($cache_file, $body);
+    	file_put_contents($cache_file, $response);
     }
 
     if($options['return_info']) return array('headers' => $headers, 'body' => $body, 'info' => $info, 'curl_handle'=>$ch);
@@ -555,7 +587,6 @@ function ls($pattern="*", $folder="", $recursivly=false, $options=array('return_
 		
 		if(!chdir($folder)) return array();
 	}
-	
 	
 	$get_files	= in_array('return_files', $options);
 	$get_folders= in_array('return_folders', $options);
@@ -604,8 +635,8 @@ function ls($pattern="*", $folder="", $recursivly=false, $options=array('return_
  *				$get_attributes - 1 or 0. If this is 1 the function will get the attributes as well as the tag values - this results in a different array structure in the return value.
  *				$priority - Can be 'tag' or 'attribute'. This will change the way the resulting array sturcture. For 'tag', the tags are given more importance.
  * Return: The parsed XML in an array form. Use print_r() to see the resulting array structure.
- * Examples: $array =  xml2array(file_get_contents('feed.xml');
- * 			 $array =  xml2array(file_get_contents('feed.xml', 1, 'attribute');
+ * Examples: $array =  xml2array(file_get_contents('feed.xml'));
+ * 			 $array =  xml2array(file_get_contents('feed.xml', 1, 'attribute'));
  */
 function xml2array($contents, $get_attributes=1, $priority = 'tag') {
     if(!$contents) return array();
@@ -730,3 +761,11 @@ function xml2array($contents, $get_attributes=1, $priority = 'tag') {
     
     return($xml_array);
 } 
+
+/// Parses the given HTML string using the domDocument class and returns a dom node.
+function parseHTML($html) {
+	$dom = new domDocument;
+	$dom->loadHTML($html);
+	$dom->preserveWhiteSpace = false;
+	return $dom;
+}

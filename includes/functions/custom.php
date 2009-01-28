@@ -78,7 +78,7 @@ function showStatus() {
 /**
  * Shows the final message - redirects to a new page with the message in the URL
  */
-function showMessage($message, $url="?", $status="success",$extra_data=array()) {
+function showMessage($message, $url='', $status="success",$extra_data=array()) {
 	//If it is an ajax request, Just print the data
 	if(isset($_REQUEST['ajax'])) {
 		$success = '';
@@ -99,6 +99,12 @@ function showMessage($message, $url="?", $status="success",$extra_data=array()) 
 		if($status === 'success') print $message . "\n";
 
 	} else {
+		if(!$url) {
+			global $QUERY;
+			$QUERY[$status] = $message;
+			return;
+		}
+	
 		if(strpos($url, 'http://') === false) {
 			global $config;
 			$url = joinPath($config['site_url'], $url);

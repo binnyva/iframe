@@ -1,4 +1,6 @@
 <?php
+//Yes, I know this file is a mess. I'll get around to fixing it. Someday...
+
 //Make including classes easier
 set_include_path(get_include_path() . PATH_SEPARATOR .  joinPath($config['iframe_folder'], 'includes/classes')); 
 if(file_exists(joinPath($config['site_folder'] , 'models'))) set_include_path(get_include_path() . PATH_SEPARATOR .  joinPath($config['site_folder'] , 'models'));
@@ -36,7 +38,7 @@ if($config['mode'] == 'd') {
 	
 	$Logger = false;
 	if(i($QUERY,'debug') == 'log') {
-		include("Development/Logger.php");
+		include(joinPath("Development", "Logger.php"));
 		$Logger = new Logger;
 		$Logger->log("\nRendering Request: $_SERVER[REQUEST_URI]");
 	}

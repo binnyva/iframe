@@ -26,9 +26,10 @@ class Logger {
 		$this->log_file = $log_file;
 		
 		if($this->log_file and is_writable($folder)) {
-			if(is_writable($this->log_file))
-				$this->handle = fopen($this->log_file, 'a');
-		}
+			$this->handle = fopen($this->log_file, 'a');
+		} 
+		
+		if(!$this->handle) print "Cannot enable logging: Log File '{$this->log_file}' not writable";
 	}
 	
 	/**

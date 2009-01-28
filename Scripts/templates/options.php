@@ -35,6 +35,7 @@ $html->buildInput('model_file', 'Model File', 'text', $field_data['model_file'],
 <?php for($field_count = 1; $field_count <= $total_fields; $field_count++) { ?>
 <fieldset class="field" id="field_<?=$field_count?>">
 <legend>Field <?=$field_count?></legend>
+
 <?php
 $html->buildInput('field_name_' . $field_count, 'Field', 'text', $field_data['field_name_' . $field_count], array(), '<span class="help">The database field name (Eg. user_first_name)</span>');
 

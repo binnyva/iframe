@@ -6,6 +6,7 @@ class HTML {
 	*				$name - The name and ID of the dropdown
 	*				$selected - The value that is selected by default - ie. key of the array.
 	*				$extra - All the additional attributes that must be added to the &lt;select&gt; tag - as an array.
+	*				$print_select - If this is true, it prints the output - else, it returns the HTML thats generated. Defaults to 'true'
 	* Example	: 
 	* $countries = array(
 	* 	'US'	=>	'United State of America',
@@ -24,7 +25,6 @@ class HTML {
 			$select .= $this->getTag('option',$attrbs,$value);
 		}
 		$select .= $this->getEndTag("select");
-		
 		if($print_select) print $select;
 		return $select;
 	}

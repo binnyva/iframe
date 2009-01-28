@@ -68,7 +68,7 @@ function autoFillFieldDetails(ele) {
 	else if(field.indexOf("name")+1 || field.indexOf("title")+1) {
 		validations[0].selected = true; //Mandatory validation.
 	}
-	
+
 	//Select types
 	var type = $("field_type_"+fc);
 	if(field.indexOf("date") + 1) {
