@@ -390,7 +390,8 @@ class DBTable {
 	}
 	
 	private function _escape($string) {
-		return "'" . mysql_real_escape_string($string) . "'";
+		global $sql;
+		return "'" . $sql->escape($string) . "'";
 	}
 }
 
