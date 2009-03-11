@@ -16,8 +16,8 @@ class MVC {
 	public $controller	= '';
 
 	public $title		= ''; ///The title of the page - use setTemplate() to set it.
-	public $layout		= 'page.php'; ///This should contain the layout of the site.
 	public $options		= array(
+		'layout_file'		=> 'templates/layout/page.php', ///This should contain the layout of the site.
 		'template_folder'	=> 'templates',
 		'model_folder'		=> 'models',
 		'insert_layout'		=> true
@@ -216,7 +216,7 @@ class MVC {
 		$css_includes = implode($this->css_includes,"\n");
 		$js_includes = implode($this->js_includes,"\n");
 
-		include(joinPath($config['site_folder'], $this->options['template_folder'], "/layout/", $this->layout));
+		include(joinPath($config['site_folder'], $this->options['layout_file']));
 	}
 	
 	//////////////////////////////// Action functions ////////////////////////////////

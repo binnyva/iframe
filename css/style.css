@@ -8,18 +8,21 @@ a {
 	text-decoration:none;
 	color:blue;
 }
-label {
+.form-area label {
 	width:100px;
 	display:block;
 	float:left;
 	text-align:right;
 	padding-right:5px;
 }
-inupt, select {
+.form-area input, .form-area select {
 	float:left;
 }
 br {
 	clear:both;
+}
+img {
+	border:0;
 }
 
 #loading {

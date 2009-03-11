@@ -126,23 +126,25 @@ function registerEventHandles() {
 		if(!$("field_type_"+fc)) continue;
 
 		//Upon entering the title, this function will automatically fill in the field name
-		$("field_title_"+fc).onchange = function(e) {
-			if(!e) e = window.event;
-			var ele = this || e.src;
-			autoFillFieldDetails(ele);
-		}
+		$("field_title_"+fc).on("change", function(e) {
+			autoFillFieldDetails(this);
+		});
 
-		$("field_type_"+fc).onchange = function(e) {
-			if(!e) e = window.event;
-			var ele = this || e.src;
-			fieldOptions(ele);
-		}
+		$("field_type_"+fc).on("change", function(e) {
+			fieldOptions(this);
+		});
 		
-		$("auto_handler_"+fc).on("change", function() {
+  		$("#auto_handler_"+fc);//.on("change", function() {
+// 			var fc = this.id.replace(/[^\d]/g,"");
+// 			if(this.value != "off") $("field_details_"+fc).hide();
+// 			else $("field_details_"+fc).show();
+//  		});
+
+		document.getElementById("auto_handler_"+fc).onchange= function() {
 			var fc = this.id.replace(/[^\d]/g,"");
 			if(this.value != "off") $("field_details_"+fc).hide();
 			else $("field_details_"+fc).show();
-		});
+ 		}
 	}
 }
 
@@ -292,12 +294,12 @@ function init() {
 		if( !$('single').value) $('single').value= title.replace(/e?s$/i,'');
 	});
 	
-	for(var i=1; i<=field_count; i++) {
+ 	for(var i=1; i<=field_count; i++) {
 		registerEventHandles(i);
-		autoFillFieldDetails($('field_title_'+i));
-		fieldOptions($('field_type_'+i));
-		makeHelpText(i-1);
-	}
+// 		autoFillFieldDetails($('field_title_'+i));
+ 		fieldOptions($('field_type_'+i));
+ 		makeHelpText(i-1);
+ 	}
 	
 	//If the user don't want add functionality, don't generate the adding file either.
 	$("add_funcionality").click(function() {

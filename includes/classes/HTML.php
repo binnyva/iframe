@@ -13,7 +13,7 @@ class HTML {
 	*	'IN'	=>	'India',
 	*	'RU'	=>	'Russia'
 	* );
-	* buildDropDownArray($list,'countries','IN',array('class'=>'dropdown','multiple'=>'multiple'));
+	* buildDropDownArray($countries,'countries','IN',array('class'=>'dropdown','multiple'=>'multiple'));
 	*/
 	function buildDropDownArray($array, $name, $selected="", $extra=array(), $print_select=true) {
 		$attributes = '';
