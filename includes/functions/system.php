@@ -72,7 +72,8 @@ function escapeQuery($param_array = array(),$ignore_magic_quote_setting = false)
 			if($GLOBALS['sql']) $value = $GLOBALS['sql']->escape($value); //If there is an SQL Connection,
 			else $value = addslashes($value);
 			
-			$QUERY[$key] = htmlspecialchars($value);
+			//$QUERY[$key] = htmlspecialchars($value);
+			$QUERY[$key] = $value;
 		}
 	}
 	return $QUERY;
