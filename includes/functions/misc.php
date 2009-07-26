@@ -375,6 +375,7 @@ function sendEMail($from_email,$to,$message,$subject) {
 function load($url,$options=array()) {
 	$default_options = array(
 		'method'		=> 'get',
+		'post_data'		=> array(),
 		'return_info'	=> false,
 		'return_body'	=> true,
 		'cache'			=> false,
@@ -436,7 +437,7 @@ function load($url,$options=array()) {
     if(function_exists("curl_init") 
                 and (!(isset($options['use']) and $options['use'] == 'fsocketopen'))) { //Don't use curl if it is specifically stated to use fsocketopen in the options
         
-        if(isset($options['post_data'])) { //There is an option to specify some data to be posted.
+        if(isset($options['post_data']) and $options['post_data']) { //There is an option to specify some data to be posted.
         	$page = $url;
         	$options['method'] = 'post';
         	

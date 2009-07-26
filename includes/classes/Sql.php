@@ -316,7 +316,7 @@ class Sql {
 		foreach($datas as $value) {
 			$pos = strpos($qry,'?');
 			if($pos === false) break;
-			$value = mysqli_real_escape_string($value);
+			$value = $this->escape($value);
 
 			if(is_string($value)) {
 				$value = "'".$value."'";
