@@ -5,7 +5,6 @@
 set_include_path(get_include_path() . PATH_SEPARATOR .  joinPath($config['iframe_folder'], 'includes/classes')); 
 if(file_exists(joinPath($config['site_folder'] , 'models'))) set_include_path(get_include_path() . PATH_SEPARATOR .  joinPath($config['site_folder'] , 'models'));
 
-
 //Find all path info
 $config['PHP_SELF'] = ($PHP_SELF) ? $PHP_SELF : $_SERVER["PHP_SELF"];
 
@@ -48,7 +47,7 @@ elseif($config['mode'] == 'p') error_reporting(0);
 // Database connection is optional
 $sql = false;
 if(isset($config['db_host']) and $config['db_host']) {
-	$sql = new Sql($config['db_host'],$config['db_user'],$config['db_password'],$config['db_database']); // Connect to DB
+	$sql = new Sql($config['db_host'], $config['db_user'], $config['db_password'], $config['db_database']); // Connect to DB
 	Sql::$mode = $config['mode'];
 }
 if(!isset($config['use_mvc']) or $config['use_mvc'] === false) $template = new MVC;
@@ -56,7 +55,7 @@ if(!isset($config['use_mvc']) or $config['use_mvc'] === false) $template = new M
 //Otherways it is a mess with google
 ini_set('url_rewriter.tags',"");
 ini_set('session.use_trans_sid',false); 
-session_start();
+if(isset($_SERVER["HTTP_HOST"])) session_start(); //Don't start the session for a console app.
 
 $config['date_format']	= '%d %b %Y';
 $config['time_format']	= '%d %b %Y, %h:%i %p';
