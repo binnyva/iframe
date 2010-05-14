@@ -33,8 +33,8 @@ class Calendar {
 	function __construct($callback = '', $year=0, $month=0) {
 		if($callback) $this->setDailyFunction($callback);
 
-		$this->month= (isset($_REQUEST['month']))? intval($_REQUEST['month']): $month;	//Shows the calendar for this month
-		$this->year	= (isset($_REQUEST['year'])) ? intval($_REQUEST['year']) : $year;	// of this year.
+		$this->month= (!empty($_REQUEST['month']))? intval($_REQUEST['month']): $month;	//Shows the calendar for this month
+		$this->year	= (!empty($_REQUEST['year'])) ? intval($_REQUEST['year']) : $year;	// of this year.
 		if(!$this->year)	$this->year = date('Y'); //This could be 0 if it the default argument the function - make it current year
 		if(!$this->month)	$this->month = date('n');
 		
@@ -47,8 +47,6 @@ class Calendar {
 		//Validations
 		if($this->month > 12)		$this->month=12;
 		elseif($this->month < 1)	$this->month=1;
-		
-		if(!$this->_withinLimit($this->year, $this->month)) $this->_error404();
 		
 		$this->_month_days  = array(31,28,31,30,31,30,31,31,30,31,30,31);
 		if($this->year%4 == 0) $this->_month_days[1] = 29;
@@ -290,6 +288,8 @@ class Calendar {
 	
 	/// Prints the full table with just 1 call - this calls printTableStart(), printTableBody() and printTableEnd()
 	function display() {
+		if(!$this->_withinLimit($this->year, $this->month)) $this->_error404();
+		
 		$this->printTableStart();
 		$this->printTableBody();
 		$this->printTableEnd();

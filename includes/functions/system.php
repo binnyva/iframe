@@ -108,20 +108,27 @@ function unescapeQuery($param_array = array(),$ignore_magic_quote_setting = fals
  * Arguments  : $data - the variable that must be displayed
  * Link : http://www.bin-co.com/php/scripts/dump/
  */
-function dump($data) {
-	if(is_array($data)) { //If the given variable is an array, print using the print_r function.
-		print "<pre>-----------------------\n";
-		print_r($data);
-		print "-----------------------</pre>";
-	} elseif (is_object($data)) {
-		print "<pre>==========================\n";
-		var_export($data);
-		print "===========================</pre>";
-	} else {
-		print "=========&gt;";
-		print var_dump($data);
-		print "&lt;=========";
+function dump() {
+	$args = func_get_args();
+	$count = count($args) - 1;
+	
+	print "<pre>";
+	if($count) print "-------------------------------------------------------------------------------------------------------------------\n";
+	foreach($args as $data) {
+		if(is_array($data) or is_object($data)) { //If the given variable is an array, print using the print_r function.
+			if(!$count) print "-----------------------\n";
+			if(is_array($data)) print_r($data);
+			else var_export($data);
+			if(!$count) print "-----------------------\n";
+			else print "=======================================================\n";
+		} else {
+			print "</pre>=========&gt;";
+			print var_dump($data);
+			print "&lt;=========<pre>\n";
+		}
 	}
+	if($count) print "-------------------------------------------------------------------------------------------------------------------";
+	print "</pre>\n";
 }
 
 //http://php.net/autoload

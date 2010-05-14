@@ -73,6 +73,7 @@ class SqlPager {
 		$this->page = ($this->_getParam('sp_page')) ? $this->_getParam('sp_page') : 1;
 		
 		$this->page_link = basename($_SERVER['PHP_SELF']);
+		if($_SERVER["QUERY_STRING"]) $this->page_link .= '?' + $_SERVER["QUERY_STRING"];
 
 		$offset = ($this->page - 1) * $this->items_per_page;
 		$this->_pager_query = $query . " LIMIT $offset," . $this->items_per_page;
@@ -356,29 +357,8 @@ function goToPage(page) {
 	 *			  $params(Array) - An associative array holding the parameters that should be added to the URL. 
 	 * Example : _getLinkParameters('index.php?user=1',array('sp_page'=>7,'sp_items_per_page'=>5))
 	 */
-	function _getLinkParameters($url , $params = array()) {
-		$use_existing_arguments = true;
-		if($use_existing_arguments) $params = $params + $_GET;
-		
-		if(!$params) return $url;
-		$link = $url;
-		if(strpos($link,'?') === false) $link .= '?'; //If there is no '?' add one at the end
-		elseif(!preg_match('/(\?|\&(amp;)?)$/',$link)) $link .= '&amp;'; //If there is no '&' at the END, add one.
-		
-		$params_arr = array();
-		foreach($params as $key=>$value) {
-			if($key == 'success' or $key == 'error') continue; // Success or Error message don't have to be shown.
-			
-			if(gettype($value) == 'array') { //Handle array data properly
-				foreach($value as $val) {
-					$params_arr[] = $key . '[]=' . urlencode($val);
-				}
-			} else {
-				$params_arr[] = $key . '=' . urlencode($value);
-			}
-		}
-		$link .= implode('&amp;',$params_arr);
-		return $link;
+	function _getLinkParameters($url,$params=array(),$use_existing_arguments=false) {
+		return getLink($url, $params, $use_existing_arguments);
 	}
 
 	/**

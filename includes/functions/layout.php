@@ -1,5 +1,5 @@
 <?php
-function render($file='') {
+function render($file='', $use_layout=true, $use_exact_path = false) {
 	//If it is an ajax request, we don't have to render the page.
 	if(isset($_REQUEST['ajax'])) {
 		print '{"success":"Done","error":false}';
@@ -7,7 +7,7 @@ function render($file='') {
 	}
 
 	//Otherwise, render it.
-	$GLOBALS['template']->render($file);
+	$GLOBALS['template']->render($file, $use_layout, $use_exact_path);
 }
 
 /**
@@ -32,7 +32,7 @@ function showHead($title='') {
 
 
 function showBegin() {
-	global $config;
+	global $config, $QUERY;
 ?>
 </head>
 <body>
@@ -43,6 +43,11 @@ function showBegin() {
 <?php } ?>
 
 <div id="content">
+<div id="error-message" <?=($QUERY['error']) ? '':'style="display:none;"';?>><?php
+	if(isset($PARAM['error'])) print strip_tags($PARAM['error']); //It comes from the URL
+	else print $QUERY['error']; //Its set in the code(validation error or something.
+?></div>
+<div id="success-message" <?=($QUERY['success']) ? '':'style="display:none;"';?>><?=strip_tags(stripslashes($QUERY['success']))?></div>
 <!-- Begin Content -->
 <?php
 }

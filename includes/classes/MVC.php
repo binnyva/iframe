@@ -65,7 +65,7 @@ class MVC {
 		if(!strpos(basename($file_name), '.php')) { ///:TODO: This could be .php5 or something - could cause problems.
 			$file_name .= 'index.php';
 		}
-
+		
 		$this->page = $file_name;
 	}
 	
@@ -82,13 +82,14 @@ class MVC {
 	 * This will set the template for the page - you can specify the file to be used as the template.
 	 * In most cases, this is an internal function. But it can be called by the user as well.
 	 * Argument : $template_file - This is the template file to be used - it must be kept in the template folder.
+	 *			  $use_exact_path - If this is false, MVC will try to find the template file using some rules(search in the templates folder etc. If true, it will just include the exact page.
 	 */
-	function setTemplate($template_file) {
+	function setTemplate($template_file, $use_exact_path = false) {
 		global $config;
 		$this->_findResources($template_file);
 
-		$template_file = joinPath($config['site_folder'], $this->options['template_folder'], $template_file);
-		
+		if(!$use_exact_path) $template_file = joinPath($config['site_folder'], $this->options['template_folder'], $template_file);
+				
 		//Plugins are a special case.
 		if(strpos($config['PHP_SELF'],'plugins') !== false) {
 			$template_file = 'template.php';
@@ -172,6 +173,9 @@ class MVC {
 	function addResource($file, $type="", $use_exact_path=false) {
 		if(!$file) return;
 		global $config;
+		
+		if(preg_match('#https?\://#', $file)) $use_exact_path = true; // If a full absolute url is given, use exact path.
+		
 		if(!$type) list($name,$type) = explode(".",$file);
 		$folder = ($type == 'js') ? $this->js_folder : $this->css_folder ;
 		$link = '';
@@ -188,7 +192,7 @@ class MVC {
 			if(!in_array($current_include,$this->js_includes)) array_push($this->js_includes, $current_include);
 
 		} else {
-			error("Template Error: Type(2nd argument of addResource) '$type' not provided.");
+			error("Template Error: Type(2nd argument of addResource) '$type' not valid. Must be 'css' or 'js'.");
 		}
 
 		if(!in_array($current_include,$this->includes)) {
@@ -224,19 +228,21 @@ class MVC {
 	 * Render the page by includeing the template file. It also calls the printHead() and printEnd() functions.
 	 * Arguments : $template_file - The template file for the current page - if nothing is given it uses the 
 	 *					template with the same name as the current page. OPTIONAL
+	 *				$use_layout - If this is true, it will insert the template file into the layout file and display it. If false, it will just display the template file.
+	 *				$use_exact_path - If this is false, MVC will try to find the template file using some rules(search in the templates folder etc. If true, it will just include the exact page.
 	 */
-	function render($__template_file = "") { // The __ to make sure a global variable don't overwrite it.
+	function render($__template_file = "", $use_layout = true, $use_exact_path = false) { // The __ to make sure a global variable don't overwrite it.
 		extract($GLOBALS); //Make sure that all variables are accessable from the template.
 
 		if($__template_file) {
-			$this->setTemplate($__template_file);
+			$this->setTemplate($__template_file, $use_exact_path);
 		} elseif(!$this->template) {
 			$this->setTemplate($this->page);
 		}
 		
  		if(!$this->template) error('The template file for "' . $this->page . '" does not exist.');
 		
-		if($this->options['insert_layout']) $this->printLayout();
+		if($use_layout and $this->options['insert_layout']) $this->printLayout();
 		else include($this->template);
 	}
 }

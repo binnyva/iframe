@@ -11,14 +11,29 @@
  *			http://www.google.com/search?q=binny&hello=world&results=10
  */
 function getLink($url,$params=array(),$use_existing_arguments=false) {
+	if(!$params and !$use_existing_arguments) return $url;
 	if($use_existing_arguments) $params = $params + $_GET;
-	if(!$params) return $url;
+	
 	$link = $url;
-	if(strpos($link,'?') === false) $link .= '?'; //If there is no '?' add one at the end
-	elseif(!preg_match('/(\?|\&(amp;)?)$/',$link)) $link .= '&amp;'; //If there is no '&' at the END, add one.
+	
+	if(strpos($link,'?') === false) {
+		$existing_parameters = array();
+	} else { // This will make sure that even if the specified param exists in the given url, it will be over written.
+		$url_parts = explode('?', $url);
+		$link = $url_parts[0];
+		$existing_parameters = array();
+		
+		$all_url_parameters = split("\&(amp\;)?", $url_parts[1]);
+		foreach($all_url_parameters as $part) {
+			list($name, $value) = explode("=", $part);
+			$existing_parameters[$name] = $value;
+		}
+	}
+	if($existing_parameters) $params = $params + $existing_parameters;
 	
 	$params_arr = array();
 	foreach($params as $key=>$value) {
+		if($value === null) continue; // If the value is given as null, don't show it in the query at all. Use arg=>"null" if you want a string null in the query.
 		if($use_existing_arguments) {// Success or Error message don't have to be shown.
 			if(($key == 'success' and isset($_GET['success']) and $_GET['success'] == $value)
 			 	or ($key == 'error' and isset($_GET['error']) and $_GET['error'] == $value)) continue;
@@ -32,7 +47,7 @@ function getLink($url,$params=array(),$use_existing_arguments=false) {
 			$params_arr[] = $key . '=' . urlencode($value);
 		}
 	}
-	$link .= implode('&amp;',$params_arr);
+	if($params_arr) $link = $link . '?' . implode('&amp;',$params_arr);
 	
 	return $link;
 }
@@ -80,12 +95,13 @@ function check($conditions,$show=1) {
 	$errors = array();
 	$field_errors = array();
 	foreach($conditions as $cond) {
-		unset($title,$default_error,$error,$when,$input,$is,$value,$name, $value_field);
+		unset($title,$default_error,$error,$when,$input,$is,$value,$name,$value_field);
 		extract($cond);
 
 		if(!isset($title))$title= format($name);
 		if(!isset($name)) $name = unformat($title);
-		$input = $_REQUEST[$name];
+		$input = '';
+		if(!empty($_REQUEST[$name])) $input = $_REQUEST[$name];
 		if(isset($value_field)) {
 			$value = $_REQUEST[$value_field];
 		}
@@ -375,13 +391,15 @@ function sendEMail($from_email,$to,$message,$subject) {
 function load($url,$options=array()) {
 	$default_options = array(
 		'method'		=> 'get',
-		'post_data'		=> array(),
-		'return_info'	=> false,
-		'return_body'	=> true,
-		'cache'			=> false,
-		'referer'		=> '',
-		'headers'		=> array(),
-		'session'		=> false,
+		'post_data'		=> array(),		// The data that must be send to the URL as post data.
+		'return_info'	=> false,		// If true, returns the headers, body and some more info about the fetch.
+		'return_body'	=> true,		// If false the function don't download the body - useful if you just need the header or last modified instance.
+		'cache'			=> false,		// If true, saves a copy to a local file - so that the file don't have multiple times.
+		'cache_folder'	=> '/tmp/php-load-function/', // The folder to where the cache copy of the file should be saved to.
+		'cache_timeout'	=> 0,			// If the cached file is older that given time in minutes, it will download the file again and cache it.
+		'referer'		=> '',			// The referer of the url.
+		'headers'		=> array(),		// Custom headers
+		'session'		=> false,		// If this is true, the following load() calls will use the same session - until load() is called with session_close=true.
 		'session_close'	=> false,
 	);
 	// Sets the default options.
@@ -396,14 +414,14 @@ function load($url,$options=array()) {
     );
     $response = '';
     
+    
     $send_header = array(
         'Accept' => 'text/*',
         'User-Agent' => 'BinGet/1.00.A (http://www.bin-co.com/php/scripts/load/)'
     ) + $options['headers']; // Add custom headers provided by the user.
     
     if($options['cache']) {
-    	$cache_folder = '/tmp/php-load-function/';
-    	if(isset($options['cache_folder'])) $cache_folder = $options['cache_folder'];
+    	$cache_folder = $options['cache_folder'];
     	if(!file_exists($cache_folder)) {
     		$old_umask = umask(0); // Or the folder will not get write permission for everybody.
     		mkdir($cache_folder, 0777);
@@ -412,23 +430,45 @@ function load($url,$options=array()) {
     	
     	$cache_file_name = md5($url) . '.cache';
     	$cache_file = joinPath($cache_folder, $cache_file_name); //Don't change the variable name - used at the end of the function.
-    	    	
-    	if(file_exists($cache_file)) { // Cached file exists - return that.
-    		$response = file_get_contents($cache_file);
+    	
+    	if(file_exists($cache_file) and filesize($cache_file) != 0) { // Cached file exists - return that.
+    		$timedout = false;
+    		if($options['cache_timeout']) {
+    			if(((time() - filemtime($cache_file)) / 60) > $options['cache_timeout']) $timedout = true;  // If the cached file is older than the timeout value, download the URL once again.
+    		}
     		
-    		 //Seperate header and content
-			$separator_position = strpos($response,"\r\n\r\n");
-			$header_text = substr($response,0,$separator_position);
-			$body = substr($response,$separator_position+4);
-			
-			foreach(explode("\n",$header_text) as $line) {
-				$parts = explode(": ",$line);
-				if(count($parts) == 2) $headers[$parts[0]] = chop($parts[1]);
+    		if(!$timedout) {
+				$response = file_get_contents($cache_file);
+				
+				//Seperate header and content
+				$seperator_charector_count = 4;
+				$separator_position = strpos($response,"\r\n\r\n");
+				if(!$separator_position) {
+					$separator_position = strpos($response,"\n\n");
+					$seperator_charector_count = 2;
+				}
+				// If the real seperator(\r\n\r\n) is NOT found, search for the first < char.
+				if(!$separator_position) {
+					$separator_position = strpos($response,"<"); //:HACK:
+					$seperator_charector_count = 0;
+				}
+				
+				$body = '';
+				$header_text = '';
+				if($separator_position) {
+					$header_text = substr($response,0,$separator_position);
+					$body = substr($response,$separator_position+$seperator_charector_count);
+				}
+				
+				foreach(explode("\n",$header_text) as $line) {
+					$parts = explode(": ",$line);
+					if(count($parts) == 2) $headers[$parts[0]] = chop($parts[1]);
+				}
+				$headers['cached'] = true;
+				
+				if(!$options['return_info']) return $body;
+				else return array('headers' => $headers, 'body' => $body, 'info' => array('cached'=>true));
 			}
-			$headers['cached'] = true;
-			
-    		if(!$options['return_info']) return $body;
-    		else return array('headers' => $headers, 'body' => $body, 'info' => array('cached'=>true));
     	}
     }
 
@@ -553,6 +593,10 @@ function load($url,$options=array()) {
         //Seperate header and content
         $header_text = substr($response, 0, $info['header_size']);
         $body = substr($response, $info['header_size']);
+        
+        // If there is a redirect, there will be multiple headers in the response. We need just the last one.
+        $header_text = end(explode("\r\n\r\n", trim($header_text)));
+        $response = $header_text . "\r\n\r\n" . $body;
         
         foreach(explode("\n",$header_text) as $line) {
             $parts = explode(": ",$line);
@@ -761,12 +805,128 @@ function xml2array($contents, $get_attributes=1, $priority = 'tag') {
     }
     
     return($xml_array);
-} 
+}
+
+
 
 /// Parses the given HTML string using the domDocument class and returns a dom node.
 function parseHTML($html) {
 	$dom = new domDocument;
-	$dom->loadHTML($html);
+	@$dom->loadHTML($html);
 	$dom->preserveWhiteSpace = false;
 	return $dom;
+}
+
+/**
+ * Get DOM elements based on the given CSS Selector - V 1.00.A Beta
+ * Direct port of http://www->openjs->com/scripts/dom/css_selector/
+ */
+function getElementsBySelector($all_selectors, $document) {
+	$selected = array();
+	
+	$all_selectors = preg_replace(array('/^\s*([^\w])\s*$/', '/\s{2,}/'),array("$1", ' '), $all_selectors);//Remove the 'beutification' spaces
+	$selectors = explode(",", $all_selectors);
+	
+	// COMMA:
+	$comma_count = 0;
+	foreach ($selectors as $selector) {
+		$comma_count++;
+		$context = array($document);
+		$inheriters = explode(" ", $selector);
+
+		// SPACE:
+		$space_count = 0;
+		foreach($inheriters as $element) {
+			$space_count++;
+			//This part is to make sure that it is not part of a CSS3 Selector
+			$left_bracket = strpos($element, "[");
+			$right_bracket= strpos($element, "]");
+			$pos = strpos($element, "#"); //ID
+			if($pos !== false and !($pos > $left_bracket and $pos < $right_bracket)) {
+				$parts = explode("#", $element);
+				$tag = $parts[0];
+				$id = $parts[1];
+				$ele = false;
+				
+				//$ele = $document->getElementById($id); // Does'nt work - PHP bug, I guess.
+				$all = getElementsBySelectorGetElements($context, $tag);
+				foreach($all as $eles) {
+					if($eles->getAttribute("id") == $id) {
+						$ele = $eles;
+						break;
+					}
+				}
+				
+				if(!$ele or ($tag and strtolower($ele->nodeName) != $tag)) { //Specified element not found
+					continue 2;
+				}
+				
+				//If Id is the last element, return it as a single element and not as an array.
+				if(count($inheriters) == $space_count and count($selectors) == $comma_count) return $ele;
+
+				$context = array($ele);
+				continue;
+			}
+
+			$pos = strpos($element, ".");//Class
+			if($pos !== false and !($pos > $left_bracket and $pos < $right_bracket)) {
+				$parts = explode('.', $element);
+				$tag = $parts[0];
+				$class_name = $parts[1];
+
+				$found = getElementsBySelectorGetElements($context, $tag);
+				$context = array();
+				
+ 				foreach($found as $fnd) {
+ 					if(preg_match('/(^|\s)'.$class_name.'(\s|$)/', $fnd->getAttribute("class"))) $context[] = $fnd;
+ 				}
+				continue;
+			}
+
+			if(strpos($element, '[') !== false) {//If the char '[' appears, that means it needs CSS 3 parsing
+				// Code to deal with attribute selectors
+				$tag = '';
+				if (preg_match('/^(\w*)\[(\w+)([=~\|\^\$\*]?)=?[\'"]?([^\]\'"]*)[\'"]?\]$/', $element, $matches)) {
+					$tag = $matches[1];
+					$attr = $matches[2];
+					$operator = $matches[3];
+					$value = $matches[4];
+				}
+				$found = getElementsBySelectorGetElements($context, $tag);
+				$context = array();
+				foreach ($found as $fnd) {
+ 					if($operator == '=' and $fnd->getAttribute($attr) != $value) continue;
+					if($operator == '~' and !preg_match('/(^|\\s)'.$value.'(\\s|$)/', $fnd->getAttribute($attr))) continue;
+					if($operator == '|' and !preg_match('/^'.$value.'-?/', $fnd->getAttribute($attr))) continue;
+					if($operator == '^' and strpos($value, $fnd->getAttribute($attr)) === false) continue;
+					if($operator == '$' and strrpos($value, $fnd->getAttribute($attr)) != (strlen($fnd->getAttribute($attr)) - strlen($value))) continue;
+					if($operator == '*' and strpos($value, $fnd->getAttribute($attr)) !== false) continue;
+					else if(!$fnd->getAttribute($attr)) continue;
+					
+					$context[] = $fnd;
+ 				}
+
+				continue;
+			}
+
+			//Tag selectors - no class or id specified->
+			$found = getElementsBySelectorGetElements($context,$element);
+			$context = $found;
+		}
+		foreach($context as $con) $selected[] = $con;
+	}
+	return $selected;
+}
+
+// Grab all of the tagName elements within current context	
+// Helper function for getElementsBySelector()
+function getElementsBySelectorGetElements($context, $tag='*') {
+	if(empty($tag)) $tag = '*';
+	// Get elements matching tag, filter them for class selector
+	$found = array();
+	foreach ($context as $con) {
+		$eles = $con->getElementsByTagName($tag);
+		foreach($eles as $ele) $found[] = $ele;
+	}
+	return $found;
 }

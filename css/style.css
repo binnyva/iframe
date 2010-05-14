@@ -15,7 +15,10 @@ a {
 	text-align:right;
 	padding-right:5px;
 }
-.form-area input, .form-area select {
+.form-area input, .form-area select, .form-area textarea {
+	float:left;
+}
+.form-area p.info {
 	float:left;
 }
 br {
@@ -50,9 +53,21 @@ table .odd {
 	background-color:#eee;
 }
 
+/*Lists*/
+ul.horizontal, ul.vertical {
+	list-style:none;
+	margin:0;
+	padding:0;
+}
+ul.horizontal li {
+	float:left;
+	padding:0;
+}
+
 /*Messages*/
 #warning-message,.warning {
-	color:red;
+	color:orange;
+	font-weight:bold;
 }
 #error-message,.error, .error-message {
 	color:red;
@@ -86,4 +101,7 @@ table .odd {
 	padding-left:12px;
 	background-repeat:no-repeat;
 	background-position:top left;
+}
+.no-icon {
+	background-image:none !important;
 }

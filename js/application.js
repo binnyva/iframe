@@ -1,7 +1,7 @@
 //Framework Specific
 function showMessage(data) {
-	if(data.success) $("success-message").innerHTML = stripSlashes(data.success);
-	if(data.error) $("error-message").innerHTML = stripSlashes(data.error);
+	if(data.success) $("#success-message").innerHTML = stripSlashes(data.success);
+	if(data.error) $("#error-message").innerHTML = stripSlashes(data.error);
 }
 function stripSlashes(text) {
 	if(!text) return "";
@@ -13,10 +13,10 @@ function ajaxError() {
 	alert("Error communicating with server. Please try again");
 }
 function loading() {
-	$("loading").show();
+	$("#loading").show();
 }
 function loaded() {
-	$("loading").hide();
+	$("#loading").hide();
 }
 
 

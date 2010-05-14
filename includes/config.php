@@ -59,6 +59,10 @@ if(isset($_SERVER["HTTP_HOST"])) session_start(); //Don't start the session for 
 
 $config['date_format']	= '%d %b %Y';
 $config['time_format']	= '%d %b %Y, %h:%i %p';
+
+$config['date_format_php']	= phpDateFormat($config['date_format']);
+$config['time_format_php']	= phpDateFormat($config['time_format']);
+
 $abs = $config['site_absolute_path'];
 $config['code_path'] = preg_replace("/includes/",'',dirname(__FILE__));
 

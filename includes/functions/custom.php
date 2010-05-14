@@ -78,7 +78,7 @@ function showStatus() {
 /**
  * Shows the final message - redirects to a new page with the message in the URL
  */
-function showMessage($message, $url='', $status="success",$extra_data=array()) {
+function showMessage($message, $url='', $status="success",$extra_data=array(), $use_existing_params=true) {
 	//If it is an ajax request, Just print the data
 	if(isset($_REQUEST['ajax'])) {
 		$success = '';
@@ -110,8 +110,37 @@ function showMessage($message, $url='', $status="success",$extra_data=array()) {
 			$url = joinPath($config['site_url'], $url);
 		}
 		
-		$goto = str_replace('&amp;', '&', getLink($url, array($status=>$message), true));
+		$goto = str_replace('&amp;', '&', getLink($url, array($status=>$message) + $extra_data, $use_existing_params));
 		header("Location:$goto");
 	}
 	exit;
+}
+
+/**
+ * Converts the given MySQL Date format to PHP date formatting string. %Y-%m-%d becomes Y-m-d.
+ */
+function phpDateFormat($format_string) {
+	$replace_rules = array(
+		'%a' => 'D',
+		'%b' => 'M',
+		'%c' => 'n',
+		'%D' => 'jS',
+		'%e' => 'j',
+		'%f' => 'u',
+		'%j' => 'z',
+		'%k' => 'G',
+		'%l' => 'g',
+		'%p' => 'A',
+		'%r' => 'h:i:s A',
+		'%S' => 's',
+		'%T' => 'H:i:s',
+		'%U' => 'W', // Limited functionality.
+		'%u' => 'W',
+		'%v' => 'W', // Limited functionality.
+		'%V' => 'W', // Limited functionality.
+		'%W' => 'l',
+		'%'  => ''
+	);
+
+	return str_replace(array_keys($replace_rules), array_values($replace_rules), $format_string);
 }
