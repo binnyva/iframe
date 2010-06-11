@@ -21,18 +21,21 @@ $rel = findRelation();
 
 // App's root path(absolute)
 $iframe_folder = dirname(__FILE__) . DIRECTORY_SEPARATOR;
-if($rel !== false) { //If the 'configuration.php' file is found, use that
-	require($rel . "configuration.php");
-	
-	if($rel == '') $config['site_folder'] = realpath('.');
-	else $config['site_folder'] = realpath($rel);
-	$config['site_relative_path'] = $rel;
 
-} else {
-	require($iframe_folder . 'configuration.php');
+if(empty($config)) {
+	if($rel !== false) { //If the 'configuration.php' file is found, use that
+		require($rel . "configuration.php");
+		
+		if($rel == '') $config['site_folder'] = realpath('.');
+		else $config['site_folder'] = realpath($rel);
+		$config['site_relative_path'] = $rel;
 	
-	$config['site_folder'] = $config['iframe_folder'];
-	$config['site_relative_path'] = '';
+	} else {
+		require($iframe_folder . 'configuration.php');
+		
+		$config['site_folder'] = $config['iframe_folder'];
+		$config['site_relative_path'] = '';
+	}
 }
 $config['iframe_folder'] = $iframe_folder;
 
