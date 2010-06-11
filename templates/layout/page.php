@@ -2,6 +2,7 @@
 <html><head>
 <title><?=$title?></title>
 <link href="<?=$abs?>css/style.css" rel="stylesheet" type="text/css" />
+<link href="<?=$abs?>images/silk_theme.css" rel="stylesheet" type="text/css" />
 <?=$css_includes?>
 </head>
 <body>
