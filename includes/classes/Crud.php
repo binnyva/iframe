@@ -184,6 +184,19 @@ class Crud {
 	}
 	
 	/**
+	 * Add a forign field's data as a dropdown list.
+	 * Arguments: $field - the name of the field. Eg: url
+	 *            $name - the title of the field. 'URL'
+	 *            $table - the table wth the date that should be used n the dropdown.
+	 *            $where - the conditions for the data.
+	 */
+	function addListDataField($field, $table, $name=false, $where='') {
+		if(!empty($where)) $where = " WHERE $where";
+		
+		$this->addField($field, $name, 'enum', array(), $this->execQuery("SELECT id,name FROM `{$table}` $where", "byid"));
+	}
+	
+	/**
 	 * Set the rules to validate this field.
 	 * Arguments:	$field - the name of the field to which these rules must be attached to.
 	 *				$validation_rules - An array of rules that specifies the validation for that field. This will be passed into the check() for both PHP and JS.
@@ -422,10 +435,11 @@ class Crud {
 			$value = i($field_data, $field_name);
 			
 			// Changing the value depending on the type.
-			switch($field_info['field_type']) {
+			switch($field_info['type']) {
 				case 'datetime':
 					if($field_name == 'added_on') {
 						if($this->action == 'add_save') $value = date('Y-m-d H:i:s'); // Automatically stamp the added date/time in this field.
+						
 					} elseif($field_name == 'edited_on') {
 						if($this->action == 'edit_save') $value = date('Y-m-d H:i:s');
 					} else {
@@ -466,7 +480,7 @@ class Crud {
 				$save_data[$field_name] = $value;
 			}
 		}
-		
+
 		return $save_data;
 	}
 	
@@ -815,15 +829,14 @@ class Crud {
 		if(!$type) $type = array_pop(explode(".",$file));
 		if(preg_match('#https?\://#', $file)) $use_exact_path = true;
 		
-		//$current_folder = dirname(joinPath($config['site_folder'], $config['current_page']));
-		$current_folder = $config['site_folder'];
 		if(!$use_exact_path) {
-			$file = joinPath($this->urls[$type.'_folder'], $file);
-			
+			$file = joinPath($type, $this->urls[$type.'_folder'], $file);
 			if(preg_match('#https?\://#', $file)) $use_exact_path = true; // Starts with 'http://' - so no checks necessary.
-			elseif(!file_exists(joinPath($current_folder, $type, $file))) return; // The $type is given here to check if the file is in the js/ or css/ folder.
+			else {
+				$file = joinPath($config['site_url'], $file);
+				$use_exact_path = true;
+			}
 		}
-		
 		$template->addResource($file, $type, $use_exact_path);
 	}
 	

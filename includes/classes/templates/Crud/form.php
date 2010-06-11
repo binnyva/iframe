@@ -9,6 +9,7 @@ $html = new HTML;
 <?php
 $js_code = '';
 $row_data = $this->current_page_data;
+if(empty($row_data)) $row_data = $_GET;
 
 foreach($this->form_fields as $field_name) {
 	$field_info = $this->fields[$field_name];
