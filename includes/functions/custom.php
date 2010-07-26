@@ -144,3 +144,4 @@ function phpDateFormat($format_string) {
 
 	return str_replace(array_keys($replace_rules), array_values($replace_rules), $format_string);
 }
+

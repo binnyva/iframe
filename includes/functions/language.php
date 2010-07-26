@@ -134,3 +134,11 @@ function i($array, $index=false, $default_value=false) {
 	
 	return $array[$index];
 }
+
+/// Returns a random element of an array.
+function any() {
+	$arr = func_get_args();
+	if(count($arr) == 1) $arr = $arr[0];
+	
+	return $arr[array_rand($arr)];
+}

@@ -23,10 +23,12 @@ function getLink($url,$params=array(),$use_existing_arguments=false) {
 		$link = $url_parts[0];
 		$existing_parameters = array();
 		
-		$all_url_parameters = split("\&(amp\;)?", $url_parts[1]);
-		foreach($all_url_parameters as $part) {
-			list($name, $value) = explode("=", $part);
-			$existing_parameters[$name] = $value;
+		if($url_parts[1]) {
+			$all_url_parameters = split("\&(amp\;)?", $url_parts[1]);
+			foreach($all_url_parameters as $part) {
+				list($name, $value) = explode("=", $part);
+				$existing_parameters[$name] = $value;
+			}
 		}
 	}
 	if($existing_parameters) $params = $params + $existing_parameters;
@@ -416,7 +418,6 @@ function load($url,$options=array()) {
     
     
     $send_header = array(
-        'Accept' => 'text/*',
         'User-Agent' => 'BinGet/1.00.A (http://www.bin-co.com/php/scripts/load/)'
     ) + $options['headers']; // Add custom headers provided by the user.
     
@@ -484,7 +485,8 @@ function load($url,$options=array()) {
         	if(is_array($options['post_data'])) { //The data is in array format.
 				$post_data = array();
 				foreach($options['post_data'] as $key=>$value) {
-					$post_data[] = "$key=" . urlencode($value);
+					if($value)  $post_data[] = "$key=" . urlencode($value);
+					else $post_data[] = $key;
 				}
 				$url_parts['query'] = implode('&', $post_data);
 			
@@ -512,9 +514,12 @@ function load($url,$options=array()) {
         }
         //Set the headers our spiders sends
         curl_setopt($ch, CURLOPT_USERAGENT, $send_header['User-Agent']); //The Name of the UserAgent we will be using ;)
-        $custom_headers = array("Accept: " . $send_header['Accept'] );
+        unset($send_header['User-Agent']);
+        
+        $custom_headers = array();
+        foreach($send_header as $key => $value) $custom_headers[] = "$key: $value";
         if(isset($options['modified_since']))
-            array_push($custom_headers,"If-Modified-Since: ".gmdate('D, d M Y H:i:s \G\M\T',strtotime($options['modified_since'])));
+            $custom_headers[] = "If-Modified-Since: ".gmdate('D, d M Y H:i:s \G\M\T',strtotime($options['modified_since']));
         curl_setopt($ch, CURLOPT_HTTPHEADER, $custom_headers);
         if($options['referer']) curl_setopt($ch, CURLOPT_REFERER, $options['referer']);
 
@@ -523,11 +528,10 @@ function load($url,$options=array()) {
         curl_setopt($ch, CURLOPT_MAXREDIRS, 5);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
-        if(isset($url_parts['user']) and isset($url_parts['pass'])) {
-            $custom_headers = array("Authorization: Basic ".base64_encode($url_parts['user'].':'.$url_parts['pass']));
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $custom_headers);
-        }
-
+        if(isset($url_parts['user']) and isset($url_parts['pass']))
+            $custom_headers[] = "Authorization: Basic ".base64_encode($url_parts['user'].':'.$url_parts['pass']);
+       
+		if($custom_headers) curl_setopt($ch, CURLOPT_HTTPHEADER, $custom_headers);
         $response = curl_exec($ch);
         $info = curl_getinfo($ch); //Some information on the fetch
         
