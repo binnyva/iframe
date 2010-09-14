@@ -57,7 +57,8 @@ class Crud {
 		'float'				=> 'text',
 		'datetime'			=> 'datetime',
 		'date'				=> 'date',
-		'enum'				=> 'select'
+		'enum'				=> 'select',
+		'time'				=> 'text'
 	);
 	
 	public $success = '';				// A success message - if any.
@@ -250,7 +251,7 @@ class Crud {
 	 * Example: $admin->addListingField('User Posts','"<a href=\'$row[url]\'>View All Post of this User</a>"');
 	 */
 	function addListingField($title, $data) {
-		if($this->action == 'list') {
+		if(($this->action == 'list') or ($this->action == 'add_save') or ($this->action == 'edit_save')) {
 			$this->addField(unformat($title), $title, 'virtual', array(), array('html'=>$data));
 		}
 		$this->setListingFields();
@@ -522,8 +523,7 @@ class Crud {
 			'length<'	=>	'length>',
 			'length>'	=>	'length<',
 		);
-		
-		return $rule_map[$rule];
+		return isset($rule_map[$rule]) ? $rule_map[$rule] : '';
 	}
 	
 	/**
@@ -545,6 +545,7 @@ class Crud {
 		$total_rows = count($this->current_page_data);
 		for($i=0; $i<$total_rows; $i++) {
 			$row = $this->current_page_data[$i];
+			
 			foreach($this->listing_fields as $field_name) {
 				$f = $this->fields[$field_name];
 				$value = '';

@@ -2,7 +2,10 @@
 //Yes, I know this file is a mess. I'll get around to fixing it. Someday...
 
 //Make including classes easier
-set_include_path(get_include_path() . PATH_SEPARATOR .  joinPath($config['iframe_folder'], 'includes/classes')); 
+set_include_path(get_include_path() 
+	. PATH_SEPARATOR .  joinPath($config['iframe_folder'], 'includes/classes')
+	. PATH_SEPARATOR .  joinPath($config['iframe_folder'], 'includes/classes/external')
+	); 
 if(file_exists(joinPath($config['site_folder'] , 'models'))) set_include_path(get_include_path() . PATH_SEPARATOR .  joinPath($config['site_folder'] , 'models'));
 
 //Find all path info

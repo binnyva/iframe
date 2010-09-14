@@ -3,10 +3,10 @@ global $config;
 $html = new HTML;
 $column_count = count($this->listing_fields);
 ?>
-<h2><?=$this->title?></h2>
+<h2><?php echo $this->title?></h2>
 
-<div class="with-icon error" <?=($this->error) ? '' : 'style="display:none;"';?>><?=$this->error?></div>
-<div class="with-icon success" <?=($this->success) ? '':'style="display:none;"';?>><?=$this->success?></div>
+<div class="with-icon error" <?php echo ($this->error) ? '' : 'style="display:none;"';?>><?php echo $this->error?></div>
+<div class="with-icon success" <?php echo ($this->success) ? '':'style="display:none;"';?>><?php echo $this->success?></div>
 
 <?php if($this->allow['searching']) { ?>
 <form name="search-form" method="post" action="">
@@ -45,7 +45,7 @@ if($this->allow['delete']) $action_colspan++;
 
 if($action_colspan) {
 	$column_count += $action_colspan;
-?><th colspan="<?=$action_colspan?>">Action</th><?php } ?>
+?><th colspan="<?php echo $action_colspan?>">Action</th><?php } ?>
 </tr>
 
 <?php
@@ -86,8 +86,8 @@ foreach($this->current_page_data as $row) {
 		} elseif($f['value_type'] == 'sort') {
 			$sort_field = $field_count;
 			?>
-<input type="hidden" name="sort_row_id[]" value="<?=$id?>" />
-<input type="text" size="3" name="sort_order[]" tabindex="<?=$field_count?>" id="sort_order_<?=$id?>" class="sorter" value="<?=$value?>" />
+<input type="hidden" name="sort_row_id[]" value="<?php echo $id?>" />
+<input type="text" size="3" name="sort_order[]" tabindex="<?php echo $field_count?>" id="sort_order_<?php echo $id?>" class="sorter" value="<?php echo $value?>" />
 			<?php
 		
 		// Every other field.
@@ -97,9 +97,9 @@ foreach($this->current_page_data as $row) {
 		print "</td>\n";
 	}
 	
-if($this->allow['edit']) { ?><td class="action"><a href="<?=getLink($this->urls['edit'], array('id'=>$id, 'action'=>'edit'), true);?>" class="icon edit">Edit</a></td><?php } ?>
+if($this->allow['edit']) { ?><td class="action"><a href="<?php echo getLink($this->urls['edit'], array('id'=>$id, 'action'=>'edit'), true);?>" class="icon edit">Edit</a></td><?php } ?>
 
-<?php if($this->allow['delete']) { ?><td class="action"><a href="<?=getLink($this->urls['delete'], array('select_row[]'=>$id, 'action'=>'delete'), true);?>" title="Delete <?=i($row, 'name', 'row')?>" class="icon delete confirm">Delete</a></td><?php } ?>
+<?php if($this->allow['delete']) { ?><td class="action"><a href="<?php echo getLink($this->urls['delete'], array('select_row[]'=>$id, 'action'=>'delete'), true);?>" title="Delete <?php echo i($row, 'name', 'row')?>" class="icon delete confirm">Delete</a></td><?php } ?>
 </tr>
 <?php }
 
@@ -130,7 +130,7 @@ if($this->current_page_data) {
 
 // No data.
 } else { ?>
-<tr><td class="no-records-found" colspan="<?=$column_count?>">No <?=$this->title_plural?> found.</td></tr>
+<tr><td class="no-records-found" colspan="<?php echo $column_count?>">No <?php echo $this->title_plural?> found.</td></tr>
 <?php } ?>
 </table>
 <input type='hidden' name='action' id='list-form-action' value='list' />
@@ -153,5 +153,5 @@ foreach($save_current_state as $state_name) {
 </form><br />
 
 <?php if($this->allow['add']) { ?>
-<a href="<?=getLink($this->urls['add'], array('action'=>'add'), true)?>" class="with-icon add">Add New <?=$this->title?></a><br />
+<a href="<?php echo getLink($this->urls['add'], array('action'=>'add'), true)?>" class="with-icon add">Add New <?php echo $this->title?></a><br />
 <?php } ?>

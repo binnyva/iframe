@@ -10,7 +10,7 @@
 ***************************************************************************************************/
 class Sql {
 	//All Variables - Public
-	public static $mode = 'd'; ///Mode - p = Production, d = Development and t = Testing
+	public static $mode = 'd'; ///Mode - p = Production, d = Development and t = Testing (And x = disabled - nothing happens in this mode)
 
 	//Private Variables
 	private $_row  = "";
@@ -63,6 +63,10 @@ class Sql {
 		if(self::$mode == 't') {
 			print $query;
 			return false;
+			
+		} else if(self::$mode == 'x') {
+			return false;
+			
 		} else if(self::$mode == 'd') { // Log the query if we are in the Development mode.
 			if($GLOBALS['Logger']) $GLOBALS['Logger']->log("Query: $query");
 		}
@@ -294,7 +298,7 @@ class Sql {
 			if ($this->isKeyword($field_value)) { //If the is values has a special meaning - like NOW() give it special consideration
 				$insert_values[] = $field_value;
 			} else {
-				$insert_values[] = "'$field_value'";
+				$insert_values[] = "'" . $this->escape($field_value) . "'";
 			}
 		}
 		$insert_query .= implode(',', $insert_values);
@@ -326,7 +330,7 @@ class Sql {
 			if ($this->isKeyword($value)) { //If the is values has a special meaning - like NOW() give it special consideration
 				$update_fields[] = "$field=$value";
 			} else {
-				$update_fields[] = "$field='$value'";
+				$update_fields[] = "$field='" . $this->escape($value) . "'";
 			}
 		}
 		$update_query .= implode(',',$update_fields);
