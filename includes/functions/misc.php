@@ -508,6 +508,7 @@ function load($url,$options=array()) {
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); //Just return the data - not print the whole thing.
 		curl_setopt($ch, CURLOPT_HEADER, true); //We need the headers
 		curl_setopt($ch, CURLOPT_NOBODY, !($options['return_body'])); //The content - if true, will not download the contents. There is a ! operation - don't remove it.
+		if(isset($options['encoding'])) curl_setopt($ch, CURLOPT_ENCODING, $options['encoding']); // Used if the encoding is gzip.
 		if(isset($options['method']) and $options['method'] == 'post' and isset($url_parts['query'])) {
 			curl_setopt($ch, CURLOPT_POST, true);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $url_parts['query']);

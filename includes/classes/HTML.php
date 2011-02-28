@@ -63,7 +63,7 @@ class HTML {
 				$attributes['checked'] = 'checked';
 				$attributes['value'] = $data;
 			}
-			
+		
 		} else if ($type == 'textarea' ) { //Textarea
 			$tag = 'textarea';
 			unset($attributes['type']);
@@ -72,11 +72,13 @@ class HTML {
 			$value = $data;
 		}
 		
-		if($data !== '') $attributes['value'] = $data;
-		elseif(isset($PARAM[$name]) and !isset($attributes['value'])) {
-			$attributes['value'] = $value = $PARAM[$name];
+		if($type != 'checkbox') { // If the field is a checkbox, we need the attribute 'value' to be 1 even if its not checked.
+			if($data !== '') $attributes['value'] = $data;
+			elseif(isset($PARAM[$name]) and !isset($attributes['value'])) {
+				$attributes['value'] = $value = $PARAM[$name];
+			}
 		}
-	
+		
 		//Create all the attributes that is to be appended at the end of the tag.
 		$all_attributes = $extra + $attributes;
 		if($tag == 'textarea' and isset($all_attributes['value'])) unset($all_attributes['value']); //Textarea don't have a value attribute.

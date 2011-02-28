@@ -115,6 +115,7 @@ if($this->current_page_data) {
 <?php if($this->allow['delete']) { ?><li><a href="#" onclick="submit('delete');" class="with-icon delete">Delete Selected</a></li><?php } ?>
 <?php if($this->allow['status_change'] and !empty($this->status_field)) { ?><li><a href="#" onclick="submit('activate');" class="with-icon activate">Activate Selected</a></li>
 <li><a href="#" onclick="submit('deactivate');" class="with-icon deactivate">Deactivate Selected</a></li><?php } ?>
+<?php echo $this->code['multi_select_choice']; ?>
 </ul></td>
 <?php } else print "<td>&nbsp;</td>";
 	

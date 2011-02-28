@@ -54,7 +54,7 @@ JS_END;
 		$html->buildInput($field, '', 'hidden', $hidden_value);
 		
 	} else {
-		if($field_type == 'checkbox' and $value === false) $value = $data;
+		//if($field_type == 'checkbox' and $value === false) $value = $data;
 		if($field_type == 'checkbox' or $field_type == 'radio' or $field_type == 'textarea') $attributes = array();
 		else $attributes = array('class'=>'text-long');
 		

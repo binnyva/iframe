@@ -58,14 +58,18 @@ class Crud {
 		'datetime'			=> 'datetime',
 		'date'				=> 'date',
 		'enum'				=> 'select',
-		'time'				=> 'text'
+		'time'				=> 'text',
+		'bit'				=> 'checkbox',
 	);
 	
 	public $success = '';				// A success message - if any.
 	public $error = '';					// Error message holder.
 	
-	public $top_code = '';				// Prints this after showTop() and before printAction()
-	public $bottom_code = '';			// Prints this after printAction() and before showEnd()
+	public $code = array(
+		'top'	=> '',					// Prints this after showTop() and before printAction()
+		'bottom'=> '',					// Prints this after printAction() and before showEnd()
+		'multi_select_choice'	=> '',	// In the Delete, Activate, Deactivate part - below all the rows.
+	);
 	
 	
 	///////////////////////////////////////// Configuration Function ////////////////////////////////////
@@ -106,6 +110,7 @@ class Crud {
 			$value_type = false;
 			$validation = array();
 			$data = array();
+			$field_title = format($Field);
 			
 			if($Key == 'PRI') $this->setPrimaryKey($Field);
 			else {
@@ -128,13 +133,28 @@ class Crud {
 							$data = array_shift(array_keys($data)); // First element in the enum list is the default value.
 						}
 						break;
+					case 'int':
+						// If it is a foreign key...
+						if(preg_match('/^(.+)_id$/', $Field, $matches)) {
+							$data_type = 'enum';
+							$validation = array();
+							$reference_table = str_replace(array('parent_', 'parent'), '', $matches[1]);
+							
+							if(ctype_upper($this->table[0])) $reference_table = ucfirst($reference_table); // In my designs, I tend to upper case the first char of the table. If the current table has first char uppercased, try doing the same to the reference table.
+							if(!$reference_table) $reference_table = $this->table;
+							$field_title = $reference_table;
+							
+							$data = $this->execQuery("SELECT id,name FROM `{$reference_table}`", "byid");
+							$data['0'] = 'None';
+						}
+						break;
 					case 'varchar':
 						$length = preg_replace('/.*\((.+)\).*/', "$1", $Type);
 						if($length == 255) $field_type = 'textarea';
 						$validation['length<'] = $length;
 				}
 				
-				$this->addField($Field, format($Field), $data_type, $validation, $data, $field_type, $value_type);
+				$this->addField($Field, $field_title, $data_type, $validation, $data, $field_type, $value_type);
 			}
 		}
 		// Some pre render stuff.
@@ -425,11 +445,15 @@ class Crud {
 	 */
 	function preSaveChanges($field_data) {
 		if(!$this->validateForm()) return false;
-		
+				
 		// Remove invalid fields(stuff not in the DB)
 		$save_data = array();
 		foreach($this->fields as $field_name => $field_info) {
-			if(!isset($field_data[$field_name]) and $field_info['field_type'] != 'file') { // Make sure that the field shows up in the submit list.(file type don't show in the $_POST array)
+			if(!isset($field_data[$field_name]) 				// Make sure that the field shows up in the submit list.(
+					and $field_info['field_type'] != 'file'	 	// File type don't show in the $_POST array
+					and $field_info['field_type'] != 'checkbox'	// Checkbox won't show up if unchecked.
+					) {
+					
 				unset($field_data[$field_name]);
 				continue;
 			}
@@ -465,6 +489,10 @@ class Crud {
 						if($result) return $this->validationError($field_name, $result);
 						else $value = $filename;
 					}
+					break;
+				
+				case 'bit':
+					if(!$value) $value = '0';
 					break;
 				
 				// Passwords
@@ -801,9 +829,9 @@ class Crud {
 	/// Shows everything - not often called.
 	function render() {
 		showTop($this->title);
-		print $this->top_code;
+		print $this->code['top'];
 		$this->printAction();
-		print $this->bottom_code;
+		print $this->code['bottom'];
 		showEnd();
 	}
 	

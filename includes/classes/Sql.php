@@ -11,6 +11,8 @@
 class Sql {
 	//All Variables - Public
 	public static $mode = 'd'; ///Mode - p = Production, d = Development and t = Testing (And x = disabled - nothing happens in this mode)
+	
+	public $error_message;
 
 	//Private Variables
 	private $_row  = "";
@@ -60,6 +62,8 @@ class Sql {
 	 * Return   : The SQL Resource of the given query
 	 */
 	function getSql($query) {
+		$this->error_message = '';
+		
 		if(self::$mode == 't') {
 			print $query;
 			return false;
@@ -422,6 +426,7 @@ class Sql {
 		$error_message = "MySQL Error : <code>" . mysqli_error($this->_db_connection) . "</code>";
 		if($query) $error_message .= "<br /><br /><u>In Query...</u><br /><code>" . $query . "</code>";
 		
+		$this->error_message = $error_message;
 		if(self::$mode == 'd') {
 			die($error_message);
 		} elseif(self::$mode == 't') {
