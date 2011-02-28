@@ -1,0 +1,6 @@
+To make a new project
+ 
+mkdir <FOLDER FOR PROJECT>
+cd <FOLDER FOR PROJECT>
+perl /var/www/html/iframe/Scripts/install.pl "<Project Title>" link
+find -name .svn -exec rm -rf {} \;

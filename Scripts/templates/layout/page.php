@@ -12,6 +12,12 @@
 </div>
 
 <div id="content">
+<div id="error-message" <?=($QUERY['error']) ? '':'style="display:none;"';?>><?php
+	if(isset($PARAM['error'])) print strip_tags($PARAM['error']); //It comes from the URL
+	else print $QUERY['error']; //Its set in the code(validation error or something.
+?></div>
+<div id="success-message" <?=($QUERY['success']) ? '':'style="display:none;"';?>><?=strip_tags(stripslashes($QUERY['success']))?></div>
+
 <!-- Begin Content -->
 <?php 
 /////////////////////////////////// The Template file will appear here ////////////////////////////

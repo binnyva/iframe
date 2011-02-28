@@ -4,22 +4,25 @@ use File::Basename;
 use File::Spec;
 use Cwd;
 
-# Arguments
-# 1 project name
-# 2 Action - full or link
-my $project_name = 'Chromics';
+# This script will not create the project folder. Create the folder yourself.
+unless(@ARGV) {
+	print "Usage: perl install.pl <PROJECT_NAME> [link/full]\n";
+	exit;
+}
+my $project_name = $ARGV[0];
 my $install = 'link';
+$install = $ARGV[1] if($ARGV[1]);
 
 my ($volume,$iframe_folder,$file) = File::Spec->splitpath( File::Basename::dirname($0) );
 $iframe_folder = Cwd::realpath($iframe_folder);
 my $current_folder = Cwd::getcwd();
 my $iframe_folder_relative = File::Spec->abs2rel($iframe_folder);
 
-
 if($install eq 'link') {
 	`cp -R $iframe_folder/Scripts/installation/* .`;
 	`cp -R $iframe_folder/css css`;
 	`cp -R $iframe_folder/js js`;
+	`cp -R $iframe_folder/images images`;
 	`cp -R $iframe_folder/templates templates`;
 	print "Please execute this command...\nfind -name .svn -exec rm -rf {} \\;";
 }

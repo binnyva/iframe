@@ -1,5 +1,5 @@
 <?php
-include("%IFRAME_FOLDER_RELATIVE%/common.php");
+require("./common.php");
 
 $message = "Hello World";
 

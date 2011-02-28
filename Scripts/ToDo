@@ -1,0 +1,14 @@
+datatype 'date'/datetime is not reflected in the Type dropdown.
+Forign key 'project_id' is thought to be an id field and given must/unique validation(this is given for primary keys)
+Ability to remove fields from the list. 
+user_id must have an Auto handler
+Logged in must be a validation for the whole page and sections
+
+
+
+
+
+
+
+
+

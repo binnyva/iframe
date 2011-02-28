@@ -134,7 +134,7 @@ function registerEventHandles() {
 			fieldOptions(this);
 		});
 		
-  		$("#auto_handler_"+fc);//.on("change", function() {
+//  		$("#auto_handler_"+fc).on("change", function() {
 // 			var fc = this.id.replace(/[^\d]/g,"");
 // 			if(this.value != "off") $("field_details_"+fc).hide();
 // 			else $("field_details_"+fc).show();
