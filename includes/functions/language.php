@@ -27,6 +27,9 @@ function format($value) {
  * Returns : The unformated string
  */
 function unformat($value) {
+	$value = str_replace("'s", 's', $value); // Changes the text 'Binny's code' to 'Binnys code'. Because 'binny_s_code' looks bad.
+	
+	
 	$value = preg_replace('/\W/','_',$value);	//Replace all special chars with an '_'
 	$value = preg_replace('/__+/','_',$value);	//Replace multiple '_' with a single one.
 	$value = preg_replace(

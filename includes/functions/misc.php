@@ -24,7 +24,7 @@ function getLink($url,$params=array(),$use_existing_arguments=false) {
 		$existing_parameters = array();
 		
 		if($url_parts[1]) {
-			$all_url_parameters = split("\&(amp\;)?", $url_parts[1]);
+			$all_url_parameters = preg_split("/\&(amp\;)?/", $url_parts[1]);
 			foreach($all_url_parameters as $part) {
 				list($name, $value) = explode("=", $part);
 				$existing_parameters[$name] = $value;

@@ -89,7 +89,7 @@ class MVC {
 		$this->_findResources($template_file);
 
 		if(!$use_exact_path) $template_file = joinPath($config['site_folder'], $this->options['template_folder'], $template_file);
-				
+
 		//Plugins are a special case.
 		if(strpos($config['PHP_SELF'],'plugins') !== false) {
 			$template_file = 'template.php';
@@ -243,6 +243,12 @@ class MVC {
  		if(!$this->template) error('The template file for "' . $this->page . '" does not exist.');
 		
 		if($use_layout and $this->options['insert_layout']) $this->printLayout();
-		else include($this->template);
+		else {
+			$title = ($this->title) ? $this->title : $config['site_title'];
+			$includes = implode($this->includes,"\n");
+			$css_includes = implode($this->css_includes,"\n");
+			$js_includes = implode($this->js_includes,"\n");
+			include($this->template);
+		}
 	}
 }

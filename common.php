@@ -33,7 +33,7 @@ if(empty($config)) {
 	} else {
 		require($iframe_folder . 'configuration.php');
 		
-		$config['site_folder'] = $config['iframe_folder'];
+		$config['site_folder'] = $iframe_folder;
 		$config['site_relative_path'] = '';
 	}
 }

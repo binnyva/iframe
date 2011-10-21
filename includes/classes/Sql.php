@@ -179,13 +179,18 @@ class Sql {
 
 	/**
 	 * Arguments: $query - MySQL query
-	 * Return   : Affected rows
+	 * Return   : Affected rows/Insert Id
 	 * Runs a query in the currently open MySQL connection and gets the number of affected rows. Use
 	 *	this while running update, insert etc. query that don't need to 'fetch' the results.
 	 */ 
 	function execQuery($query) {
-		$this -> getSql($query);
-		return $this->fetchAffectedRows();
+		$this->getSql($query);
+		
+		// If its an insert, get the insert id :UGLY:
+		if(preg_match('/^\s*insert\s/i',$query))
+			return $this->fetchInsertId();
+		else // Else return affected rows
+			return $this->fetchAffectedRows();
 	}
 	
 	/**

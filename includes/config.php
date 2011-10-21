@@ -9,7 +9,7 @@ set_include_path(get_include_path()
 if(file_exists(joinPath($config['site_folder'] , 'models'))) set_include_path(get_include_path() . PATH_SEPARATOR .  joinPath($config['site_folder'] , 'models'));
 
 //Find all path info
-$config['PHP_SELF'] = ($PHP_SELF) ? $PHP_SELF : $_SERVER["PHP_SELF"];
+$config['PHP_SELF'] = !empty($PHP_SELF) ? $PHP_SELF : $_SERVER["PHP_SELF"];
 
 //Absolute Path
 if(!isset($config['site_absolute_path'])) {
@@ -23,7 +23,7 @@ if(!isset($config['site_absolute_path'])) {
 }
 $config['current_page'] = str_replace($config['site_absolute_path'], '/', $config['PHP_SELF']);
 
-if(!isset($config['site_url'])) {
+if(!isset($config['site_url']) and isset($_SERVER['HTTP_HOST'])) {
 	$config['site_url']	= "http://" . $_SERVER['HTTP_HOST'] . $config['site_absolute_path'];
 }
 

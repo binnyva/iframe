@@ -58,6 +58,8 @@ JS_END;
 		if($field_type == 'checkbox' or $field_type == 'radio' or $field_type == 'textarea') $attributes = array();
 		else $attributes = array('class'=>'text-long');
 		
+		if($data and !$value) $value = $data;
+		
 		$html->buildInput($field, $name, $field_type, isset($PARAM[$field]) ? $PARAM[$field] : $value, $attributes);
 	}
 	if(isset($this->validation_errors[$field])) {

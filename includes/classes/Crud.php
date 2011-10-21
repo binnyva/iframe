@@ -582,7 +582,7 @@ class Crud {
 				
 				switch($f['type']) {
 					// Enum - or the listing.
-					case 'enum':
+					case 'enum':						
 						if($f['data'] and isset($f['data'][$value])) $new_value = $f['data'][$value];
 						else $new_value = $value;
 						break;

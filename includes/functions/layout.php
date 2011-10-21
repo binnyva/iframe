@@ -24,10 +24,10 @@ function showHead($title='') {
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html><head>
-<title><?=$title?></title>
+<title><?php echo $title; ?></title>
 <link href="<?php echo joinPath($config['site_url'],'css/style.css')?>" rel="stylesheet" type="text/css" />
 <link href="<?php echo joinPath($config['site_url'],'images/silk_theme.css')?>" rel="stylesheet" type="text/css" />
-<?=implode("\n", $template->css_includes);?>
+<?php echo implode("\n", $template->css_includes);?>
 <?php
 }
 
@@ -44,11 +44,11 @@ function showBegin() {
 <?php } ?>
 
 <div id="content">
-<div id="error-message" <?=($QUERY['error']) ? '':'style="display:none;"';?>><?php
+<div id="error-message" <?php echo ($QUERY['error']) ? '':'style="display:none;"';?>><?php
 	if(isset($PARAM['error'])) print strip_tags($PARAM['error']); //It comes from the URL
 	else print $QUERY['error']; //Its set in the code(validation error or something.
 ?></div>
-<div id="success-message" <?=($QUERY['success']) ? '':'style="display:none;"';?>><?=strip_tags(stripslashes($QUERY['success']))?></div>
+<div id="success-message" <?php echo ($QUERY['success']) ? '':'style="display:none;"';?>><?php echo strip_tags(stripslashes($QUERY['success']))?></div>
 <!-- Begin Content -->
 <?php
 }
@@ -64,8 +64,8 @@ function showEnd() {
 <!-- End Content -->
 </div>
 
-<script src="<?=joinPath($config['site_url'],'js/library/jsl.js')?>" type="text/javascript"></script>
-<script src="<?=joinPath($config['site_url'],'js/application.js')?>" type="text/javascript"></script>
+<script src="<?php echo joinPath($config['site_url'],'js/library/jsl.js')?>" type="text/javascript"></script>
+<script src="<?php echo joinPath($config['site_url'],'js/application.js')?>" type="text/javascript"></script>
 <?php echo implode("\n", $template->js_includes);?>
 </body>
 </html>
