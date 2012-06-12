@@ -112,15 +112,15 @@ if($this->current_page_data) {
 		$starting_point++; // - to make sure our rowspan = 2 is taken into account.
 		?><td colspan="2">
 <ul class="actions-multiple vertical">
-<?php if($this->allow['delete']) { ?><li><a href="#" onclick="submit('delete');" class="with-icon delete">Delete Selected</a></li><?php } ?>
-<?php if($this->allow['status_change'] and !empty($this->status_field)) { ?><li><a href="#" onclick="submit('activate');" class="with-icon activate">Activate Selected</a></li>
-<li><a href="#" onclick="submit('deactivate');" class="with-icon deactivate">Deactivate Selected</a></li><?php } ?>
+<?php if($this->allow['delete']) { ?><li><a href="javascript:submit('delete');" class="with-icon delete">Delete Selected</a></li><?php } ?>
+<?php if($this->allow['status_change'] and !empty($this->status_field)) { ?><li><a href="javascript:submit('activate');" class="with-icon activate">Activate Selected</a></li>
+<li><a href="javascript:submit('deactivate');" class="with-icon deactivate">Deactivate Selected</a></li><?php } ?>
 <?php echo $this->code['multi_select_choice']; ?>
 </ul></td>
 <?php } else print "<td>&nbsp;</td>";
 	
 	for($i=$starting_point; $i<=count($this->listing_fields); $i++) {
-		if($sort_field and $sort_field == $i) print "<td><a href='#' onclick=\"submit('sort');\" class='with-icon save'>Sort</a></td>";
+		if($sort_field and $sort_field == $i) print "<td><a href=\"javascript:submit('sort');\" class='with-icon save'>Sort</a></td>";
 		else print "<td>&nbsp;</td>";
 	}
 	
