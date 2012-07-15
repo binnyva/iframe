@@ -734,6 +734,7 @@ class Crud {
 	/// Shows the data editing form - creates and caches the data. Then include the form template file.
 	function printForm() {
 		global $QUERY;
+		
 		if($this->action == 'edit') $this->current_page_data = $this->execQuery("SELECT * FROM `{$this->table}` WHERE `{$this->primary_key}`=$QUERY[id]", "assoc");
 		
 		require('templates/Crud/form.php');
@@ -757,9 +758,23 @@ class Crud {
 				break;
 		
 			case 'add_save':
-				if($this->add($_POST) and $_POST['submit'] != 'Save and Continue Editing') {
-					$this->printListing();
-					
+				$result = $this->add($_POST);
+				if($result) {
+					if($_POST['submit'] == 'Save') {
+						$this->printListing();
+
+					} elseif($_POST['submit'] == 'Save and Continue Editing') {
+						$this->current_page_data = $_POST;
+						$this->action = 'edit';
+						$this->printForm();
+						
+					} elseif($_POST['submit'] == 'Save and Show New Form') {
+						$this->action = 'add';
+						global $PARAM;
+						$PARAM = array();
+						$this->current_page_data = array();
+						$this->printForm();
+					}
 				} else { // Validation errors.
 					$this->current_page_data = $_POST;
 					$this->action = 'add';
@@ -769,7 +784,7 @@ class Crud {
 				break;
 				
 			case 'edit_save':
-				if($this->edit($_REQUEST['row_id'], $_POST) and $_POST['submit'] != 'Save and Continue Editing') {
+				if($this->edit($_REQUEST['row_id'], $_POST) and $_POST['submit'] == 'Save') {
 					$this->printListing();
 					
 				} else {

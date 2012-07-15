@@ -5,6 +5,7 @@ function check(conditions) {
 		var id = cond['id'];
 		var msg = cond['msg'];
 		var name = cond['name'];
+		if(!id) id = name;
 		
 		if(cond['when'] == 0 || cond['when'] == false) {
 			continue;

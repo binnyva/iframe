@@ -2,9 +2,9 @@
 global $PARAM;
 $html = new HTML;
 ?>
-<h2 class="action-title"><?=ucfirst($this->action) . ' ' . $this->title?></h2>
+<h2 class="action-title"><?php echo ucfirst($this->action) . ' ' . $this->title?></h2>
 
-<form action="<?=$this->urls['main']?>" id="admin-form" method="post" class="form-area" enctype="multipart/form-data">
+<form action="<?php echo $this->urls['main']?>" id="admin-form" method="post" class="form-area" enctype="multipart/form-data">
 <fieldset>
 <?php
 $js_code = '';
@@ -59,8 +59,10 @@ JS_END;
 		else $attributes = array('class'=>'text-long');
 		
 		if($data and !$value) $value = $data;
+		if(is_array($value)) $value = i($value, 'data', '');
+		if(!empty($PARAM[$field])) $value = $PARAM[$field];
 		
-		$html->buildInput($field, $name, $field_type, isset($PARAM[$field]) ? $PARAM[$field] : $value, $attributes);
+		$html->buildInput($field, $name, $field_type, $value, $attributes);
 	}
 	if(isset($this->validation_errors[$field])) {
 		if(count($this->validation_errors[$field]) > 1) {
@@ -87,7 +89,7 @@ if($QUERY['action'] == 'edit' or $QUERY['action'] == 'edit_save')
 
 print "<input type='submit' id='action-save' name='submit' class='action-submit' value='Save' />";
 print "<input type='submit' id='action-save-edit' name='submit' class='action-submit' value='Save and Continue Editing' />";
-
+print "<input type='submit' id='action-save-new' name='submit' class='action-submit' value='Save and Show New Form' />";
 print "</div>";
 
 
@@ -123,7 +125,7 @@ function validate(e) {
 }
 function main() {
 	$("admin-form").on("submit", validate);
-<?=$js_code?>
+<?php echo $js_code?>
 }
 </script>
 
