@@ -44,7 +44,7 @@ class DBTable {
 		if($this->order) $query .= ' ORDER BY ' . $this->order;
 		if($this->group) $query .= ' GROUP BY ' . $this->group;
 		if($this->limit) $query .= ' LIMIT ' . $this->offset . ',' . $this->limit;
-
+		
 		return $this->query = $query;
 	}
 	
@@ -77,7 +77,7 @@ class DBTable {
 			if(is_numeric($arg)) {
 				$ids[] = $arg;
 			} elseif(is_array($arg)) {
-				$this->setRequirement($arg);
+				$this->setRequirement(array('where'=>$arg));
 			} elseif(is_string($arg)) {
 				$this->where($arg);
 			}
@@ -265,11 +265,16 @@ class DBTable {
 	 *			$User->where("name='Binny'","age=23")->get();
 	 */
 	function where() {
+		global $sql;
 		$conditions = $this->_getArguments(func_get_args()); // Don't call _addTableName for this - it may mess things up
 		
-		foreach($conditions as $cond) {
-			if(is_string($cond))
+		foreach($conditions as $key => $cond) {
+			if(is_string($key)) {
+				if(!in_array($cond,$this->conditions)) $this->conditions[] = "`$key`='".$sql->escape($cond)."'";
+			
+			} else if(is_string($cond)) {
 				if(!in_array($cond,$this->conditions)) $this->conditions[] = $cond;
+			}
 		}
 		return $this;
 	}

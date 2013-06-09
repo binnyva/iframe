@@ -295,4 +295,9 @@ class Calendar {
 		$this->printTableEnd();
 	}
 	
+	/// An alias for display()
+	function render() {
+		$this->display();
+	}
+	
 }

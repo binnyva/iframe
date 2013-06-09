@@ -288,7 +288,7 @@ function upload($file_id, $folder="", $types="") {
 
 	$file_title = $_FILES[$file_id]['name'];
 	//Get file extension
-	$ext_arr = split("\.",basename($file_title));
+	$ext_arr = explode(".",basename($file_title));
 	$ext = strtolower($ext_arr[count($ext_arr)-1]); //Get the last extension
 
 	//Not really uniqe - but for all practical reasons, it is
@@ -560,7 +560,7 @@ function load($url,$options=array()) {
 				$out .= "GET $page HTTP/1.0\r\n"; //HTTP/1.0 is much easier to handle than HTTP/1.1
 			}
 			$out .= "Host: $url_parts[host]\r\n";
-			$out .= "Accept: $send_header[Accept]\r\n";
+			if(isset($send_header['Accept'])) $out .= "Accept: $send_header[Accept]\r\n";
 			$out .= "User-Agent: {$send_header['User-Agent']}\r\n";
 			if(isset($options['modified_since']))
 				$out .= "If-Modified-Since: ".gmdate('D, d M Y H:i:s \G\M\T',strtotime($options['modified_since'])) ."\r\n";
@@ -596,11 +596,19 @@ function load($url,$options=array()) {
 		$headers['Status'] = 404;
 	} else {
 		//Seperate header and content
-		$header_text = substr($response, 0, $info['header_size']);
-		$body = substr($response, $info['header_size']);
+		$header_text = '';
+		$body = $response;
+		if(isset($info['header_size'])) {
+		  $header_text = substr($response, 0, $info['header_size']);
+		  $body = substr($response, $info['header_size']);
+		} else {
+			$header_text = reset(explode("\r\n\r\n", trim($response)));
+			$body = str_replace($header_text."\r\n\r\n", '', $response);
+		}		
 		
 		// If there is a redirect, there will be multiple headers in the response. We need just the last one.
-		$header_text = end(explode("\r\n\r\n", trim($header_text)));
+		$header_parts = explode("\r\n\r\n", trim($header_text));
+		$header_text = end($header_parts);
 		
 		foreach(explode("\n",$header_text) as $line) {
 			$parts = explode(": ",$line);
@@ -725,7 +733,7 @@ function xml2array($contents, $get_attributes=1, $priority = 'tag') {
 	$repeated_tag_index = array();//Multiple tags with same name will be turned into an array
 	foreach($xml_values as $data) {
 		unset($attributes,$value);//Remove existing values, or there will be trouble
-
+		
 		//This command will extract these variables into the foreach scope
 		// tag(string), type(string), level(int), attributes(array).
 		extract($data);//We could use the array by itself, but this cooler.
@@ -794,6 +802,8 @@ function xml2array($contents, $get_attributes=1, $priority = 'tag') {
 					$repeated_tag_index[$tag.'_'.$level]++;
 
 				} else { //If it is not an array...
+					if(!is_array($current)) $current = array($current);
+					
 					$current[$tag] = array($current[$tag],$result); //...Make it an array using using the existing value and the new value
 					$repeated_tag_index[$tag.'_'.$level] = 1;
 					if($priority == 'tag' and $get_attributes) {

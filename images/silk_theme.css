@@ -21,7 +21,7 @@
 /*Common Stuff*/
 .settings {background-image:url(silk_icons/wrench.png);}
 .logout {background-image:url(silk_icons/door_out.png);}
-.calendar {background-image:url(silk_icons/calendar.png);}
+.calendar,.date {background-image:url(silk_icons/calendar.png);}
 .info {background-image:url(silk_icons/information.png);}
 .plugin {background-image:url(silk_icons/plugin.png);}
 .search {background-image:url(silk_icons/find.png);}

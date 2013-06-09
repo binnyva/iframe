@@ -79,8 +79,7 @@ class Crud {
 		
 		if($title) $this->title = $title;
 		else $this->title = format($table);
-		
-		
+				
 		// If the title ends with 's' or 'es', set that as the plural.
 		if(preg_match('/e?s$/', $this->title)) {
 			$this->title_plural = $this->title;
@@ -462,7 +461,7 @@ class Crud {
 			// Changing the value depending on the type.
 			switch($field_info['type']) {
 				case 'datetime':
-					if($field_name == 'added_on') {
+					if($field_name == 'added_on' and $field_info['field_type'] == 'hidden') {
 						if($this->action == 'add_save') $value = date('Y-m-d H:i:s'); // Automatically stamp the added date/time in this field.
 						
 					} elseif($field_name == 'edited_on') {
@@ -870,7 +869,8 @@ class Crud {
 	private function _addResource($file, $type='', $use_exact_path = false) {
 		global $template, $config;
 		
-		if(!$type) $type = array_pop(explode(".",$file));
+		$file_name_parts = explode(".",$file);
+		if(!$type) $type = array_pop($file_name_parts);
 		if(preg_match('#https?\://#', $file)) $use_exact_path = true;
 		
 		if(!$use_exact_path) {
@@ -904,7 +904,11 @@ class Crud {
 		
 			$query =  $query_start . " $replace_part " . $new_string . $query_end;
 		} elseif($new_string) {
-			$query .= " $replace_part " . $new_string;
+			if(strtolower(trim($replace_part)) == 'where') {
+				$query = str_replace('ORDER BY', ' WHERE ' . $new_string . ' ORDER BY', $query);
+			} else {
+				$query .= " $replace_part " . $new_string;
+			}
 		}
 		
 		return $query;

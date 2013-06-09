@@ -11,18 +11,18 @@
  */
 class SqlPager {
 	// Public Variables
-	var $query;				/// The SQL Query to be paged.
-	var $items_per_page;	/// The Number of items that should be shown in 1 page
-	var $page;				/// The current page number
-	var $total_items;		/// Total number of records
-	var $total_pages;		/// Total number of pages
-	var $page_link   = "";	/// The file that must be used while making links to pages.
+	public $query;				/// The SQL Query to be paged.
+	public $items_per_page;		/// The Number of items that should be shown in 1 page
+	public $page;				/// The current page number
+	public $total_items;		/// Total number of records
+	public $total_pages;		/// Total number of pages
+	public $page_link   = "";	/// The file that must be used while making links to pages.
 	
 	/**
 	 * This is the template used to create links when the getLink() is called.
 	 * %%PAGE_LINK%% - current page url & sp_page=PageNumber . Example: demo.php?param=value&sp_page=3
 	 */
-	var $link_template = '<a href="%%PAGE_LINK%%" class="page-%%CLASS%%">%%TEXT%%</a>';
+	public $link_template = '<a href="%%PAGE_LINK%%" class="page-%%CLASS%%">%%TEXT%%</a>';
 	
 	/**
 	 * This is the template used to create links when the getStatus() is called. Possible substitutions...
@@ -32,16 +32,16 @@ class SqlPager {
 	 * %%TOTAL_PAGES%%
 	 * %%TOTAL_ITEMS%%
 	 */
-	var $status_template = 'Viewing %%FROM%% - %%TO%% of %%TOTAL_ITEMS%%';
+	public $status_template = 'Viewing %%FROM%% - %%TO%% of %%TOTAL_ITEMS%%';
 	
 	///The current mode of the system. Possible values are 'd' = Development Mode, 't' = Testing Mode, 'p' = Production Mode
-	var $mode = 'd';
-	var $opt = array(
+	public $mode = 'd';
+	public $opt = array(
 		'links_count'	=> 10, // If 0, shows all links
 	);
 
 	///The text used in the pager is customizable. HTML is allowed.
-	var $text = array(
+	public $text = array(
 		'previous' => '&lt;' , 'next' => '&gt;', 		//Next and Previous Texts
 		'first' => '&lt;&lt;', 'last' => '&gt;&gt;', 	//First and Last Links
 		'current_page_indicator' => array(
@@ -52,8 +52,8 @@ class SqlPager {
 	);
 
 	///Private Variables
-	var $_sql_resource;
-	var $_pager_query;
+	public $_sql_resource;
+	public $_pager_query;
 
 	/**
 	 * Constructor
@@ -73,7 +73,7 @@ class SqlPager {
 		$this->page = ($this->_getParam('sp_page')) ? $this->_getParam('sp_page') : 1;
 		
 		$this->page_link = basename($_SERVER['PHP_SELF']);
-		if($_SERVER["QUERY_STRING"]) $this->page_link .= '?' + $_SERVER["QUERY_STRING"];
+		if($_SERVER["QUERY_STRING"]) $this->page_link .= '?' . $_SERVER["QUERY_STRING"];
 
 		$offset = ($this->page - 1) * $this->items_per_page;
 		$this->_pager_query = $query . " LIMIT $offset," . $this->items_per_page;

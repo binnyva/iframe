@@ -31,12 +31,14 @@ class Sql {
 	 * 			 $sql = new Sql("Data"); //Shortcut - if host is localhost, user is 'root' and password is empty(for development systems);
 	 */
 	function __construct($db_host, $db_user=false, $db_password=false, $db_name=false) {
-		if($db_user === false) { // Shortcut method
-			$this->_db_connection = mysqli_connect('localhost', 'root', '', $db_host);
-		} else {
-			$this->_db_connection = mysqli_connect($db_host, $db_user, $db_password, $db_name);
+		if(self::$mode != 'x') {
+			if($db_user === false) { // Shortcut method
+				$this->_db_connection = mysqli_connect('localhost', 'root', '', $db_host);
+			} else {
+				$this->_db_connection = mysqli_connect($db_host, $db_user, $db_password, $db_name);
+			}
+			if(!$this->_db_connection) $this->_error("Cannot connect to Database Host '".$db_host."': " . mysqli_connect_error());
 		}
-		if(!$this->_db_connection) $this->_error("Cannot connect to Database Host '".$db_host."': " . mysqli_connect_error());
 	}
 	
 	/**
@@ -201,26 +203,21 @@ class Sql {
 	function query($query, $return_type='all') {
 		$result = array();
 		
-		if(Sql::$mode == 't') { //Just testing, fools!
-			print $query . '<br />';
-
-		} else {
-			$result = array();
-			if($return_type == 'assoc') {
-				$result = $this->getAssoc($query);
-			} elseif($return_type == 'sql') {
-				$result = $this->getSql($query);
-			} elseif($return_type == 'exec') {
-				$result = $this->execQuery($query);
-			} elseif($return_type == 'one') {
-				$result = $this->getOne($query);
-			} elseif($return_type == 'col') {
-				$result = $this->getCol($query);
-			} elseif($return_type == 'byid') {
-				$result = $this->getById($query);
-			} else { //exec
-				$result = $this->getAll($query);
-			}
+		$result = array();
+		if($return_type == 'assoc') {
+			$result = $this->getAssoc($query);
+		} elseif($return_type == 'sql') {
+			$result = $this->getSql($query);
+		} elseif($return_type == 'exec') {
+			$result = $this->execQuery($query);
+		} elseif($return_type == 'one') {
+			$result = $this->getOne($query);
+		} elseif($return_type == 'col') {
+			$result = $this->getCol($query);
+		} elseif($return_type == 'byid') {
+			$result = $this->getById($query);
+		} else { //exec
+			$result = $this->getAll($query);
 		}
 		
 		return $result;
@@ -457,25 +454,37 @@ class Sql {
 	
 	/*****************************************************************************/
 	function escape($string) {
+		if(self::$mode == 'x') return mysql_real_escape_string($string);;
+		
 		return mysqli_real_escape_string($this->_db_connection, $string);
 	}
 	
 	function fetchAssoc($resource = false) {
+		if(self::$mode == 'x' or self::$mode == 't') return array();
+		
 		if(!$resource) $resource = $this->_resource;
 		return mysqli_fetch_assoc($resource);
 	}
 	function fetchRow($resource = false) {
+		if(self::$mode == 'x' or self::$mode == 't') return array();
+		
 		if(!$resource) $resource = $this->_resource;
 		return mysqli_fetch_row($resource);
 	}
 	function fetchNumRows($resource = false) {
+		if(self::$mode == 'x' or self::$mode == 't') return 0;
+		
 		if(!$resource) $resource = $this->_resource;
 		return mysqli_num_rows($resource);
 	}
 	function fetchInsertId() {
+		if(self::$mode == 'x' or self::$mode == 't') return 0;
+		
 		return mysqli_insert_id($this->_db_connection);
 	}
 	function fetchAffectedRows() {
+		if(self::$mode == 'x' or self::$mode == 't') return 0;
+		
 		return mysqli_affected_rows($this->_db_connection);
 	}
 	

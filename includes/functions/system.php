@@ -69,7 +69,7 @@ function escapeQuery($param_array = array(),$ignore_magic_quote_setting = false)
 		if(is_array($value)) { //Escape Arrays recursively
 			$QUERY[$key] = escapeQuery($value,$ignore_magic_quote_setting); //:RECURSION:
 		} else {
-			if($GLOBALS['sql']) $value = $GLOBALS['sql']->escape($value); //If there is an SQL Connection,
+			if(isset($GLOBALS['sql'])) $value = $GLOBALS['sql']->escape($value); //If there is an SQL Connection,
 			else $value = addslashes($value);
 			
 			//$QUERY[$key] = htmlspecialchars($value);

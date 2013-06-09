@@ -123,10 +123,11 @@ function validate(e) {
 	if(!success) JSL.event(e).stop();
 	return !(success);
 }
-function main() {
+function start() {
 	$("admin-form").on("submit", validate);
 <?php echo $js_code?>
 }
+window.onload=start;
 </script>
 
 <?php
