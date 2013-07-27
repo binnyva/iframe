@@ -1,5 +1,5 @@
 <?php
-include("./common.php");
+require("./common.php");
 
 $message = "Hello World";
 
