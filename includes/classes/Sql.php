@@ -314,6 +314,26 @@ class Sql {
 		
 		return $this->fetchInsertId();
 	}
+	
+	/**
+	 * Builds and executes an UPDATE command - by taking a table name and an array holding all the conditions in an associative array
+	 * Arguments: 	$table - name of the table
+	 *				$where	- The WHERE clause should be given here.
+	 * Example : <pre>remove("Data",'id=14');</pre>
+	 */
+	function remove($table,$where) {
+		if(!$where or !$table) return;
+	
+		$delete_query = "DELETE FROM `$table`";
+		if(strpos(strtolower($where),"where ") !== false)
+			$delete_query .= " $where";
+		else
+			$delete_query .= " WHERE $where";
+
+		$this->getSql($delete_query);
+		
+		return $this->fetchAffectedRows();
+	}
 
 	/**
 	 * Builds and executes an UPDATE command - by taking a table name and an array holding all the data in an associative array - the key being the field name and the value being the data.

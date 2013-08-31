@@ -88,6 +88,12 @@ class DBTable {
 		return $this->createExecQuery();
 	}
 	
+	/// Return just one data value.
+	function findOne($requiements, $field) {
+		$data = $this->find($requiements);
+		return isset($data[0][$field]) ? $data[0][$field] : '';
+	}
+	
 	/// Returns the results of all the rows whose IDs are provided
 	function findById() {
 		$ids = $this->_getArguments(func_get_args());

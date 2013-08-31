@@ -129,7 +129,8 @@ class Crud {
 							$this->setStatusField($Field);
 							$field_type = 'checkbox';
 							$value_type = 'status';
-							$data = array_shift(array_keys($data)); // First element in the enum list is the default value.
+							$data_keys = array_keys($data);
+							$data = array_shift($data_keys); // First element in the enum list is the default value.
 						}
 						break;
 					case 'int':

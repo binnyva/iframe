@@ -145,3 +145,27 @@ function any() {
 	
 	return $arr[array_rand($arr)];
 }
+
+
+/**
+ * Returns the given array after making it into a key format. If an element of the array has a key called 'id', that will be set as the key of that element.*
+ * array('0'=>array('id'=>1,'name'=>'Binny'), '1'=>array('id'=>30,'name'=>'Bijoy')) will become...
+ * array('1'=>array('id'=>1,'name'=>'Binny'), '30'=>array('id'=>30,'name'=>'Bijoy')) 
+ */
+function keyFormat($data, $primary_field='id') {
+	$return = array();
+	foreach($data as $row) {
+		if(is_array($primary_field) and count($primary_field) == 2) $return[$row[$primary_field[0]]] = $row[$primary_field[1]];
+		else $return[$row[$primary_field]] = $row;
+	}
+	
+	return $return;
+}
+
+/// Flattens a mutli colmn array - Removes everything but the first element of each element of the array.
+function colFormat($data) {
+	$return = array();
+	foreach($data as $row) $return[] = current($row);
+	
+	return $return;
+}

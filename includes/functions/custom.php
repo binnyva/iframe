@@ -78,9 +78,9 @@ function showStatus() {
 /**
  * Shows the final message - redirects to a new page with the message in the URL
  */
-function showMessage($message, $url='', $status="success",$extra_data=array(), $use_existing_params=true) {
+function showMessage($message, $url='', $status="success",$extra_data=array(), $use_existing_params=true, $ajax = false) {
 	//If it is an ajax request, Just print the data
-	if(isset($_REQUEST['ajax'])) {
+	if(isset($_REQUEST['ajax']) or $ajax) {
 		$success = '';
 		$error = '';
 		$insert_id = '';
@@ -114,6 +114,10 @@ function showMessage($message, $url='', $status="success",$extra_data=array(), $
 		header("Location:$goto");
 	}
 	exit;
+}
+/// Shortcut for showMessage when using ajax.
+function showAjaxMessage($message, $type='success') {
+	showMessage('Connection deleted.','',$type,array(),true,true);
 }
 
 /**
