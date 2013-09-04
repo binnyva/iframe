@@ -142,7 +142,7 @@ class Crud {
 							
 							if(ctype_upper($this->table[0])) $reference_table = ucfirst($reference_table); // In my designs, I tend to upper case the first char of the table. If the current table has first char uppercased, try doing the same to the reference table.
 							if(!$reference_table) $reference_table = $this->table;
-							$field_title = $reference_table;
+							$field_title = ucfirst(str_replace('_',' ', $reference_table));
 							
 							$data = $this->execQuery("SELECT id,name FROM `{$reference_table}`", "byid");
 							$data['0'] = 'None';
@@ -697,7 +697,7 @@ class Crud {
 		foreach($this->form_fields as $field_name) {
 			$field_info = $this->fields[$field_name];
 			extract($field_info);
-			if($type == 'datetime' and !isset($done[$type])
+			if(($type == 'datetime' or $type == 'date') and !isset($done[$type])
 					and ($this->action == 'edit' or $this->action == 'add' or $this->action == 'add_save' or $this->action == 'edit_save')) {
 				$this->_addResource(joinPath($config['site_url'], 'js', $this->urls['js_folder'], "jscalendar/calendar-blue.css"),	"css", true);
 				$this->_addResource("jscalendar/calendar.js",		"js");

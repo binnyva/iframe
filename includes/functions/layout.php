@@ -65,7 +65,7 @@ function showEnd() {
 <!-- End Content -->
 </div>
 
-<script src="<?php echo joinPath($config['site_url'],'js/library/jsl.js')?>" type="text/javascript"></script>
+<script src="<?php echo joinPath($config['site_url'],'js/library/jquery.js')?>" type="text/javascript"></script>
 <script src="<?php echo joinPath($config['site_url'],'js/application.js')?>" type="text/javascript"></script>
 <?php echo implode("\n", $template->js_includes);?>
 </body>
