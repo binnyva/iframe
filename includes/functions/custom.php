@@ -117,7 +117,7 @@ function showMessage($message, $url='', $status="success",$extra_data=array(), $
 }
 /// Shortcut for showMessage when using ajax.
 function showAjaxMessage($message, $type='success') {
-	showMessage('Connection deleted.','',$type,array(),true,true);
+	showMessage($message,'',$type,array(),true,true);
 }
 
 /**

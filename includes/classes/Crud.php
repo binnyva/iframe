@@ -73,7 +73,7 @@ class Crud {
 	
 	
 	///////////////////////////////////////// Configuration Function ////////////////////////////////////
-	function __construct($table, $title='', $primary_key='id') {
+	function __construct($table, $title='', $primary_key='id', $guess=true) {
 		global $config, $template;
 		$this->table = $table;
 		
@@ -95,7 +95,7 @@ class Crud {
 		$this->setPrimaryKey($primary_key);
 		$this->setUrl();
 		
-		$this->guess();
+		if($guess) $this->guess();
 	}
 	
 	/// Guesses all the fields based on the the Database structure.
@@ -144,8 +144,14 @@ class Crud {
 							if(!$reference_table) $reference_table = $this->table;
 							$field_title = ucfirst(str_replace('_',' ', $reference_table));
 							
-							$data = $this->execQuery("SELECT id,name FROM `{$reference_table}`", "byid");
-							$data['0'] = 'None';
+							// Check if the table exists...
+							$reference_table_exists = $this->execQuery("SHOW TABLES LIKE '{$reference_table}'", 'one');
+							if($reference_table_exists) {
+								$data = $this->execQuery("SELECT id,name FROM `{$reference_table}`", "byid");
+								$data['0'] = 'None';
+							} else {
+								$data = array("No Data");
+							}
 						}
 						break;
 					case 'varchar':
@@ -180,6 +186,10 @@ class Crud {
 	 * 			  $type - Datatype for that field . Eg: varchar
 	 * 			  $validation - an array that specifies all the necessary validations. Eg: array('empty','url');
 	 * 			  $data - some preset data. Useful for setting hidden variables and Dropdown boxes.
+	 * 			  $field_type - what kind of HTML field.
+	 * 			  $value_type - what kind of data(email, name, url, etc).
+	 * 	Examples:
+	 * 			add_field(); // Create a dropdown using data from another table.
 	 */
 	function addField($field, $name=false, $type='varchar', $validation=array(), $data=array(), $field_type=false, $value_type=false) {
 		if($name === false) $name = format($field);
