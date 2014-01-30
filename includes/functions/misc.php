@@ -67,31 +67,31 @@ function getLink($url,$params=array(),$use_existing_arguments=false) {
  * :TODO: This function is not fully tested. It is not even partaily tested.
  * :TODO: Documentation needed desperatly
  * :TODO: Change this function to a class.
- The first argument - $conditions is an array with all the validaiton rule
- Each element of the array is one rule.
- Each rule is an associative array. The following keys are supported
-
- name	: The name of the field that should be checked. ($_REQUEST['date'] - here the name is 'date')
- is		: What sort data should MAKE AN ERROR. If the given type is found as the field value, an error will be raised. Example 'empty'
- title	: The human friendly name for the field (eg. 'Date of Birth')
- error  : The message that should be shown if there is a validation error
- value	: The programmer provided value. Some rules must have an additional value to be matched against. For example the '<' condition must have a value - the user inputed value and the value given in this index will be compared
- when	: This is a method to short-circut the validation. If this is false, or '0' validaiton will NOT take place. The rule will just be ignored.
- 
- Example :
- $conditions = array(
- 	array(
- 		'name'	=>	'username',
- 		'is'	=>	'empty',
- 		'error' =>	'Please provide a valid username'
- 	),
- 	array(
- 		'name'	=>	'username',
- 		'is'	=>	'length<',
- 		'value'	=> 	3,
- 		'error' =>	'Make sure that then username has atleast 3 chars'
- 	)
- )
+ * The first argument - $conditions is an array with all the validaiton rule
+ * Each element of the array is one rule.
+ * Each rule is an associative array. The following keys are supported
+ * 
+ * name	: The name of the field that should be checked. ($_REQUEST['date'] - here the name is 'date')
+ * is		: What sort data should MAKE AN ERROR. If the given type is found as the field value, an error will be raised. Example 'empty'
+ * title	: The human friendly name for the field (eg. 'Date of Birth')
+ * error  : The message that should be shown if there is a validation error
+ * value	: The programmer provided value. Some rules must have an additional value to be matched against. For example the '<' condition must have a value - the user inputed value and the value given in this index will be compared
+ * when	: This is a method to short-circut the validation. If this is false, or '0' validaiton will NOT take place. The rule will just be ignored.
+ *  
+ * Example :
+ * $conditions = array(
+ *	 array(
+ *		 'name'	=>	'username',
+ *		 'is'	=>	'empty',
+ *		 'error' =>	'Please provide a valid username'
+ *	 ),
+ *	 array(
+ *		 'name'	=>	'username',
+ *		 'is'	=>	'length<',
+ *		 'value'	=> 	3,
+ *		 'error' =>	'Make sure that then username has atleast 3 chars'
+ *	 )
+ * )
  */
 function check($conditions,$show=1) {
 	$errors = array();

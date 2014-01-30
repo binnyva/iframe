@@ -60,8 +60,8 @@ ini_set('url_rewriter.tags',"");
 ini_set('session.use_trans_sid',false); 
 if(isset($_SERVER["HTTP_HOST"])) session_start(); //Don't start the session for a console app.
 
-$config['date_format']	= '%d %b %Y';
-$config['time_format']	= '%d %b %Y, %h:%i %p';
+$config['date_format']	= '%D %b %Y';
+$config['time_format']	= '%D %b %Y, %h:%i %p';
 
 $config['date_format_php']	= phpDateFormat($config['date_format']);
 $config['time_format_php']	= phpDateFormat($config['time_format']);
