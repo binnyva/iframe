@@ -88,11 +88,12 @@ class MVC {
 		global $config;
 		$this->_findResources($template_file);
 
-		if(!$use_exact_path) $template_file = joinPath($config['site_folder'], $this->options['template_folder'], $template_file);
-
-		//Plugins are a special case.
-		if(strpos($config['PHP_SELF'],'plugins') !== false) {
-			$template_file = 'template.php';
+		if(!$use_exact_path) {
+			$template_file = joinPath($config['site_folder'], $this->options['template_folder'], $template_file);
+			//Plugins are a special case.
+			if(strpos($config['PHP_SELF'],'plugins') !== false) {
+				$template_file = 'template.php';
+			}
 		}
 		
 		if(!file_exists($template_file)) {

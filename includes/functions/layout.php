@@ -40,7 +40,7 @@ function showBegin() {
 <body>
 <?php if(isset($config['site_title'])) { ?>
 <div id="header">
-<h1 id="logo"><a href="<?php echo $config['site_url']?>"><?php echo $config['site_title']?></a></h1>
+<h1 id="logo"><a href="<?php echo $config['home_url']?>"><?php echo $config['site_title']?></a></h1>
 </div>
 <?php } ?>
 

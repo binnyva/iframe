@@ -1,14 +1,14 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html><head>
-<title><?php echo $title?></title>
-<link href="<?php echo $abs?>css/style.css" rel="stylesheet" type="text/css" />
-<link href="<?php echo $abs?>images/silk_theme.css" rel="stylesheet" type="text/css" />
+<title><?php echo $config['site_title'] ?></title>
+<link href="<?php echo $config['site_url'] ?>css/style.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo $config['site_url'] ?>images/silk_theme.css" rel="stylesheet" type="text/css" />
 <?php echo $css_includes ?>
 </head>
 <body>
 <div id="loading">loading...</div>
 <div id="header">
-<h1 id="logo"><a href="<?php echo $abs ?>"><?php echo $title ?></a></h1>
+<h1 id="logo"><a href="<?php echo $config['home_url']; ?>"><?php echo $config['site_title'] ?></a></h1>
 </div>
 
 <div id="content">
@@ -31,8 +31,8 @@ include($GLOBALS['template']->template);
 
 <div id="footer">An <a href="http://www.bin-co.com/php/scripts/iframe/">iFrame</a> Application</div>
 
-<script src="<?=$abs?>js/library/jsl.js" type="text/javascript"></script>
-<script src="<?=$abs?>js/application.js" type="text/javascript"></script>
-<?=$js_includes?>
+<script src="<?php $config['site_url'] ?>js/library/jsl.js" type="text/javascript"></script>
+<script src="<?php $config['site_url'] ?>js/application.js" type="text/javascript"></script>
+<?php echo $js_includes ?>
 </body>
 </html>
