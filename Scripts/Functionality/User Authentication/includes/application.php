@@ -1,6 +1,6 @@
 <?php
 require_once(joinPath($config['site_folder'] , 'models/User.php'));
-$User = new User;
+$user = new User;
 
 function checkUser($check_admin = false) {
 	global $config;
