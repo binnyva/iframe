@@ -128,7 +128,7 @@ function phpDateFormat($format_string) {
 		'%a' => 'D',
 		'%b' => 'M',
 		'%c' => 'n',
-		'%D' => 'jS',
+		'%D' => 'j\<\s\u\p\>S\<\/\s\u\p\>',
 		'%e' => 'j',
 		'%f' => 'u',
 		'%j' => 'z',
