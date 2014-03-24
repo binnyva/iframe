@@ -15,7 +15,9 @@ calendar = {
 	month_days: [31,28,31,30,31,30,31,31,30,31,30,31],
 	//Get today's date - year, month, day and date
 	today : new Date(),
-	opt : {},
+	opt : {
+		"format":"Y-m-d"
+	},
 	data: [],
 
 	//Functions
@@ -63,7 +65,7 @@ calendar = {
 		var ths = _calendar_active_instance;
 		if(ths.opt['onDateSelect']) ths.opt['onDateSelect'].apply(ths, [year,month,day]); // Custom handler if the user wants it that way.
 		else {
-			document.getElementById(ths.opt["input"]).value = year + "-" + month + "-" + day; // Date format is :HARDCODE:
+			document.getElementById(ths.opt["input"]).value = ths.dateFormat(new Date(year,month,day), ths.opt['format']);
 			ths.hideCalendar();
 		}
 	},
@@ -184,10 +186,7 @@ calendar = {
 		if(date_in_input) {
 			var selected_date = false;
 			var date_parts = date_in_input.split("-");
-			if(date_parts.length == 3) {
-				date_parts[1]--; //Month starts with 0
-				selected_date = new Date(date_parts[0], date_parts[1], date_parts[2]);
-			}
+			selected_date = new Date(date_in_input);
 			if(selected_date && !isNaN(selected_date.getYear())) { //Valid date.
 				existing_date = selected_date;
 			}
@@ -240,5 +239,107 @@ calendar = {
 
 			document.getElementsByTagName("body")[0].insertBefore(div,document.getElementsByTagName("body")[0].firstChild);
 		}
-	}
+	},
+
+
+/*
+ * Based on...
+ * Date Format 1.2.3
+ * (c) 2007-2009 Steven Levithan <stevenlevithan.com>
+ * MIT license
+ *
+ * Includes enhancements by Scott Trenda <scott.trenda.net>
+ * and Kris Kowal <cixar.com/~kris.kowal/>
+ *
+ * Accepts a date, a mask, or a date and a mask.
+ * Returns a formatted version of the given date.
+ * The date defaults to the current date/time.
+ * The mask defaults to dateFormat.masks.default.
+ */
+
+dateFormat: function () {
+	var	token = /j|d|D|l|n|m|M|F|y|Y|g|h|G|H|i|s|a|A|Z|o|S|"[^"]*"|'[^']*'/g,
+		timezone = /\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g,
+		timezoneClip = /[^-+\dA-Z]/g,
+		pad = function (val, len) {
+			val = String(val);
+			len = len || 2;
+			while (val.length < len) val = "0" + val;
+			return val;
+		};
+
+	// Regexes and supporting functions are cached through closure
+	return function (date, mask, utc) {
+		var dF = calendar.dateFormat;
+
+		// You can't provide utc if you skip other args (use the "UTC:" mask prefix)
+		if (arguments.length == 1 && Object.prototype.toString.call(date) == "[object String]" && !/\d/.test(date)) {
+			mask = date;
+			date = undefined;
+		}
+
+		// Passing date through Date applies Date.parse, if necessary
+		date = date ? new Date(date) : new Date;
+		if (isNaN(date)) throw SyntaxError("invalid date");
+
+		if(!mask) mask = "Y-m-d";
+
+		// Allow setting the utc argument via the mask
+		if (mask.slice(0, 4) == "UTC:") {
+			mask = mask.slice(4);
+			utc = true;
+		}
+
+		var	_ = utc ? "getUTC" : "get",
+			d = date[_ + "Date"](),
+			D = date[_ + "Day"](),
+			m = date[_ + "Month"](),
+			y = date[_ + "FullYear"](),
+			H = date[_ + "Hours"](),
+			M = date[_ + "Minutes"](),
+			s = date[_ + "Seconds"](),
+			L = date[_ + "Milliseconds"](),
+			o = utc ? 0 : date.getTimezoneOffset(),
+			
+			flags = {
+				j:    d,
+				d:    pad(d),
+				D:    dF.i18n.dayNames[D],
+				l:    dF.i18n.dayNames[D + 7],
+				n:    m,
+				m:    pad(m),
+				M:    dF.i18n.monthNames[m - 1],
+				F:    dF.i18n.monthNames[m + 12 - 1],
+				y:    String(y).slice(2),
+				Y:    y,
+				g:    H % 12 || 12,
+				h:    pad(H % 12 || 12),
+				G:    H,
+				H:    pad(H),
+				i:    pad(M),
+				s:    pad(s),
+				a:   H < 12 ? "am" : "pm",
+				A:   H < 12 ? "AM" : "PM",
+				Z:    utc ? "UTC" : (String(date).match(timezone) || [""]).pop().replace(timezoneClip, ""),
+				o:    (o > 0 ? "-" : "+") + pad(Math.floor(Math.abs(o) / 60) * 100 + Math.abs(o) % 60, 4),
+				S:    ["th", "st", "nd", "rd"][d % 10 > 3 ? 0 : (d % 100 - d % 10 != 10) * d % 10]
+			};
+
+
+		return mask.replace(token, function ($0) {
+			return $0 in flags ? flags[$0] : $0.slice(1, $0.length - 1);
+		});
+	};
+}(),
+}
+
+calendar.dateFormat.i18n = {
+	dayNames: [
+		"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat",
+		"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
+	],
+	monthNames: [
+		"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+		"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+	]
 }

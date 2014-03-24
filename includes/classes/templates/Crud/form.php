@@ -120,7 +120,7 @@ function validate(e) {
 	print "success = check(" . json_encode($conditions) . ", 1);";
 	?>
 	
-	if(!success) JSL.event(e).stop();
+	if(!success) e.stopPropagation();
 	return !(success);
 }
 function start() {
@@ -136,6 +136,7 @@ function jsDateFormat($format_string) {
 		'%b' => '%M',
 		'%p' => '%a',
 		'%P' => '%A',
+		'%D' => '%d',
 	);
 
 	return str_replace(array_keys($replace_rules), array_values($replace_rules), $format_string);
