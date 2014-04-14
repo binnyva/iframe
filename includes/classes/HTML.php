@@ -140,7 +140,7 @@ class HTML {
 		return $tag;
 	}
 	
-	function buildTag( $tag, $attributes, $value ) {
-		print $this->getTag( $tag, $attributes, $value );
+	function buildTag( $tag, $attributes, $end=false ) {
+		print $this->getTag( $tag, $attributes, $end );
 	}
 }

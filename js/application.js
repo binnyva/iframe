@@ -1,7 +1,7 @@
 //Framework Specific
 function showMessage(data) {
-	if(data.success) $("#success-message").innerHTML = stripSlashes(data.success);
-	if(data.error) $("#error-message").innerHTML = stripSlashes(data.error);
+	if(data.success) $("#success-message").html(stripSlashes(data.success)).show();
+	if(data.error) $("#error-message").html(stripSlashes(data.error)).show();
 }
 function stripSlashes(text) {
 	if(!text) return "";
