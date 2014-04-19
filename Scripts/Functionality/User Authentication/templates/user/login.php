@@ -13,4 +13,4 @@
 <input type="submit" name="action" value="Login" />
 </form>
 
-<a href="register.php">Sign up</a> | <a href="forgot_password.php">Forgot Password?</a>
+<a href="signup.php">Sign up</a> | <a href="forgot_password.php">Forgot Password?</a>

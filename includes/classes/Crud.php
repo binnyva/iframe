@@ -60,6 +60,7 @@ class Crud {
 		'enum'				=> 'select',
 		'time'				=> 'text',
 		'bit'				=> 'checkbox',
+		'file'				=> 'file',
 	);
 	
 	public $success = '';				// A success message - if any.
@@ -210,7 +211,7 @@ class Crud {
 			'validation' => $validation,
 			'data'	=>	$data,
 		);
-	
+
 		$this->fields[$field] = $field_info;
 	}
 	
@@ -468,7 +469,7 @@ class Crud {
 				continue;
 			}
 			$value = i($field_data, $field_name);
-			
+
 			// Changing the value depending on the type.
 			switch($field_info['type']) {
 				case 'datetime':
@@ -579,7 +580,7 @@ class Crud {
 	function makeListingDisplayData() {
 		if(!$this->current_page_data) return;
 		global $config;
-		
+
 		$total_rows = count($this->current_page_data);
 		for($i=0; $i<$total_rows; $i++) {
 			$row = $this->current_page_data[$i];
@@ -598,11 +599,11 @@ class Crud {
 						break;
 					
 					case 'datetime':
-						if($value != '0000-00-00 00:00:00') $new_value = date(phpDateFormat($config['time_format']), strtotime($value));
+						if($value != '0000-00-00 00:00:00') $new_value = date($config['time_format_php'], strtotime($value));
 						break;
 						
 					case 'date':
-						if($value != '0000-00-00 00:00:00') $new_value = date(phpDateFormat($config['date_format']), strtotime($value));
+						if($value != '0000-00-00 00:00:00') $new_value = date($config['date_format_php'], strtotime($value));
 						break;
 					
 					case 'virtual': //Not actually a DB column.
