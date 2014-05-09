@@ -86,7 +86,8 @@ class Crud {
 			$this->title_plural = $this->title;
 			$this->title = preg_replace('/e?s$/', '', $this->title);
 		} else {
-			$this->title_plural = $this->title . 's'; // :TODO: Get a single to plural convert from the net.
+			if(substr($this->title, -1, 1) == 'y') $this->title_plural = preg_replace('/i?y$/', 'ies', $this->title);
+			else $this->title_plural = $this->title . 's';
 		}
 		
 		//Set some member variables

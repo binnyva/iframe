@@ -3,6 +3,8 @@
 <title><?php echo $config['site_title'] ?></title>
 <link href="<?php echo $config['site_url'] ?>css/style.css" rel="stylesheet" type="text/css" />
 <link href="<?php echo $config['site_url'] ?>images/silk_theme.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo $config['site_url'] ?>bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo $config['site_url'] ?>bower_components/bootstrap/dist/css/bootstrap-theme.css" rel="stylesheet" type="text/css" />
 <?php echo $css_includes ?>
 </head>
 <body>
@@ -31,7 +33,8 @@ include($GLOBALS['template']->template);
 
 <div id="footer">An <a href="http://www.bin-co.com/php/scripts/iframe/">iFrame</a> Application</div>
 
-<script src="<?php $config['site_url'] ?>js/library/jsl.js" type="text/javascript"></script>
+<script src="<?php $config['site_url'] ?>bower_components/jquery/dist/jquery.min.js" type="text/javascript"></script>
+<script src="<?php $config['site_url'] ?>bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="<?php $config['site_url'] ?>js/application.js" type="text/javascript"></script>
 <?php echo $js_includes ?>
 </body>

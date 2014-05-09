@@ -24,7 +24,7 @@ $html->buildInput('action', '', 'submit', 'Search');
 <?php } ?>
  
 <form name="display-form" id='display-form' method="post" action="">
-<table class="data-table">
+<table class="table table-striped table-bordered table-hover"><!-- Use 'data-table' class for old layout. -->
 <tr class="header-row">
 <?php if($this->allow['bulk_operations']) { $column_count++; ?>
 <th class="header-select"><input id="selection-toggle" type="checkbox" value="" name="selection-toggle" /></th>

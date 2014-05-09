@@ -1,5 +1,5 @@
 <?php
-//Configuration file for iFrame
+//Configuration file for %PROJECT_NAME%
 $config = array(
 	'site_title'	=>	'%PROJECT_NAME%',
 //	'db_host'		=>	'localhost',

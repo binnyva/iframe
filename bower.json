@@ -1,0 +1,30 @@
+{
+  "name": "iFrame",
+  "version": "1.01.A",
+  "homepage": "https://github.com/binnyva/iframe",
+  "authors": [
+    "Binny V A <binnyva@gmail.com>"
+  ],
+  "description": "Personal PHP Framework",
+  "main": "common.php",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "framework",
+    "php",
+    "iframe"
+  ],
+  "license": "BSD",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "Tests",
+    
+  ],
+  "dependencies": {
+    "bootstrap": "~3.1.1"
+  }
+}

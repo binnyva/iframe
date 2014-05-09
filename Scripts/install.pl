@@ -7,6 +7,7 @@ use Cwd;
 # This script will not create the project folder. Create the folder yourself.
 unless(@ARGV) {
 	print "Usage: perl install.pl <PROJECT_NAME> [link/full]\n";
+	print "Please make the project folder yourself.\n";
 	exit;
 }
 my $project_name = $ARGV[0];
@@ -24,7 +25,8 @@ if($install eq 'link') {
 	`cp -R $iframe_folder/js js`;
 	`cp -R $iframe_folder/images images`;
 	`cp -R $iframe_folder/templates templates`;
-	print "Please execute this command...\nfind -name .svn -exec rm -rf {} \\;";
+	`mkdir bower_components`;
+	`for i in $iframe_folder/bower_components/*; do mkdir bower_components/\$(basename \$i); cp -R $iframe_folder/bower_components/\$(basename \$i)/dist bower_components/\$(basename \$i)/dist; done`;
 }
 
 my %keywords = (
@@ -34,6 +36,7 @@ my %keywords = (
 );
 replaceInFile('index.php', %keywords);
 replaceInFile('configuration.php', %keywords);
+replaceInFile('bower.json', %keywords);
 
 print "\n";
 
