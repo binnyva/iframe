@@ -95,7 +95,7 @@ class MVC {
 				$template_file = 'template.php';
 			}
 		}
-		
+
 		if(!file_exists($template_file)) {
 			//Search the template folder for that file
 			if (file_exists( joinPath($this->options['template_folder'],$template_file) ))
@@ -249,6 +249,7 @@ class MVC {
 			$includes = implode($this->includes,"\n");
 			$css_includes = implode($this->css_includes,"\n");
 			$js_includes = implode($this->js_includes,"\n");
+
 			include($this->template);
 		}
 	}

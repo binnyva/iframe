@@ -1,0 +1,28 @@
+{
+  "name": "%PROJECT_NAME%",
+  "version": "1.00.A",
+  "authors": [
+    "Binny V A <binnyva@gmail.com>"
+  ],
+  "description": "",
+  "main": "index.php",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "php",
+    "iframe"
+  ],
+  "license": "BSD",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "Tests",
+    
+  ],
+  "dependencies": {
+    "bootstrap": "~3.1.1"
+  }
+}

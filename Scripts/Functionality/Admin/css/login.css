@@ -1,0 +1,12 @@
+#login-area {
+	width:400px;
+}
+
+#forget-password-form {
+	display: none;
+	width:250px;
+}
+
+#page-wrapper {
+	margin:0;
+} 

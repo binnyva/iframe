@@ -68,7 +68,7 @@ $config['time_format_php']	= phpDateFormat($config['time_format']);
 
 $abs = $config['site_absolute_path'];
 $config['code_path'] = preg_replace("/includes/",'',dirname(__FILE__));
-$config['home_url'] = $config['site_url'];
+if(isset($config['site_url'])) $config['home_url'] = $config['site_url'];
 
 //Auto-include the application.php file
 if(isset($config['site_relative_path']) and file_exists($config['site_relative_path'] . 'includes/application.php')) {
