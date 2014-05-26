@@ -252,5 +252,6 @@ class MVC {
 
 			include($this->template);
 		}
+		if($i_plugin) $i_plugin->callHook('end');
 	}
 }

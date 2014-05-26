@@ -74,3 +74,11 @@ if(isset($config['site_url'])) $config['home_url'] = $config['site_url'];
 if(isset($config['site_relative_path']) and file_exists($config['site_relative_path'] . 'includes/application.php')) {
 	include($config['site_relative_path'] . 'includes/application.php');
 }
+
+// Plugin System
+$i_plugin = false;
+if(file_exists(joinPath($config['site_folder'],'plugins'))) {
+	$i_plugin = new Plugin(joinPath($config['site_folder'],'plugins'));
+
+	$i_plugin->callHook('init');
+}
