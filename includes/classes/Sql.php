@@ -13,6 +13,7 @@ class Sql {
 	public static $mode = 'd'; ///Mode - p = Production, d = Development and t = Testing (And x = disabled - nothing happens in this mode)
 	
 	public $error_message;
+	public $_query;
 
 	//Private Variables
 	private $_row  = "";
@@ -65,6 +66,7 @@ class Sql {
 	 */
 	function getSql($query) {
 		$this->error_message = '';
+		$this->_query = $query;
 		
 		if(self::$mode == 't') {
 			print $query;

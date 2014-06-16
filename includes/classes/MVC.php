@@ -182,7 +182,7 @@ class MVC {
 		$link = '';
 		
 		if($use_exact_path) $link = $file;
-		else $link = joinPath($config['site_url'], $folder, $file);
+		else $link = joinPath($config['site_home'], $folder, $file);
 
 		if($type=='css' or $type=='stylesheet' or $type=='style' or $type=='stylesheets') {
 			$current_include = '<link href="' . $link . '" type="text/css" rel="stylesheet" />';
