@@ -1,10 +1,6 @@
 //This function will check/uncheck all the checkboxes if the main one is clicked.
 function checkAll() {
-	var selects = JSL.dom(".select-row");
-	var status = $("selection-toggle").checked;
-	selects.each(function(ele) {
-		ele.checked = status;
-	});
+	$(".select-row").prop("checked", this.checked);
 }
 
 function submit(action) {
@@ -12,7 +8,7 @@ function submit(action) {
 		var selecteds = $(".select-row");
 		var selected_rows = 0;
 		for(var i=0; i<selecteds.length; i++) {
-			if(selecteds[i].checked) selected_rows++;
+			if(selecteds[i].prop("checked")) selected_rows++;
 		}
 		
 		if(selected_rows) {
@@ -25,22 +21,25 @@ function submit(action) {
 		else alert("Please select an item");
 	}
 	
-	$("#list-form-action").value = action;
-	$("#display-form").get().submit();
+	$("#list-form-action").val(action);
+	$("#display-form").submit();
+}
+
+function selectRow () {
+	var check = this.firstChild.firstChild;
+	if(check) check.checked=true;
 }
 
 function init() {
-	$("selection-toggle").click(checkAll);
+	$("#selection-toggle").click(checkAll);
 	//Remove the all-selected if any checkbox has been unselected.
 	$(".select-row").click(function(e) {
-		if(!this.checked) $("selection-toggle").checked = false;
+		if(!this.checked) $("#selection-toggle").prop("checked", false);
 	});
 
 	//For going to the edit section if a row is clicked.
-	$(".data-table tr").click(function() {
-		var check = this.parentNode.firstChild.firstChild;
-		if(check) check.checked=true;
-	});
+	$(".data-table tr").click(selectRow);
+	$(".table tr").click(selectRow);
 	
 	if(window.main) main();
 }

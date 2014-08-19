@@ -1,5 +1,5 @@
 <?php
-global $config;
+global $config, $sql;
 $html = new HTML;
 $column_count = count($this->listing_fields);
 ?>
@@ -31,7 +31,9 @@ $html->buildInput('action', '', 'submit', 'Search');
 <?php } ?>
 <?php foreach($this->listing_fields as $field_name) {
 	print "<th>" . $this->fields[$field_name]['name'];
-	if($this->allow['sorting'] and $this->fields[$field_name]['type'] != 'virtual') { //Links to Sort the data.
+	if($this->allow['sorting']
+		 and $this->fields[$field_name]['type'] != 'virtual'
+		 and $this->fields[$field_name]['type'] != 'manytomany') { //Links to Sort the data.
 		print "<a href='".getLink($this->urls['main'], array("sortasc"=>$field_name, "sortdesc"=>null), true)."'><img src='" . $this->urls['image_folder'] . "up.png' alt='Sort Ascending' /></a>";
 		print "<a href='".getLink($this->urls['main'], array("sortdesc"=>$field_name, "sortasc"=>null), true)."'><img src='" . $this->urls['image_folder'] . "down.png' alt='Sort Descending' /></a>";
 	}
@@ -66,6 +68,8 @@ foreach($this->current_page_data as $row) {
 	foreach($this->listing_fields as $field_name) {
 		$field_count++;
 		$f = $this->fields[$field_name];
+
+		// Data is created at Crud::makeListingDisplayData()
 		$value = $row[$field_name];
 		print '<td>';
 		

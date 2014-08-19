@@ -58,6 +58,7 @@ class Crud {
 		'datetime'			=> 'datetime',
 		'date'				=> 'date',
 		'enum'				=> 'select',
+		'manytomany'		=> 'select',
 		'time'				=> 'text',
 		'bit'				=> 'checkbox',
 		'file'				=> 'file',
@@ -190,10 +191,9 @@ class Crud {
 	 * 			  $data - some preset data. Useful for setting hidden variables and Dropdown boxes.
 	 * 			  $field_type - what kind of HTML field.
 	 * 			  $value_type - what kind of data(email, name, url, etc).
-	 * 	Examples:
-	 * 			add_field(); // Create a dropdown using data from another table.
+	 *			  $extra_info - More info if needed.
 	 */
-	function addField($field, $name=false, $type='varchar', $validation=array(), $data=array(), $field_type=false, $value_type=false) {
+	function addField($field, $name=false, $type='varchar', $validation=array(), $data=array(), $field_type=false, $value_type=false, $extra_info=array()) {
 		if($name === false) $name = format($field);
 		
 		if(!$field_type or !$value_type or !$validation) {
@@ -211,6 +211,7 @@ class Crud {
 			'value_type' => $value_type,
 			'validation' => $validation,
 			'data'	=>	$data,
+			'extra_info' => $extra_info,
 		);
 
 		$this->fields[$field] = $field_info;
@@ -228,7 +229,39 @@ class Crud {
 		
 		$this->addField($field, $name, 'enum', array(), $this->execQuery("SELECT id,name FROM `{$table}` $where", "byid"));
 	}
+
 	
+	/**
+	 * Add a many to many relation field.
+	 * Example: (Fairly complicated...)
+	 *$crud->addManyToManyField('selected_users', 'HR_UserSelect', 
+	 *			array(
+	 *				array(
+	 *					'table'		=> 'User',
+	 *					'forign_key'=> 'user_id',
+	 *					'select'	=> 'id,name',
+	 *					'where'		=> "city_id=$city_id AND user_type='volunteer' AND status='1'",
+	 *				),
+	 *				array(
+	 *					'table'		=> 'HR_Engagement',
+	 *					'forign_key'=> 'item_id',
+	 *				),
+	 *				'where' => array('item_type'=>"engagement"),
+	 *			), 'Selected Users');
+	 */
+	function addManyToManyField($field, $reference_table, $field_list, $title='', $data=array()) {
+		if(!$data) {
+			$where = i($field_list[0], 'where');
+			if($where) $where = ' WHERE ' . $where;
+
+			$data = $this->execQuery("SELECT ".i($field_list[0], 'select', 'id,name')." FROM `".$field_list[0]['table']."` $where", "byid");
+		}
+	
+		$this->addField($field, $title, 'manytomany', array(), $data, 'select', false, 
+				array('reference_table' => $reference_table, 'field_list' => $field_list));
+	}
+	
+		
 	/**
 	 * Set the rules to validate this field.
 	 * Arguments:	$field - the name of the field to which these rules must be attached to.
@@ -279,12 +312,17 @@ class Crud {
 	}
 	
 	/**
-	 * Add a field that can only be seen when the data is being listed(list action). This field don't have to be in the database
-	 * Example: $admin->addListingField('User Posts','"<a href=\'$row[url]\'>View All Post of this User</a>"');
+	 * Add a field that can only be seen when the data is being listed(list action). This field don't have to be in the database. 
+	 *	It can also be an SQL statement with auto replaces with fields in the current row.
+	 * Example: $admin->addListingField('User Posts',array('html'=>'"<a href=\'$row[url]\'>View All Post of this User</a>"'));
+	 * $admin->addListingField('User Posts',array('sql'=>'SELECT COUNT(U.id) FROM User WHERE city_id='%city_id%'));
 	 */
 	function addListingField($title, $data) {
 		if(($this->action == 'list') or ($this->action == 'add_save') or ($this->action == 'edit_save')) {
-			$this->addField(unformat($title), $title, 'virtual', array(), array('html'=>$data));
+			if(is_array($data)) $data_array = $data;
+			else $data_array = array('html'=>$data);
+
+			$this->addField(unformat($title), $title, 'virtual', array(), $data_array);
 		}
 		$this->setListingFields();
 	}
@@ -376,7 +414,7 @@ class Crud {
 	/**
 	 * This function deletes all the IDs pvodided as the argument.
 	 * Arguments: $ids_to_delete - an array of IDs that must be deleted.
-	 * Example: $admin->delete(array(5,4,3,2);
+	 * Example: $admin->delete(array(5,4,3,2));
 	 */
 	function delete($ids_to_delete) {
 		$to_delete_count = count($ids_to_delete);
@@ -392,6 +430,9 @@ class Crud {
 			if($to_delete_count == 1) $this->error = "Failed to delete the row.";
 			else $this->error = "Failed to delete all the specified rows. $deleted_rows/$to_delete_count rows deleted.";
 		}
+
+		if(!$this->error)
+			$this->postDeleteChanges($ids_to_delete);
 	}
 	
 	/**
@@ -402,13 +443,18 @@ class Crud {
 	function add($field_data) {
 		global $sql;
 		// Some fields require special handling...
-		$field_data = $this->preSaveChanges($field_data);
+		$stripped_field_data = $this->preSaveChanges($field_data);
+
 		if($field_data) {
 			$this->success = 'Added a new ' . $this->title;
 			if(!empty($field_data['name'])) $this->success .= " called '$field_data[name]'";
 			
-			return $sql->insert($this->table, $field_data);
+			$insert_id = $sql->insert($this->table, $stripped_field_data);
+
+			$this->postSaveChanges($field_data, $insert_id);
+			return $insert_id;
 		}
+		
 		return false;
 	}
 	
@@ -424,6 +470,8 @@ class Crud {
 			if(!empty($field_data['name'])) $this->success .= " called '$field_data[name]'";
 			
 			$sql->update($this->table, $field_data, "`{$this->primary_key}`=$primary_key_value");
+
+			$this->postSaveChanges($field_data, $primary_key_value);
 			return true;
 		}
 		return false;
@@ -461,11 +509,17 @@ class Crud {
 		// Remove invalid fields(stuff not in the DB)
 		$save_data = array();
 		foreach($this->fields as $field_name => $field_info) {
-			if(!isset($field_data[$field_name]) 				// Make sure that the field shows up in the submit list.(
+			if(!isset($field_data[$field_name]) 				// Make sure that the field shows up in the submit list.
 					and $field_info['field_type'] != 'file'	 	// File type don't show in the $_POST array
 					and $field_info['field_type'] != 'checkbox'	// Checkbox won't show up if unchecked.
 					) {
 					
+				unset($field_data[$field_name]);
+				continue;
+			} elseif(isset($field_data[$field_name])
+					and $field_info['type'] 	== 'manytomany'	// Saved in a sepreate table.
+					) {
+
 				unset($field_data[$field_name]);
 				continue;
 			}
@@ -523,6 +577,63 @@ class Crud {
 		}
 
 		return $save_data;
+	}
+
+	function postSaveChanges($field_data, $element_id) {
+		foreach($this->fields as $field_name => $field_info) {
+			$entry_value = i($field_data, $field_name);
+
+			// Changing the value depending on the type.
+			switch($field_info['type']) {
+				// Fields with referal tables
+				case 'manytomany':
+					extract($field_info['extra_info']);
+
+					$where = '';
+					if(isset($field_list['where'])) 
+						foreach($field_list['where'] as $key => $value) 
+							$where .= " AND `$key`='$value'";
+
+					$this->execQuery("DELETE FROM $reference_table WHERE ".$field_list[1]['forign_key']."=$element_id $where");
+
+					if($entry_value) {
+						foreach($entry_value as $id) {
+							$extra_key = '';
+							$extra_value = '';
+							if(isset($field_list['where'])) 
+								foreach($field_list['where'] as $key => $value) {
+									$extra_key .= ", `". $key . "`";
+									$extra_value .= ", '". $value . "'";
+								}
+
+							$this->execQuery("INSERT INTO $reference_table(`".$field_list[0]['forign_key']."`, `".$field_list[1]['forign_key']."` $extra_key)
+												VALUES('$id', '$element_id' $extra_value)");
+						}
+					}
+					break;
+			}
+		}
+	}
+
+	/// Make these changes after a row is deleted.
+	function postDeleteChanges($deleted_ids) {
+		foreach($this->fields as $field_name => $field_info) {
+			switch($field_info['type']) {
+				// Fields with referal tables - delete the references on the deletition of the main element.
+				case 'manytomany':
+					extract($field_info['extra_info']);
+
+					$where = '';
+					if(isset($field_list['where'])) 
+						foreach($field_list['where'] as $key => $value) 
+							$where .= " AND `$key`='$value'";
+
+					foreach($deleted_ids as $id) {
+						$this->execQuery("DELETE FROM $reference_table WHERE `".$field_list[1]['forign_key']."`=$id $where");
+					}
+				break;
+			}
+		}
 	}
 	
 	/**
@@ -608,11 +719,32 @@ class Crud {
 						break;
 					
 					case 'virtual': //Not actually a DB column.
-						if($f['data']) {
+
+						if(isset($f['data']['html'])) {
 							$new_value = eval("return " . $f['data']['html'] . ';');
+						} elseif(isset($f['data']['sql'])) {
+							$sql = preg_replace_callback('/\%(.+?)\%/', function($m) use($row) {
+								return $row[$m[1]];
+							}, $f['data']['sql']);
+
+							$new_value = $this->execQuery($sql,'one');
 						}
 						break;
 
+					case 'manytomany':
+						extract($f['extra_info']);
+						$where = '';
+						if(isset($field_list['where'])) 
+							foreach($field_list['where'] as $key => $value) 
+								$where .= " AND `$key`='$value'";
+
+						$result = $this->execQuery("SELECT ref.".$field_list[0]['select']." FROM `".$field_list[0]['table']."` main 
+								INNER JOIN ".$reference_table." ref ON main.id=ref.".$field_list[0]['forign_key']." 
+								WHERE ref.".$field_list[1]['forign_key']."=$row[id] $where", 'byid');
+
+						$new_value = implode("<br />", array_values($result));
+						break;
+			
 					case 'varchar':
 					default:
 						$new_value = $value;
@@ -621,7 +753,7 @@ class Crud {
 				switch($f['field_type']) {
 					case 'select':
 						if($f['data'] and isset($f['data'][$value])) $new_value = $f['data'][$value];
-						else $new_value = $value;
+						elseif(!$new_value) $new_value = $value;
 						break;
 				}
 				
@@ -747,7 +879,16 @@ class Crud {
 	function printForm() {
 		global $QUERY;
 		
-		if($this->action == 'edit') $this->current_page_data = $this->execQuery("SELECT * FROM `{$this->table}` WHERE `{$this->primary_key}`=$QUERY[id]", "assoc");
+		if($this->action == 'edit') {
+			$this->current_page_data = $this->execQuery("SELECT * FROM `{$this->table}` WHERE `{$this->primary_key}`=$QUERY[id]", "assoc");
+			foreach($this->fields as $field_name => $field_info) {
+				if($field_info['type'] == 'manytomany') {
+					extract($field_info['extra_info']);
+					$this->current_page_data[$field_name] = $this->execQuery("SELECT ".$field_list[0]['forign_key']." 
+							FROM $reference_table WHERE ".$field_list[1]['forign_key']."=$QUERY[id]", "col");
+				}
+			}
+		}
 		
 		require('templates/Crud/form.php');
 	}
@@ -771,6 +912,7 @@ class Crud {
 		
 			case 'add_save':
 				$result = $this->add($_POST);
+
 				if($result) {
 					if($_POST['submit'] == 'Save') {
 						$this->printListing();
@@ -861,7 +1003,6 @@ class Crud {
 		print $this->code['bottom'];
 		showEnd();
 	}
-	
 	
 	
 	////////////////////////////////////////////// Library Stuff //////////////////////////////

@@ -2,36 +2,6 @@
 #display-area {
 	width:80%;
 }
-/*Table Display*/
-.data-table {
-	width:100%;
-	border-collapse:collapse;
-}
-.data-table th {
-	background-color:#9e0808;
-	color:#fff;
-	font-weight:bold;
-	font-size:9pt;
-	border:1px solid #666;
-}
-.data-table td {
-	border:1px solid #666;
-}
-.data-table tr:hover {
-	background-color:#FFA9A9;
-}
-.item-row-even {
-	background-color:#fee;
-}
-.data-table tr.item-row-odd {
-	background-color:#fff;
-}
-.data-table .final-row td {
-	border:0px solid #fff;
-}
-.data-table .final-row:hover {
-	background:#fff;
-}
 
 /*Forms*/
 .form-label {
@@ -66,13 +36,9 @@
 }
 form input.action-submit {
 	float:right;
-	padding:0px 10px;
 	margin:0 10px;
 }
-#action-save-edit {
-	border:1px solid #aaa;
-	padding:2px 10px;
-}
+
 #action-save {
 	font-weight:bold;
 }
@@ -86,8 +52,6 @@ br {
 
 
 /*Global Formating*/
-#content {
-}
 
 ul.menu li a {
 	color:#00f;

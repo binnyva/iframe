@@ -17,9 +17,16 @@ foreach($this->form_fields as $field_name) {
 	$value = i($row_data, $field);
 	
 	if($field_type != 'hidden') print "<div class='field-area' id='{$field}_area'>";
+	
 	// Enum - Select tag
 	if($field_type == 'select') {
-		$html->buildInput($field, $name, 'select', $value, array('options' => $data));
+		$attributes = array('options' => $data);
+		if($type == 'multiselect' or $type == 'manytomany') {
+			$attributes['multiple'] = 'multiple';
+			$attributes['size'] = 10;
+			$attributes['name'] = $field.'[]';
+		}
+		$html->buildInput($field, $name, 'select', $value, $attributes);
 	
 	// Date Field.
 	} elseif($field_type == 'datetime' or $field_type == 'date') {
@@ -31,6 +38,7 @@ foreach($this->form_fields as $field_name) {
 		elseif($this->action == 'edit' and $field == 'edited_on') $value = date(phpDateFormat($js_date_format)); // Same for edited_on field.
 		else $value = '';
 		$js_date_format = jsDateFormat($js_date_format);
+		$value = preg_replace('/<.+?>[^>]+>/','', $value);// Remove the tags. Things like <sup>th</sup>
 		
 		$html->buildInput($field, $name, 'text', $value, array('class'=>'text-long'), "<input class='button' type='button' value=' ... ' id='date_button_$field' />");
 		$print_time = 1;
@@ -52,7 +60,7 @@ JS_END;
 	} elseif($field_type == 'hidden') {
 		$hidden_value = $value ? $value : $data;
 		$html->buildInput($field, '', 'hidden', $hidden_value);
-		
+
 	} else {
 		//if($field_type == 'checkbox' and $value === false) $value = $data;
 		if($field_type == 'checkbox' or $field_type == 'radio' or $field_type == 'textarea') $attributes = array();
@@ -87,9 +95,9 @@ print "<div class='action-area'>&nbsp;";
 if($QUERY['action'] == 'edit' or $QUERY['action'] == 'edit_save')
 	print "<a href='" . getLink($this->urls['main'], array('select_row[]'=>i($QUERY, 'id'), 'action'=>'delete')) . "' title='Delete this row' class='delete-current-item confirm with-icon delete'>Delete</a>";
 
-print "<input type='submit' id='action-save' name='submit' class='action-submit' value='Save' />";
-print "<input type='submit' id='action-save-edit' name='submit' class='action-submit' value='Save and Continue Editing' />";
-print "<input type='submit' id='action-save-new' name='submit' class='action-submit' value='Save and Show New Form' />";
+print "<input type='submit' id='action-save' name='submit' class='action-submit btn btn-primary' value='Save' />";
+print "<input type='submit' id='action-save-edit' name='submit' class='action-submit btn btn-default' value='Save and Continue Editing' />";
+print "<input type='submit' id='action-save-new' name='submit' class='action-submit btn btn-success' value='Save and Show New Form' />";
 print "</div>";
 
 
@@ -119,12 +127,11 @@ function validate(e) {
 	}
 	print "success = check(" . json_encode($conditions) . ", 1);";
 	?>
-	
 	if(!success) e.stopPropagation();
-	return !(success);
+	return success;
 }
 function start() {
-	$("admin-form").on("submit", validate);
+	$("#admin-form").submit(validate);
 <?php echo $js_code?>
 }
 window.onload=start;

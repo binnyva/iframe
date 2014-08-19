@@ -93,7 +93,7 @@ class HTML {
 				$options = $extra['options'];
 				unset($extra['options']);
 			}
-			
+
 			$input = $this->buildDropDownArray($options, $name, $data, $extra, false);
 		} else {
 			$input = $this->getTag( $tag, $all_attributes, $value );
