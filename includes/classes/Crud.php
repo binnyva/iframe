@@ -224,10 +224,12 @@ class Crud {
 	 *            $table - the table wth the date that should be used n the dropdown.
 	 *            $where - the conditions for the data.
 	 */
-	function addListDataField($field, $table, $name=false, $where='') {
+	function addListDataField($field, $table, $name=false, $where='', $options=array()) {
 		if(!empty($where)) $where = " WHERE $where";
+
+		$fields = i($options, 'fields', 'id,name');
 		
-		$this->addField($field, $name, 'enum', array(), $this->execQuery("SELECT id,name FROM `{$table}` $where", "byid"));
+		$this->addField($field, $name, 'enum', array(), $this->execQuery("SELECT $fields FROM `{$table}` $where", "byid"));
 	}
 
 	

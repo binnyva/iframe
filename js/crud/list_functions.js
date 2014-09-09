@@ -8,7 +8,7 @@ function submit(action) {
 		var selecteds = $(".select-row");
 		var selected_rows = 0;
 		for(var i=0; i<selecteds.length; i++) {
-			if(selecteds[i].prop("checked")) selected_rows++;
+			if($(selecteds[i]).prop("checked")) selected_rows++;
 		}
 		
 		if(selected_rows) {

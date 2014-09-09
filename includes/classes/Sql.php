@@ -364,7 +364,14 @@ class Sql {
 		$update_query .= implode(',',$update_fields);
 	
 		if($where) {
-			if(strpos(strtolower($where),"where ") !== false)
+			if(is_array($where)) {
+				$where_query = array();
+				foreach ($where as $key => $value) {
+					$where_query[] = "`$key` = '".$this->escape($value) . "'";
+				}
+				$update_query .= " WHERE " . implode(' AND ', $where_query);
+
+			} else if(strpos(strtolower($where),"where ") !== false)
 				$update_query .= " $where";
 			else
 				$update_query .= " WHERE $where";
