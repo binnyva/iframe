@@ -229,7 +229,7 @@ class Crud {
 
 		$fields = i($options, 'fields', 'id,name');
 		
-		$this->addField($field, $name, 'enum', array(), $this->execQuery("SELECT $fields FROM `{$table}` $where", "byid"));
+		$this->addField($field, $name, 'enum', array(), $this->execQuery("SELECT $fields FROM {$table} $where", "byid"));
 	}
 
 	
@@ -724,6 +724,7 @@ class Crud {
 
 						if(isset($f['data']['html'])) {
 							$new_value = eval("return " . $f['data']['html'] . ';');
+							
 						} elseif(isset($f['data']['sql'])) {
 							$sql = preg_replace_callback('/\%(.+?)\%/', function($m) use($row) {
 								return $row[$m[1]];
