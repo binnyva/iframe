@@ -60,13 +60,20 @@ ini_set('url_rewriter.tags',"");
 ini_set('session.use_trans_sid',false); 
 if(isset($_SERVER["HTTP_HOST"])) session_start(); //Don't start the session for a console app.
 
+// Single user config option enabled. Login functions are not required.
+if(isset($config['single_user']) and $config['single_user']) {
+	$_SESSION['user_id'] = $config['single_user'];
+}
+
+// Default Date and time formats.
 $config['date_format']	= '%D %b %Y';
 $config['time_format']	= '%D %b %Y, %h:%i %p';
 
 $config['date_format_php']	= phpDateFormat($config['date_format']);
 $config['time_format_php']	= phpDateFormat($config['time_format']);
 
-$abs = $config['site_absolute_path'];
+$abs = $config['site_absolute_path']; // :DEPRECIATED:
+
 $config['code_path'] = preg_replace("/includes/",'',dirname(__FILE__));
 if(isset($config['site_url']) and !isset($config['site_home'])) {
 	$config['home_url'] = $config['site_url'];
@@ -75,7 +82,7 @@ if(isset($config['site_url']) and !isset($config['site_home'])) {
 
 //Auto-include the application.php file
 if(isset($config['site_relative_path']) and file_exists($config['site_relative_path'] . 'includes/application.php')) {
-	include($config['site_relative_path'] . 'includes/application.php');
+	require($config['site_relative_path'] . 'includes/application.php');
 }
 
 // Plugin System

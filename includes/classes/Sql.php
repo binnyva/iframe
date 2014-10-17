@@ -323,14 +323,25 @@ class Sql {
 	 *				$where	- The WHERE clause should be given here.
 	 * Example : <pre>remove("Data",'id=14');</pre>
 	 */
-	function remove($table,$where) {
+	function remove($table, $where) {
 		if(!$where or !$table) return;
 	
 		$delete_query = "DELETE FROM `$table`";
-		if(strpos(strtolower($where),"where ") !== false)
-			$delete_query .= " $where";
-		else
-			$delete_query .= " WHERE $where";
+
+		if(is_array($where)) {
+			$conditions = array();
+			foreach ($where as $field => $value) {
+				$conditions[] = "`$field`='$value'";
+			}
+			$delete_query .= " WHERE " . implode(" AND ", $conditions);
+
+		} else {
+			if(strpos(strtolower($where),"where ") !== false)
+				$delete_query .= " $where";
+			else {
+				$delete_query .= " WHERE $where";
+			}
+		}
 
 		$this->getSql($delete_query);
 		

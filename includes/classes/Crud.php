@@ -704,6 +704,7 @@ class Crud {
 				$value = '';
 				if($f['type'] != 'virtual' and isset($row[$field_name])) $value = $row[$field_name];
 				$new_value = '';
+
 				
 				switch($f['type']) {
 					// Enum - or the listing.
@@ -724,6 +725,11 @@ class Crud {
 
 						if(isset($f['data']['html'])) {
 							$new_value = eval("return " . $f['data']['html'] . ';');
+							
+						} elseif(isset($f['data']['function'])) {
+							$new_value = '';
+							if(function_exists($f['data']['function']))
+								$new_value = call_user_func($f['data']['function'], $row);
 							
 						} elseif(isset($f['data']['sql'])) {
 							$sql = preg_replace_callback('/\%(.+?)\%/', function($m) use($row) {
@@ -774,7 +780,7 @@ class Crud {
 							$new_value = call_user_func($f['data']['function'], $value);
 						}
 				}
-				
+
 				$this->current_page_data[$i][$field_name] = $new_value;
 			}
 		}
