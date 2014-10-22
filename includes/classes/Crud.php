@@ -702,7 +702,7 @@ class Crud {
 			foreach($this->listing_fields as $field_name) {
 				$f = $this->fields[$field_name];
 				$value = '';
-				if($f['type'] != 'virtual' and isset($row[$field_name])) $value = $row[$field_name];
+				if(isset($row[$field_name])) $value = $row[$field_name];
 				$new_value = '';
 
 				
@@ -722,7 +722,7 @@ class Crud {
 						break;
 					
 					case 'virtual': //Not actually a DB column.
-
+						$new_value = $value;
 						if(isset($f['data']['html'])) {
 							$new_value = eval("return " . $f['data']['html'] . ';');
 							

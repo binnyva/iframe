@@ -70,6 +70,7 @@ foreach($this->current_page_data as $row) {
 		$f = $this->fields[$field_name];
 
 		// Data is created at Crud::makeListingDisplayData()
+
 		$value = $row[$field_name];
 		print '<td>';
 		
