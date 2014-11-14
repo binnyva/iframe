@@ -22,7 +22,7 @@ class SqlPager {
 	 * This is the template used to create links when the getLink() is called.
 	 * %%PAGE_LINK%% - current page url & sp_page=PageNumber . Example: demo.php?param=value&sp_page=3
 	 */
-	public $link_template = '<a href="%%PAGE_LINK%%" class="page-%%CLASS%%">%%TEXT%%</a>';
+	public $link_template = '<a href="%%PAGE_LINK%%" class="%%CLASS%%">%%TEXT%%</a>';
 	
 	/**
 	 * This is the template used to create links when the getStatus() is called. Possible substitutions...
@@ -60,7 +60,7 @@ class SqlPager {
 	 * Argument : $query - The query that should be used for paging
 	 * 			  $items_per_page - The default number of items per page - defaults to 10 [OPTIONAL]
 	 */
-	function SqlPager($query, $items_per_page = 10) {
+	function __construct($query, $items_per_page = 10) {
 		$query = preg_replace('/ LIMIT .+/i','',$query);//Remove the 'limitation' if there is one
 		$this->query = $query;
 
@@ -140,7 +140,13 @@ class SqlPager {
 			if($i == $this->page) { //Current Page
 				$to_print .= $this->text['current_page_indicator']['left'] . $i . $this->text['current_page_indicator']['right'];
 			} else {
-				$to_print .= '<a class="sp-page-number" href="' . $this->getLinkToPage($i) . '">'.$i."</a>";
+				$replaces = array(
+					"%%PAGE%%" => $i,
+					"%%CLASS%%" => 'sp-page-number sp-page-'.$i,
+					"%%TEXT%%" => $i, 
+					"%%PAGE_LINK%%" => $this->getLinkToPage($i),
+				);
+				$to_print .= str_replace(array_keys($replaces), array_values($replaces), $this->link_template);
 			}
 			$to_print .= $this->text['link_seperator'];
 		}

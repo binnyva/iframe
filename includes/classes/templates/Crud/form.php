@@ -59,6 +59,8 @@ JS_END;
 	
 	} elseif($field_type == 'hidden') {
 		$hidden_value = $value ? $value : $data;
+		if(!$hidden_value) $hidden_value = '';
+
 		$html->buildInput($field, '', 'hidden', $hidden_value);
 
 	} else {

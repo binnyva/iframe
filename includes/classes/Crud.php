@@ -53,6 +53,7 @@ class Crud {
 		'text'				=> 'textarea',
 		'mediumtext'		=> 'textarea',
 		'int'				=> 'text',
+		'tinyint'			=> 'text',
 		'bigint'			=> 'text',
 		'float'				=> 'text',
 		'datetime'			=> 'datetime',
@@ -358,6 +359,21 @@ class Crud {
 		// If fields are not specified, include everything.
 		if(!$listing_fields) {
 			foreach($this->fields as $name=>$f) $listing_fields[] = $name;
+		} else {
+			foreach ($listing_fields as $field_name) {
+				if(!isset($this->fields[$field_name])) { // If the given field is not there in the List of existing fields, initiate that field.
+					$this->fields[$field_name] = array(
+						'field'	=>	$field_name,
+						'name'	=>	format($field_name),
+						'type'	=>	'varchar',
+						'field_type'	=> 'varchar',
+						'value_type'	=> 'text',
+						'validation'	=> array(),
+						'data'			=>	array(),
+						'extra_info' => array(),
+					);
+				}
+			}			
 		}
 		$this->listing_fields = $listing_fields;
 		

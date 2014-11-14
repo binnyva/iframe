@@ -22,11 +22,12 @@ class Plugin {
 	/* Calls/Activate the hooks. This will call all the functions associated with the hook.
 	 * Argument: $hook_name - The name of the hook to be activated.
 	 */
-	function callHook($hook_name, $arguments = array()) {
+	function callHook($hook_name, $arguments = array(), $return_data = false) {
 		if(empty($this->hooks[$hook_name])) return;
 
 		foreach ($this->hooks[$hook_name] as $function_name) {
-			call_user_func($function_name, $arguments);
+			$return = call_user_func($function_name, $arguments);
+			if($return_data) return $return;
 		}
 	}
 
@@ -40,5 +41,12 @@ class Plugin {
 		}
 
 		array_push($this->hooks[$hook_name], $function_name);
+	}
+
+	/* Check for the existance of a given hook.
+	 * Argument: $hook_name - the name of the hook
+	 */
+	function isHook($hook_name) {
+		return isset($this->hooks[$hook_name]);
 	}
 }

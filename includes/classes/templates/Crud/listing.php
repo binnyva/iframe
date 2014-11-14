@@ -77,14 +77,13 @@ foreach($this->current_page_data as $row) {
 		// The Active/Deactive Status column.
 		if($f['field_type'] == 'checkbox' and $f['value_type'] == 'status') {
 			$toggle_action = 'activate';
-			$status_class = 'deactive';
+			$status_class = 'inactive';
 			$state = 'Disabled';
 			if($value) {
 				$toggle_action = 'deactivate';
 				$status_class = 'active';
 				$state = 'Enabled';
 			}
-			
 			print "<a href='" . getLink($this->urls['main'], array('select_row[]'=>$id,'action'=>'toggle_status','field_name'=>$field_name), true) . "' title='".ucfirst($toggle_action)."' class='icon $status_class'>$state</a>";
 		
 		// The sorter...
@@ -115,7 +114,7 @@ if($this->current_page_data) {
 	
 	if($this->allow['bulk_operations']) {
 		$starting_point++; // - to make sure our rowspan = 2 is taken into account.
-		?><td colspan="2">
+		?><td colspan="2" nowrap="nowrap">
 <ul class="actions-multiple vertical">
 <?php if($this->allow['delete']) { ?><li><a href="javascript:submit('delete');" class="with-icon delete">Delete Selected</a></li><?php } ?>
 <?php if($this->allow['status_change'] and !empty($this->status_field)) { ?><li><a href="javascript:submit('activate');" class="with-icon activate">Activate Selected</a></li>

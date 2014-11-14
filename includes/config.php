@@ -23,6 +23,20 @@ if(!isset($config['site_absolute_path'])) {
 }
 $config['current_page'] = str_replace($config['site_absolute_path'], '/', $config['PHP_SELF']);
 
+// This is to tell us where the App is CLI, is hosted online or on our own system, etc.
+$config['server_host'] = 'cli';
+$config['server_online'] = true;
+if(isset($_SERVER['HTTP_HOST'])) {
+	$config['server_host'] = $_SERVER['HTTP_HOST'];
+	if($config['server_host'] == 'localhost' 
+		or $config['server_host'] == '127.0.0.1'
+		or $config['server_host'] == $_SERVER['SERVER_ADDR']) {
+			$config['server_online'] = false;
+	}
+}
+if($config['server_host'] == 'cli') $config['server_online'] = false;
+
+// Get the full URL of the website.
 if(!isset($config['site_url']) and isset($_SERVER['HTTP_HOST'])) {
 	$config['site_url']	= "http://" . $_SERVER['HTTP_HOST'] . $config['site_absolute_path'];
 }
