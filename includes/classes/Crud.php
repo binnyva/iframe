@@ -211,7 +211,7 @@ class Crud {
 			'field_type' => $field_type,
 			'value_type' => $value_type,
 			'validation' => $validation,
-			'data'	=>	$data,
+			'data'		 =>	$data,
 			'extra_info' => $extra_info,
 		);
 

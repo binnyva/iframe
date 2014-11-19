@@ -26,8 +26,8 @@ class Plugin {
 		if(empty($this->hooks[$hook_name])) return;
 
 		foreach ($this->hooks[$hook_name] as $function_name) {
-			$return = call_user_func($function_name, $arguments);
-			if($return_data) return $return;
+			$return = call_user_func_array($function_name, $arguments);
+			if($return_data) return $return; // If Return is there, for loop will run only once.
 		}
 	}
 
