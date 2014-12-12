@@ -30,6 +30,8 @@ $html->buildInput('action', '', 'submit', 'Search');
 <th class="header-select"><input id="selection-toggle" type="checkbox" value="" name="selection-toggle" /></th>
 <?php } ?>
 <?php foreach($this->listing_fields as $field_name) {
+	if(!isset($this->fields[$field_name])) continue;
+
 	print "<th>" . $this->fields[$field_name]['name'];
 	if($this->allow['sorting']
 		 and $this->fields[$field_name]['type'] != 'virtual'
@@ -66,6 +68,7 @@ foreach($this->current_page_data as $row) {
 	
 	$field_count = 0;
 	foreach($this->listing_fields as $field_name) {
+		if(!isset($this->fields[$field_name])) continue;
 		$field_count++;
 		$f = $this->fields[$field_name];
 

@@ -390,7 +390,7 @@ class Sql {
 			else
 				$update_query .= " WHERE $where";
 		}
-
+	
 		$this->getSql($update_query);
 		
 		return $this->fetchAffectedRows();

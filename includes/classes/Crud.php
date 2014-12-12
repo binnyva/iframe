@@ -237,7 +237,7 @@ class Crud {
 	/**
 	 * Add a many to many relation field.
 	 * Example: (Fairly complicated...)
-	 *$crud->addManyToManyField('selected_users', 'HR_UserSelect', 
+	 * $crud->addManyToManyField('selected_users', 'HR_UserSelect', 
 	 *			array(
 	 *				array(
 	 *					'table'		=> 'User',
@@ -459,7 +459,7 @@ class Crud {
 	 * Example: $admin->add(array('username'=>'binnyva', 'name'=>'Binny'));
 	 */
 	function add($field_data) {
-		global $sql;
+		global $sql, $QUERY;
 		// Some fields require special handling...
 		$stripped_field_data = $this->preSaveChanges($field_data);
 
@@ -468,6 +468,7 @@ class Crud {
 			if(!empty($field_data['name'])) $this->success .= " called '$field_data[name]'";
 			
 			$insert_id = $sql->insert($this->table, $stripped_field_data);
+			$QUERY['id'] = $insert_id; // Slightly hacky. But needed for 'Save and Continue Editing' to work
 
 			$this->postSaveChanges($field_data, $insert_id);
 			return $insert_id;
@@ -523,7 +524,7 @@ class Crud {
 	 */
 	function preSaveChanges($field_data) {
 		if(!$this->validateForm()) return false;
-				
+
 		// Remove invalid fields(stuff not in the DB)
 		$save_data = array();
 		foreach($this->fields as $field_name => $field_info) {
@@ -577,6 +578,12 @@ class Crud {
 				
 				case 'bit':
 					if(!$value) $value = '0';
+					break;
+
+				case 'enum':
+					if($field_info['value_type'] == 'status') {
+						if(!$value) $value = '0';
+					}
 					break;
 				
 				// Passwords
@@ -716,6 +723,7 @@ class Crud {
 			$row = $this->current_page_data[$i];
 			
 			foreach($this->listing_fields as $field_name) {
+				if(!isset($this->fields[$field_name])) continue;
 				$f = $this->fields[$field_name];
 				$value = '';
 				if(isset($row[$field_name])) $value = $row[$field_name];
@@ -936,7 +944,9 @@ class Crud {
 				break;
 		
 			case 'add_save':
-				$result = $this->add($_POST);
+			case 'edit_save':
+				if($action == 'add_save') $result = $this->add($_POST);
+				else $result = $this->edit($_REQUEST['row_id'], $_POST);
 
 				if($result) {
 					if($_POST['submit'] == 'Save') {
@@ -945,10 +955,12 @@ class Crud {
 					} elseif($_POST['submit'] == 'Save and Continue Editing') {
 						$this->current_page_data = $_POST;
 						$this->action = 'edit';
+						$QUERY['action'] = 'edit';
 						$this->printForm();
 						
 					} elseif($_POST['submit'] == 'Save and Show New Form') {
 						$this->action = 'add';
+						$QUERY['action'] = 'add';
 						global $PARAM;
 						$PARAM = array();
 						$this->current_page_data = array();
@@ -956,18 +968,7 @@ class Crud {
 					}
 				} else { // Validation errors.
 					$this->current_page_data = $_POST;
-					$this->action = 'add';
-					$this->printForm();
-				}
-				
-				break;
-				
-			case 'edit_save':
-				if($this->edit($_REQUEST['row_id'], $_POST) and $_POST['submit'] == 'Save') {
-					$this->printListing();
-					
-				} else {
-					$this->action = 'edit';
+					$this->action = $action;
 					$this->printForm();
 				}
 				

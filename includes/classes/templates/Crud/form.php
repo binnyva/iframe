@@ -12,6 +12,8 @@ $row_data = $this->current_page_data;
 if(empty($row_data)) $row_data = $_GET;
 
 foreach($this->form_fields as $field_name) {
+	if(!isset($this->fields[$field_name])) continue;
+	
 	$field_info = $this->fields[$field_name];
 	extract($field_info);
 	$value = i($row_data, $field);
@@ -101,7 +103,6 @@ print "<input type='submit' id='action-save' name='submit' class='action-submit 
 print "<input type='submit' id='action-save-edit' name='submit' class='action-submit btn btn-default' value='Save and Continue Editing' />";
 print "<input type='submit' id='action-save-new' name='submit' class='action-submit btn btn-success' value='Save and Show New Form' />";
 print "</div>";
-
 
 if($QUERY['action'] == 'edit' or $QUERY['action'] == 'add') $form_action = $QUERY['action'] . "_save";
 else $form_action = $QUERY['action'];
