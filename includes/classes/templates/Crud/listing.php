@@ -2,8 +2,10 @@
 global $config, $sql;
 $html = new HTML;
 $column_count = count($this->listing_fields);
-?>
+
+if($this->title) { ?>
 <h2><?php echo $this->title?></h2>
+<?php } ?>
 
 <div class="with-icon error" <?php echo ($this->error) ? '' : 'style="display:none;"';?>><?php echo $this->error?></div>
 <div class="with-icon success" <?php echo ($this->success) ? '':'style="display:none;"';?>><?php echo $this->success?></div>
@@ -28,8 +30,10 @@ $html->buildInput('action', '', 'submit', 'Search');
 <tr class="header-row">
 <?php if($this->allow['bulk_operations']) { $column_count++; ?>
 <th class="header-select"><input id="selection-toggle" type="checkbox" value="" name="selection-toggle" /></th>
-<?php } ?>
-<?php foreach($this->listing_fields as $field_name) {
+<?php }
+
+if($this->allow['header']) {
+	foreach($this->listing_fields as $field_name) {
 	if(!isset($this->fields[$field_name])) continue;
 
 	print "<th>" . $this->fields[$field_name]['name'];
@@ -42,12 +46,13 @@ $html->buildInput('action', '', 'submit', 'Search');
 	
 	print "</th>";
 }
+}
 
 $action_colspan = 0;
 if($this->allow['edit']) $action_colspan++;
 if($this->allow['delete']) $action_colspan++;
 
-if($action_colspan) {
+if($action_colspan and $this->allow['header']) {
 	$column_count += $action_colspan;
 ?><th colspan="<?php echo $action_colspan?>">Action</th><?php } ?>
 </tr>

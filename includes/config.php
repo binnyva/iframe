@@ -3,8 +3,8 @@
 
 //Make including classes easier
 set_include_path(get_include_path() 
-	. PATH_SEPARATOR .  joinPath($config['iframe_folder'], 'includes/classes')
-	. PATH_SEPARATOR .  joinPath($config['iframe_folder'], 'includes/classes/external')
+	. PATH_SEPARATOR . joinPath($config['iframe_folder'], 'includes/classes')
+	. PATH_SEPARATOR . joinPath($config['iframe_folder'], 'includes/classes/external')
 	); 
 if(file_exists(joinPath($config['site_folder'] , 'models'))) set_include_path(get_include_path() . PATH_SEPARATOR .  joinPath($config['site_folder'] , 'models'));
 

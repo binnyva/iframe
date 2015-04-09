@@ -39,6 +39,7 @@ class Crud {
 		'bulk_operations'	=> true,	// Allow bulk operations like bulk/activate/inactivate delete using checkboxs
 		'searching'			=> true,	// Show the search form.
 		'status_change'		=> true,	// Allow the status changes. If false, the single click status toggle will be disable, as will the bulk status change thingy.
+		'header'			=> true,	// Show header in the listing.
 		
 		'add'				=> true,	// Allow the user to add new rows.
 		'delete'			=> true,	// Lets the user delete stuff.

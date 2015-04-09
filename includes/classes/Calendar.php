@@ -125,6 +125,7 @@ class Calendar {
 		}
 	}
 	
+	/// Returns the items for the given day
 	function getData($day) {
 		if(isset($this->items[$day])) return $this->items[$day];
 		else return array();
@@ -177,7 +178,7 @@ class Calendar {
 		} else {
 			print "&nbsp;";
 		}
-		print "</td>";
+		print "</td>\n";
 		$column++;
 		
 		return $d;
@@ -250,16 +251,13 @@ class Calendar {
 	 * Prints out the Weekday names that are at the top of the table.
 	 */
 	function printDayNames() {
-	?>
-<tr class='weekday-names'><td>Sun</td><td>Mon</td><td>Tue</td><td>Wed</td><td>Thu</td><td>Fri</td><td>Sat</td></tr>
-	<?php
+		print "<tr class='weekday-names'><td>Sun</td><td>Mon</td><td>Tue</td><td>Wed</td><td>Thu</td><td>Fri</td><td>Sat</td></tr>\n";
 	}
 	
 	/// Prints out the top of the table - calls printCalendarNavigationLinks() and printDayNames()
 	function printTableStart() {
-		?>
-<table class='calendar'>
-		<?php
+		print "<table class='calendar'>\n";
+
 		$this->printCalendarNavigationLinks();
 		$this->printDayNames();
 	}

@@ -229,6 +229,7 @@ class SqlPager {
 		$with_these = array($from, $to, $this->total_items, $this->page, $this->total_pages);
 		$status = str_replace($replace_these, $with_these, $this->status_template);
 		
+		if($this->total_pages == 1) return '';
 		return $status;
 	}
 
