@@ -12,14 +12,14 @@ class Crud {
 	
 	public $items_per_page = 20;		// Number of items per page - this will be sent into the SqlPager class.
 	public $urls = array(				// URLs of some main areas.
-		'main'	=> '',					// The listing URL - just the file and nothing else.
-		'add'	=> '?action=add',		// The add page URL
-		'edit'	=> '?action=edit',		// The edit page URL
-		'delete'=> '?action=delte',		// The delete page URL
+		'main'				=> '',					// The listing URL - just the file and nothing else.
+		'add'				=> '?action=add',		// The add page URL
+		'edit'				=> '?action=edit',		// The edit page URL
+		'delete'			=> '?action=delte',		// The delete page URL
 		
-		'js_folder'	=> 'crud/',			// The Javascript folder. This folder is inside the js/ folder. So if this is crud/, that means the js files are in /js/crud/
-		'css_folder'=> 'crud/',			// The folder that holds CSS files.
-		'image_folder'=> 'crud/', 		// The folder in which the images are kept - Will be dynamially set in the consturctor.
+		'js_folder'			=> 'crud/',			// The Javascript folder. This folder is inside the js/ folder. So if this is crud/, that means the js files are in /js/crud/
+		'css_folder'		=> 'crud/',			// The folder that holds CSS files.
+		'image_folder'		=> 'crud/', 		// The folder in which the images are kept - Will be dynamially set in the consturctor.
 	);
 	
 	public $listing_query	= '';		// The query use to create the listing page. Use setListingQuery() to set this query. That will make sure all the extra parts(sorting, paging) etc. stays intact.
@@ -72,6 +72,7 @@ class Crud {
 	public $code = array(
 		'top'	=> '',					// Prints this after showTop() and before printAction()
 		'bottom'=> '',					// Prints this after printAction() and before showEnd()
+		'before_content'	=> '',		// Show this before the content is shown
 		'multi_select_choice'	=> '',	// In the Delete, Activate, Deactivate part - below all the rows.
 	);
 	

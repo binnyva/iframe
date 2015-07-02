@@ -241,7 +241,11 @@ class MVC {
 			$this->setTemplate($this->page);
 		}
 		
- 		if(!$this->template) error('The template file for "' . $this->page . '" does not exist.');
+ 		if(!$this->template) {
+ 			if($__template_file != 'crud' or !isset($crud)) { // Couldn't find the page. And there is no crud rendering to do.
+	 			error('The template file for "' . $this->page . '" does not exist.');
+ 			}
+ 		}
 		
 		if($use_layout and $this->options['insert_layout']) $this->printLayout();
 		else {

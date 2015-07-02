@@ -10,7 +10,7 @@ if($this->title) { ?>
 <div class="with-icon error" <?php echo ($this->error) ? '' : 'style="display:none;"';?>><?php echo $this->error?></div>
 <div class="with-icon success" <?php echo ($this->success) ? '':'style="display:none;"';?>><?php echo $this->success?></div>
 
-<?php if($this->allow['searching']) { ?>
+<?php if($this->allow['searching'] and count($this->search_fields)) { ?>
 <form name="search-form" method="post" action="">
 <label for="search">Search</label>
 <?php 
@@ -23,7 +23,9 @@ else $html->buildInput('search_in','', 'select', i($GLOBALS['PARAM'], 'search_in
 $html->buildInput('action', '', 'submit', 'Search');
 ?>
 </form>
-<?php } ?>
+<?php }
+print $this->code['before_content'];
+?>
  
 <form name="display-form" id='display-form' method="post" action="">
 <table class="table table-striped table-bordered table-hover"><!-- Use 'data-table' class for old layout. -->
@@ -155,7 +157,7 @@ if($this->pager->total_pages > 1) {
 	$this->pager->printPager();
 	print $this->pager->getLink("next") . $this->pager->getLink("last") . '<br />';
 }
-print $this->pager->getStatus();
+if($this->pager->total_items) print $this->pager->getStatus();
 
 $save_current_state = array('search','search_in', 'sp_page','sp_items_per_page', 'sortasc', 'sortdesc');
 foreach($save_current_state as $state_name) {

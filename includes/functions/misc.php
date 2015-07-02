@@ -952,3 +952,9 @@ function getElementsBySelectorGetElements($context, $tag='*') {
 	}
 	return $found;
 }
+
+/// Returns just the first name of the person.
+function first_name($name) {
+	$parts = explode(' ', $name);
+	return reset($parts);
+}
