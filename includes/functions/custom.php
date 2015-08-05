@@ -79,8 +79,13 @@ function showStatus() {
  * Shows the final message - redirects to a new page with the message in the URL
  */
 function showMessage($message, $url='', $status="success",$extra_data=array(), $use_existing_params=true, $ajax = false) {
-	//If it is an ajax request, Just print the data
-	if(isset($_REQUEST['ajax']) or $ajax) {
+	global $config;	
+	if($config['server_host'] == 'cli') {
+		print $message . "\n";
+		if($status == 'error') exit;
+
+	} elseif(isset($_REQUEST['ajax']) or $ajax) {
+		//If it is an ajax request, Just print the data
 		$success = '';
 		$error = '';
 		$insert_id = '';

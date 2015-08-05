@@ -205,7 +205,7 @@ class MVC {
 	 * Adds meta tags. :TODO: improve this.
 	 */
 	function addMetadata($name,$contents) {
-		$this->head_data .= '<meta name="'.$name.'" content="'.$contents.'" />'."\n";
+		$this->content['head'] .= '<meta name="'.$name.'" content="'.$contents.'" />'."\n";
 	}
 
 

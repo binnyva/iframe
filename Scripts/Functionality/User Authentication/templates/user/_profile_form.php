@@ -8,4 +8,3 @@ $html->buildInput("username", "Username", "text", i($PARAM,'username'), $extra);
 
 <?php $html->buildInput("name", "Name", "text", i($PARAM,'name')); ?>
 <?php $html->buildInput("email", "Email", "text", i($PARAM,'email')); ?>
-<?php $html->buildInput("url", "Website", "text", i($PARAM,'url') ? i($PARAM,'url') : 'http://'); ?>
