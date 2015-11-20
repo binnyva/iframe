@@ -111,9 +111,12 @@ function unescapeQuery($param_array = array(),$ignore_magic_quote_setting = fals
 function dump() {
 	$args = func_get_args();
 	$count = count($args) - 1;
-	
+
+	$backtrace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 1);
+
 	print "<pre>";
-	if($count) print "-------------------------------------------------------------------------------------------------------------------\n";
+	if($count) print "----------------------------------------------------------------------------------------------------\n";
+	print "Called from : " . $backtrace[0]['file'] . ' at line ' . $backtrace[0]['line'] . "\n";
 	foreach($args as $data) {
 		if(is_array($data) or is_object($data)) { //If the given variable is an array, print using the print_r function.
 			if(!$count) print "-----------------------\n";

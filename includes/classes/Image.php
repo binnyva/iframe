@@ -68,8 +68,8 @@ class Image {
 		
 		$imgdest= imagecreatetruecolor($this->width, $this->height);
 		$imgsrc	= $this->image;
-		$height	= $this->height;
-		$width	= $this->width;
+		$width = imagesx($this->image);
+		$height= imagesy($this->image);
 
 		switch( $type ) {
 			//Mirroring direction
@@ -117,9 +117,23 @@ class Image {
 	function resize($new_width,$new_height, $use_resize = true) {
 		if(!$this->image) return false;
 		if(!$new_height and !$new_width) return false; //Both width and height is 0
-		
-		$height = $this->height;
-		$width  = $this->width;
+
+		// If there is ability to read exif, we can correct orientation of images.
+		if(function_exists('exif_read_data')) {
+			$exif = exif_read_data($this->file_name, 0, true);
+
+			if($exif and isset($exif['IFD0']['Orientation'])) {
+				if($exif['IFD0']['Orientation'] == 8) { // The wierd orientation. I do not know how this works - just know that it does. Someday I might figure it out.
+					$this->rotate(90);
+					$swap = $new_width;
+					$new_width = $new_height;
+					$new_height = $swap;
+				}
+			}
+		}
+
+		$width = imagesx($this->image);
+		$height= imagesy($this->image);
 		
 		//If the width or height is give as 0, find the correct ratio using the other value
 		if(!$new_height and $new_width) $new_height = $height * $new_width / $width; //Get the new height in the correct ratio
@@ -146,8 +160,8 @@ class Image {
 	function crop($from_x,$from_y,$to_x,$to_y) {
 		if(!$this->image) return false;
 		
-		$height = $this->height;
-		$width  = $this->width;
+		$width = imagesx($this->image);
+		$height= imagesy($this->image);
 
 		$new_width  = $to_x - $from_x;
 		$new_height = $to_y - $from_y;

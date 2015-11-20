@@ -40,6 +40,8 @@ class Crud {
 		'searching'			=> true,	// Show the search form.
 		'status_change'		=> true,	// Allow the status changes. If false, the single click status toggle will be disable, as will the bulk status change thingy.
 		'header'			=> true,	// Show header in the listing.
+		'save_and_edit_form_button'	=> true,	//Shows the 'Save and Continue Editing' button in the edit form.
+		'save_and_new_form_button'	=> true,	//Shows the 'Save and Show New Form' button in the edit form.
 		
 		'add'				=> true,	// Allow the user to add new rows.
 		'delete'			=> true,	// Lets the user delete stuff.
@@ -58,6 +60,7 @@ class Crud {
 		'bigint'			=> 'text',
 		'float'				=> 'text',
 		'datetime'			=> 'datetime',
+		'timestamp'			=> 'datetime',
 		'date'				=> 'date',
 		'enum'				=> 'select',
 		'manytomany'		=> 'select',
@@ -162,7 +165,7 @@ class Crud {
 						break;
 					case 'varchar':
 						$length = preg_replace('/.*\((.+)\).*/', "$1", $Type);
-						if($length == 255) $field_type = 'textarea';
+						if($length > 250) $field_type = 'textarea';
 						$validation['length<'] = $length;
 				}
 				

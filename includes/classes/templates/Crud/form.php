@@ -96,12 +96,12 @@ foreach($save_current_state as $state_name) {
 
 // The action area.
 print "<div class='action-area'>&nbsp;";
-if($QUERY['action'] == 'edit' or $QUERY['action'] == 'edit_save')
+if(($QUERY['action'] == 'edit' or $QUERY['action'] == 'edit_save') and $this->allow['delete'])
 	print "<a href='" . getLink($this->urls['main'], array('select_row[]'=>i($QUERY, 'id'), 'action'=>'delete')) . "' title='Delete this row' class='delete-current-item confirm with-icon delete'>Delete</a>";
 
 print "<input type='submit' id='action-save' name='submit' class='action-submit btn btn-primary' value='Save' />";
-print "<input type='submit' id='action-save-edit' name='submit' class='action-submit btn btn-default' value='Save and Continue Editing' />";
-print "<input type='submit' id='action-save-new' name='submit' class='action-submit btn btn-success' value='Save and Show New Form' />";
+if($this->allow['save_and_edit_form_button']) print "<input type='submit' id='action-save-edit' name='submit' class='action-submit btn btn-default' value='Save and Continue Editing' />";
+if($this->allow['save_and_new_form_button']) print "<input type='submit' id='action-save-new' name='submit' class='action-submit btn btn-success' value='Save and Show New Form' />";
 print "</div>";
 
 if($QUERY['action'] == 'edit' or $QUERY['action'] == 'add') $form_action = $QUERY['action'] . "_save";

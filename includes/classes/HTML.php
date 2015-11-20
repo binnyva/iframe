@@ -101,7 +101,7 @@ class HTML {
 	
 	
 		print $label . $input . $info;
-		if($title) print "<br />";
+		if($title and $title != '&nbsp;') print "<br />";
 		print "\n";
 	}
 	

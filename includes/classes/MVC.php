@@ -65,7 +65,7 @@ class MVC {
 		if(!strpos(basename($file_name), '.php')) { ///:TODO: This could be .php5 or something - could cause problems.
 			$file_name .= 'index.php';
 		}
-		
+
 		$this->page = $file_name;
 	}
 	

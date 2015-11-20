@@ -46,7 +46,7 @@ if($this->allow['header']) {
 		print "<a href='".getLink($this->urls['main'], array("sortdesc"=>$field_name, "sortasc"=>null), true)."'><img src='" . $this->urls['image_folder'] . "down.png' alt='Sort Descending' /></a>";
 	}
 	
-	print "</th>";
+	print "</th>\n";
 }
 }
 
@@ -119,29 +119,30 @@ if($this->allow['edit']) { ?><td class="action"><a href="<?php echo getLink($thi
 
 // Extra action area...
 if($this->current_page_data) {
-	print "<tr class='final-row'>";
-	$starting_point = 1;
-	
-	if($this->allow['bulk_operations']) {
-		$starting_point++; // - to make sure our rowspan = 2 is taken into account.
-		?><td colspan="2" nowrap="nowrap">
-<ul class="actions-multiple vertical">
-<?php if($this->allow['delete']) { ?><li><a href="javascript:submit('delete');" class="with-icon delete">Delete Selected</a></li><?php } ?>
-<?php if($this->allow['status_change'] and !empty($this->status_field)) { ?><li><a href="javascript:submit('activate');" class="with-icon activate">Activate Selected</a></li>
-<li><a href="javascript:submit('deactivate');" class="with-icon deactivate">Deactivate Selected</a></li><?php } ?>
-<?php echo $this->code['multi_select_choice']; ?>
-</ul></td>
-<?php } else print "<td>&nbsp;</td>";
-	
-	for($i=$starting_point; $i<=count($this->listing_fields); $i++) {
-		if($sort_field and $sort_field == $i) print "<td><a href=\"javascript:submit('sort');\" class='with-icon save'>Sort</a></td>";
-		else print "<td>&nbsp;</td>";
+	if($this->allow['bulk_operations'] and $this->allow['sorting']) {
+		print "<tr class='final-row'>";
+		$starting_point = 1;
+		
+		if($this->allow['bulk_operations']) {
+			$starting_point++; // - to make sure our rowspan = 2 is taken into account.
+			?><td colspan="2" nowrap="nowrap">
+	<ul class="actions-multiple vertical">
+	<?php if($this->allow['delete']) { ?><li><a href="javascript:submit('delete');" class="with-icon delete">Delete Selected</a></li><?php } ?>
+	<?php if($this->allow['status_change'] and !empty($this->status_field)) { ?><li><a href="javascript:submit('activate');" class="with-icon activate">Activate Selected</a></li>
+	<li><a href="javascript:submit('deactivate');" class="with-icon deactivate">Deactivate Selected</a></li><?php } ?>
+	<?php echo $this->code['multi_select_choice']; ?>
+	</ul></td>
+	<?php } else print "<td>&nbsp;</td>";
+		
+		for($i=$starting_point; $i<=count($this->listing_fields); $i++) {
+			if($sort_field and $sort_field == $i) print "<td><a href=\"javascript:submit('sort');\" class='with-icon save'>Sort</a></td>";
+			else print "<td>&nbsp;</td>";
+		}
+		
+		if($this->allow['edit']) print "<td>&nbsp;</td>";
+		if($this->allow['delete']) print "<td>&nbsp;</td>";
+		print "</tr>";
 	}
-	
-	if($this->allow['edit']) print "<td>&nbsp;</td>";
-	if($this->allow['delete']) print "<td>&nbsp;</td>";
-	print "</tr>";
-	
 
 // No data.
 } else { ?>

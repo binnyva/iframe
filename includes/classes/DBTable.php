@@ -9,9 +9,7 @@ class DBTable {
 	private $offset = 0;
 	private $order = '';
 	private $group = '';
-	private $join_type = 'INNER';
-	private $join_table = '';
-	private $join_on = '';
+	private $joins = array();
 	private $query_result_type = 'all';
 
 	public $field = array();
@@ -32,12 +30,10 @@ class DBTable {
 	function createQuery() {
 		$query = "SELECT {$this->select} FROM {$this->table_name}";
 		
-		if($this->join_table and $this->join_on) {
-			$query .=  " {$this->join_type} JOIN {$this->join_table} ";
-			if(strpos($this->join_on, "=") === false)  //If it does not have an '=' sign in the on condition, it just the name of the forign key field instead of the entire condition.
-				$query .=  " ON `{$this->table_name}`.`{$this->primary_key_field}`=`{$this->join_table}`.`{$this->join_on}`";
-			else
-				$query .=  " ON {$this->join_on}";
+		if($this->joins) {
+			foreach($this->joins as $join) {
+				$query .= ' ' . $join['type'] . ' JOIN ' . $join['table'] . ' ON ' . $join['on'];
+			}
 		}
 		
 		if(count($this->conditions)) $query .= ' WHERE ' . implode(' AND ',$this->conditions);
@@ -117,7 +113,7 @@ class DBTable {
 	}
 	
 	/// Write the changes to the DB. If its a new row, an insert will happen. If it is an existing row, an update
-	function save($id = 0) {
+	function save($id = 0, $reset_fields = true) {
 		global $sql;
 		if($id) $this->primary_key_value = $id;
 
@@ -139,7 +135,7 @@ class DBTable {
 			$this->where("`{$this->primary_key_field}`={$this->primary_key_value}");
 			$this->query .= ' WHERE ' . implode(' AND ',$this->conditions);
 
- 			$this->_execQuery('exec');
+ 			$this->_execQuery('exec', $reset_fields);
  			$return_value = $sql->fetchAffectedRows();
 
 		} else { //New row - do an insert
@@ -155,10 +151,10 @@ class DBTable {
 			$this->query = "INSERT INTO `{$this->table_name}` (`" . implode('`,`', $field_names) . '`) '
 					. ' VALUES (' .implode(",", $field_values) . ')';
 
-			$this->_execQuery('exec');
+			$this->_execQuery('exec', $reset_fields);
 			$return_value = $sql->fetchInsertId();
 		}
-		$this->field = array(); //Reset the data after the save
+		if($reset_fields) $this->field = array(); //Reset the data after the save
 		
 		return $return_value;
 	}
@@ -298,25 +294,13 @@ class DBTable {
 	}
 	
 	/**
-	 * You can use this function to join tables togetget - inserting the JOIN clause.
-	 * Example: $User->join('Article', 'Article.user_id=User.id') ...
-	 */
-	function join($table, $on, $type = '') {
-		$this->join_table = $table;
-		$this->join_on = $on;
-		if(!$type) $this->join_type = $type;
-		
-		return $this;
-	}
-	
-	/**
 	 * Inserts a GROUP BY clause into the query.
 	 * Argument: A list of fields that must be used to group the data.
 	 * Example : $Comic->group('category_id')->get('all');
 	 */
 	function group() {
 		$arguments = $this->_addTableName(func_get_args());
-		if($arguments) $this->order = $arguments;
+		if($arguments) $this->group = $arguments;
 		
 		return $this;
 	}
@@ -330,6 +314,19 @@ class DBTable {
 	function limit($limit, $offset=0) {
 		$this->limit = $limit;
 		$this->offset = $offset;
+		return $this;
+	}
+
+	/**
+	 * You can use this function to join tables together - inserting the JOIN clause.
+	 * Example: $User->join('Article', 'Article.user_id=User.id') ...
+	 */
+	function join($table, $on, $type = 'INNER') {
+		$this->joins[] = array(
+				'table'	=> $table,
+				'on'	=> $on,
+				'type'	=> $type
+			);
 		return $this;
 	}
 	
@@ -360,10 +357,10 @@ class DBTable {
 	}
 	
 	/// The SQL is executed only here.
-	private function _execQuery($return_type) {
+	private function _execQuery($return_type, $reset_fields = true) {
 		global $sql;
 		$result = array();
-		
+
 		if(DBTable::$mode == 't') { //Just testing, fools!
 			print $this->query . '<br />';
 
@@ -383,7 +380,7 @@ class DBTable {
 				$sql->getSql($this->query);
 			}
 		}
-		$this->newRow();
+		if($reset_fields) $this->newRow();
 		
 		return $result;
 	}

@@ -11,7 +11,7 @@
  */
 function format($value) {
 	$value = preg_replace(
-		array(	"/[_\-]/",				//Changes 'hello_cruel-world' to 'hello cruel world'
+		array(	"/[_\-]/",			//Changes 'hello_cruel-world' to 'hello cruel world'
 				"/([a-zA-Z])(\d)/", //Changes 'no1' to 'no 1'
 				"/([a-z])([A-Z])/"	//Changes 'helloWorld' to 'hello World'
 		),
