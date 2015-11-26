@@ -88,7 +88,11 @@ $config['time_format_php']	= phpDateFormat($config['time_format']);
 
 $abs = $config['site_absolute_path']; // :DEPRECIATED:
 
-$config['code_path'] = preg_replace("/includes/",'',dirname(__FILE__));
+$config['iframe_folder'] = preg_replace("/includes/",'',dirname(__FILE__));
+$config['code_path'] = $config['iframe_folder']; // :DEPRECIATED:
+$config['iframe_url'] = '';
+if(!$config['server_online']) $config['iframe_url'] = "http://" . $config['server_host'] . '/iframe/';
+
 if(isset($config['site_url']) and !isset($config['site_home'])) {
 	$config['home_url'] = $config['site_url'];
 	$config['site_home'] = $config['site_url'];

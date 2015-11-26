@@ -11,37 +11,42 @@
  *	$line - The line where the error occured [OPTIONAL]
  *	$priority - The priority or the error - if its to high(>=10) the app will die. 10 has more priority than 1
  */
-function error($msg, $file="", $line="", $priority=5) {
-	global $config,$abs;
-	
-	if($config['mode'] == 'd' or $config['mode'] == 't') {
-		print <<<END
-<link href="${abs}css/error.css" type="text/css" rel="stylesheet" />
-<div class="error-message priority$priority">
-<h1>Error!</h1>
-<div id="message">$msg</div><br />
-END;
+function error($error_message, $error_title='Error', $file="", $line="", $priority=5) {
+	global $config, $template,$error_call_count;
 
-		if($file and $line) {
-			$line = $line - 1;
-			print "In file '$file' at line $line..<br /><pre>";
-			
-			//Get the 5 lines surronding the error lines - before and after
-			$lines = explode("\n",file_get_contents($file));
-			for($i=$line-5; $i<$line+5; $i++) {
-				if($i == $line) print '<span class="error-line">';
-				print "\n<span class='line-number'>$i)</span> ";
-				print str_replace(
-					array('<',"\t"),
-					array('&lt;','  '),
-					$lines[$i]
-				);//Trim it?
-				if($i == $line) print '</span>';
+	// This is to prevent recursion. Some of the functions used in the this fuction can return error.
+	if(!$error_call_count) $error_call_count = 1;
+	else $error_call_count++;
+	if($error_call_count > 10) die("Too much recursion in the error() function call.");
+	
+
+	if($config['mode'] == 'd' or $config['mode'] == 't') {
+		if($config['server_host'] == 'cli') {
+			die($error_message);
+		} else {
+			if($file and $line) {
+				$line = $line - 1;
+				$error_message .= "In file '$file' at line $line..<br /><pre>";
+				
+				//Get the 5 lines surronding the error lines - before and after
+				$lines = explode("\n",file_get_contents($file));
+				for($i=$line-5; $i<$line+5; $i++) {
+					if($i == $line) $error_message .= '<span class="error-line">';
+					$error_message .= "\n<span class='line-number'>$i)</span> ";
+					$error_message .= str_replace(
+						array('<',"\t"),
+						array('&lt;','  '),
+						$lines[$i]
+					);//Trim it?
+					if($i == $line) $error_message .= '</span>';
+				}
+				$error_message .= '</pre>';
 			}
-			print '</pre>';
+
+			if($config['iframe_url']) $template->addResource(joinPath($config['iframe_url'], 'css/iframe.css'), 'css', true);
+			$template->render(joinPath(dirname(__FILE__), '../classes/templates/error.php'), true, true, array('error_message' => $error_message, 'error_title' => $error_title));
+			exit;
 		}
-		print '</div>';
-		exit();
 	} else {
 		if($priority >= 10) die($msg);
 	}

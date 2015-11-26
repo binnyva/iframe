@@ -468,12 +468,22 @@ class Sql {
 	 * Argument : $query - The SQL Query in which the error occured.
 	 */
 	private function _error($query='') {
-		$error_message = "MySQL Error : <code>" . mysqli_error($this->_db_connection) . "</code>";
-		if($query) $error_message .= "<br /><br /><u>In Query...</u><br /><code>" . $query . "</code>";
+		$sql_error = 	htmlentities(mysqli_error($this->_db_connection));
+		$query = htmlentities($query);
+
+		// This will find the problem code and then we can highlight it in the query display.
+		if(preg_match('/syntax to use near \'(.+)\' at line/', $sql_error, $match)) {
+			$query = str_replace($match[1], '<span class="error-highlight">' . $match[1] . '</span>', $query);
+		}
+
+		$error_message = "<p>MySQL Error : <code>" . $sql_error . "</code></p>";
+		if($query) $error_message .= "<h3>In Query...</h3><pre><code>" . $query . "</code></pre>";
+		// :TODO: SQL Syntax highlighting for the above $query? http://jdorn.github.io/sql-formatter/
 		
 		$this->error_message = $error_message;
 		if(self::$mode == 'd') {
-			die($error_message);
+			error($error_message, 'MySQL Error');
+
 		} elseif(self::$mode == 't') {
 			print($error_message);
 		}

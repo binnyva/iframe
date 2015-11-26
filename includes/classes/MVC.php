@@ -177,7 +177,10 @@ class MVC {
 		
 		if(preg_match('#https?\://#', $file)) $use_exact_path = true; // If a full absolute url is given, use exact path.
 		
-		if(!$type) list($name,$type) = explode(".",$file);
+		if(!$type) {
+			$info = pathinfo($file);
+			$type = $parts['extension'];
+		}
 		$folder = ($type == 'js') ? $this->js_folder : $this->css_folder ;
 		$link = '';
 		
@@ -212,9 +215,11 @@ class MVC {
 	//////////////////////////////// Layout Functions ////////////////////////////////
 	/**
 	 * Prints the page portion. This is done by including 'page.php' inside the 'layout' folder.
+	 * Arguments: $variable_array - an array of varibale that should be availble in the included scope. OPTIONAL
 	 */
-	function printLayout() {
+	function printLayout($variable_array = false) {
 		extract($GLOBALS);
+		if($variable_array) extract($variable_array);
 
 		$title = ($this->title) ? $this->title : $config['site_title'];
 		$includes = implode($this->includes,"\n");
@@ -228,12 +233,14 @@ class MVC {
 	/**
 	 * Render the page by includeing the template file. It also calls the printHead() and printEnd() functions.
 	 * Arguments : $template_file - The template file for the current page - if nothing is given it uses the 
-	 *					template with the same name as the current page. OPTIONAL
+	 *					template with the same name as the current page. OPTIONAL 
 	 *				$use_layout - If this is true, it will insert the template file into the layout file and display it. If false, it will just display the template file.
 	 *				$use_exact_path - If this is false, MVC will try to find the template file using some rules(search in the templates folder etc. If true, it will just include the exact page.
+	 *				$variable_array - an array of varibale that should be availble in the included scope. OPTIONAL
 	 */
-	function render($__template_file = "", $use_layout = true, $use_exact_path = false) { // The __ to make sure a global variable don't overwrite it.
+	function render($__template_file = "", $use_layout = true, $use_exact_path = false, $variable_array = false) { // The __ to make sure a global variable don't overwrite it.
 		extract($GLOBALS); //Make sure that all variables are accessable from the template.
+		if($variable_array) extract($variable_array);
 
 		if($__template_file) {
 			$this->setTemplate($__template_file, $use_exact_path);
@@ -243,11 +250,11 @@ class MVC {
 		
  		if(!$this->template) {
  			if($__template_file != 'crud' or !isset($crud)) { // Couldn't find the page. And there is no crud rendering to do.
-	 			error('The template file for "' . $this->page . '" does not exist.');
+	 			error('The template file for "' . $this->page . '" does not exist.', '');
  			}
  		}
 		
-		if($use_layout and $this->options['insert_layout']) $this->printLayout();
+		if($use_layout and $this->options['insert_layout']) $this->printLayout($variable_array);
 		else {
 			$title = ($this->title) ? $this->title : $config['site_title'];
 			$includes = implode($this->includes,"\n");
