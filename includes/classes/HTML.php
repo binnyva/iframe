@@ -1,5 +1,9 @@
 <?php
 class HTML {
+	var $options = array(
+		'output'	=> 'print' // If set to return, it will return the code - else print it.
+	);
+
 	/**
 	* Creates a dropdown(select) menu using the given array and select what is $selected.
 	* Arguments :	$array - The array to be used for the dropdown
@@ -100,9 +104,11 @@ class HTML {
 		}
 	
 	
-		print $label . $input . $info;
-		if($title and $title != '&nbsp;') print "<br />";
-		print "\n";
+		$code = $label . $input . $info;
+		if($title and $title != '&nbsp;') $code .= "<br />";
+		$code .= "\n";
+
+		return $this->_output($code);
 	}
 	
 	
@@ -141,6 +147,11 @@ class HTML {
 	}
 	
 	function buildTag( $tag, $attributes, $end=false ) {
-		print $this->getTag( $tag, $attributes, $end );
+		return $this->_output($this->getTag( $tag, $attributes, $end));
+	}
+
+	function _output($code) {
+		if($this->options['output'] == 'print') print $code;
+		return $code;
 	}
 }

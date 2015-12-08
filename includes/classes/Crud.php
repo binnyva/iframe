@@ -768,6 +768,7 @@ class Crud {
 						$new_value = $value;
 						if(isset($f['data']['html'])) {
 							$new_value = eval("return " . $f['data']['html'] . ';');
+							// print $f['data']['html'] . " : " . $new_value;
 							
 						} elseif(isset($f['data']['function'])) {
 							$new_value = '';
