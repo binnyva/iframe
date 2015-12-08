@@ -4,10 +4,10 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?php echo $title?></title>
-<link href="<?php echo $abs?>css/style.css" rel="stylesheet" type="text/css" />
-<link href="<?php echo $abs?>images/silk_theme.css" rel="stylesheet" type="text/css" />
-<link href="<?php echo $abs?>bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="<?php echo $abs?>bower_components/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet">
+<link href="<?php echo $config['site_url']; ?>css/style.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo $config['site_url']; ?>images/silk_theme.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo $config['site_url']; ?>bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="<?php echo $config['site_url']; ?>bower_components/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet">
 <?php 
 echo $css_includes;
 ?>
@@ -24,7 +24,7 @@ echo $css_includes;
 	    <span class="icon-bar"></span>
 	    <span class="icon-bar"></span>
 	  </button>
-	  <a class="navbar-brand" href="<?php echo $abs ?>"><?php echo $config['site_title'] ?></a>
+	  <a class="navbar-brand" href="<?php echo $config['site_url'];  ?>"><?php echo $config['site_title'] ?></a>
 	</div>
 	<div class="collapse navbar-collapse">
 		<ul class="nav navbar-nav pull-right">
@@ -49,7 +49,7 @@ echo $css_includes;
 ?></div>
 <div class="message-area" id="success-message" <?php echo ($QUERY['success']) ? '':'style="display:none;"';?>><?php echo strip_tags(stripslashes($QUERY['success']))?></div>
 
-<br /><br />
+<br /><br /><br />
 <!-- Begin Content -->
 <?php 
 /////////////////////////////////// The Template file will appear here ////////////////////////////
@@ -68,6 +68,10 @@ if(isset($crud) and $GLOBALS['template']->template == '') {
 
 <div id="footer"></div>
 
+<script type="text/javascript">
+//Global Variables...
+var base_url = "<?php echo $config['site_url'];  ?>";
+</script>
 <script src="<?php echo $config['site_url']; ?>bower_components/jquery/dist/jquery.min.js" type="text/javascript"></script>
 <script src="<?php echo $config['site_url']; ?>bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="<?php echo $config['site_url']; ?>js/application.js" type="text/javascript"></script>

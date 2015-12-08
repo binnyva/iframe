@@ -23,6 +23,7 @@ $rel = findRelation();
 $iframe_folder = dirname(__FILE__) . DIRECTORY_SEPARATOR;
 
 if(empty($config)) {
+	$config = array();
 	if($rel !== false) { //If the 'configuration.php' file is found, use that
 		require($rel . "configuration.php");
 		

@@ -21,8 +21,7 @@
     "**/.*",
     "node_modules",
     "bower_components",
-    "Tests",
-    
+    "Tests"    
   ],
   "dependencies": {
     "bootstrap": "~3.1.1"

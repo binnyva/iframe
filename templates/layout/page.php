@@ -11,7 +11,7 @@
 <body>
 <div id="loading">loading...</div>
 <div id="header">
-<h1 id="logo"><a href="<?php echo $config['home_url']; ?>"><?php echo $config['site_title'] ?></a></h1>
+<h1 id="logo"><a href="<?php echo $config['site_home']; ?>"><?php echo $config['site_title'] ?></a></h1>
 </div>
 
 <div id="content">

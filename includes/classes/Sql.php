@@ -14,6 +14,9 @@ class Sql {
 	
 	public $error_message;
 	public $_query;
+	public $options = array(
+			'error_handling'	=> 'layout',
+		);
 
 	//Private Variables
 	private $_row  = "";
@@ -475,6 +478,10 @@ class Sql {
 		if(preg_match('/syntax to use near \'(.+)\' at line/', $sql_error, $match)) {
 			$query = str_replace($match[1], '<span class="error-highlight">' . $match[1] . '</span>', $query);
 		}
+		// If there is anything within quotes, highlight that as well.
+		elseif(preg_match('/\'([^\']+)\'/', $sql_error, $match)) {
+			$query = str_replace($match[1], '<span class="error-highlight">' . $match[1] . '</span>', $query);
+		}
 
 		$error_message = "<p>MySQL Error : <code>" . $sql_error . "</code></p>";
 		if($query) $error_message .= "<h3>In Query...</h3><pre><code>" . $query . "</code></pre>";
@@ -482,7 +489,10 @@ class Sql {
 		
 		$this->error_message = $error_message;
 		if(self::$mode == 'd') {
-			error($error_message, 'MySQL Error');
+			if($this->options['error_handling'] == 'layout')
+				error($error_message, 'MySQL Error');
+			else
+				die("MySQL Error: $error_message");
 
 		} elseif(self::$mode == 't') {
 			print($error_message);

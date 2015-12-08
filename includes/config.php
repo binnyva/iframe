@@ -94,7 +94,7 @@ $config['iframe_url'] = '';
 if(!$config['server_online']) $config['iframe_url'] = "http://" . $config['server_host'] . '/iframe/';
 
 if(isset($config['site_url']) and !isset($config['site_home'])) {
-	$config['home_url'] = $config['site_url'];
+	$config['home_url'] = $config['site_url']; // :DEPRECIATED:
 	$config['site_home'] = $config['site_url'];
 }
 

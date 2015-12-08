@@ -190,6 +190,14 @@ class Crud {
 	
 	/**
 	 * Add a field to the field list - if a field with the same name is present in the list, overwrite it.
+	 * Example:
+ 	 * Makes a list field - with a select when edited...
+	 * $crud->addField("donation_status", 'Donation Status', 'enum', array(), array(
+	 *			'TO_BE_APPROVED_BY_POC' => 'Not Approved',
+	 *			'DEPOSIT COMPLETE'		=> 'Approved'
+	 * 		), 'select');
+	 *
+	 *
 	 * Arguments: $field - the name of the field. Eg: url
 	 * 			  $name - The field title. Eg: URL
 	 * 			  $type - Datatype for that field . Eg: varchar
@@ -225,6 +233,9 @@ class Crud {
 	
 	/**
 	 * Add a forign field's data as a dropdown list.
+	 * Example: 
+	 * $crud->addListDataField("user_id", "User"); // Default relation. This actually needn't be specified - Crud can guess this.
+	 * $crud->addListDataField("donor_id", "donours", "Donor", "", array('fields' => 'id,first_name')); // When you need custom fields rather than default
 	 * Arguments: $field - the name of the field. Eg: url
 	 *            $name - the title of the field. 'URL'
 	 *            $table - the table wth the date that should be used n the dropdown.
@@ -234,8 +245,9 @@ class Crud {
 		if(!empty($where)) $where = " WHERE $where";
 
 		$fields = i($options, 'fields', 'id,name');
-		
-		$this->addField($field, $name, 'enum', array(), $this->execQuery("SELECT $fields FROM {$table} $where", "byid"));
+		$values = $this->execQuery("SELECT $fields FROM {$table} $where", "byid");
+
+		$this->addField($field, $name, 'enum', array(), $values);
 	}
 
 	
@@ -268,6 +280,23 @@ class Crud {
 		$this->addField($field, $title, 'manytomany', array(), $data, 'select', false, 
 				array('reference_table' => $reference_table, 'field_list' => $field_list));
 	}
+
+	/**
+	 * Add a field that can only be seen when the data is being listed(list action). This field don't have to be in the database. 
+	 *	It can also be an SQL statement with auto replaces with fields in the current row.
+	 * Example: 
+	 * $admin->addListingField('User Posts',array('html'=>'"<a href=\'$row[url]\'>View All Post of this User</a>"')); // Show HTML in the field
+	 * $admin->addListingField('User Posts',array('sql'=>'SELECT COUNT(U.id) FROM User WHERE city_id='%city_id%'));   // Get data from the DB and show it.
+	 */
+	function addListingField($title, $data) {
+		if(($this->action == 'list') or ($this->action == 'add_save') or ($this->action == 'edit_save')) {
+			if(is_array($data)) $data_array = $data;
+			else $data_array = array('html'=>$data);
+
+			$this->addField(unformat($title), $title, 'virtual', array(), $data_array);
+		}
+		$this->setListingFields();
+	}
 	
 		
 	/**
@@ -281,59 +310,6 @@ class Crud {
 		if(isset($this->fields[$field])) $this->fields[$field]['validation'] = $validation_rules;
 	}
 	
-	/// This function does the job of guessing what the field and value type is based on the field name, data type, validations etc.
-	function _guessFieldTypes($field, $name, $data_type, $validation) {
-		$field_type = false;
-		$value_type = false;
-		if(!$validation) $validation = array();
-		
-		$field_type = $this->data_type_field_type_map[$data_type];
-		$value_type = $field_type;
-		
-		// Special Field handles.
-		if($data_type == 'enum' and strpos($field,'status') !== false) { // Status Checkbox.
-			$field_type = 'checkbox';
-		
-		} elseif($data_type == 'varchar' and $field == 'name') {
-			$validation['must'] = true;
-			
-		} elseif($data_type == 'varchar' and (preg_match('/\burl\b/', $field) or preg_match('/\blink\b/', $field))) { 
-			$value_type = 'url';
-		
-		} elseif($data_type == 'varchar' and (
-				(strpos($field,'image') !== false) or 
-				(strpos($field,'file') !== false) or 
-				(strpos($field,'path') !== false))) { 
-			$value_type = 'file';
-			$field_type = 'file';
-			
-			if(strpos($field,'image') !== false) {
-				$validation['extension'] = array('png','jpg','jpeg','gif','bmp');
-			}
-		
-		} elseif($data_type == 'datetime' and ($field == 'added_on' or $field == 'edited_on')) {
-			$field_type = 'hidden';
-			$value_type = 'now';
-		}
-		
-		return array('field_type'=>$field_type, 'validation'=>$validation, 'value_type'=>$value_type);
-	}
-	
-	/**
-	 * Add a field that can only be seen when the data is being listed(list action). This field don't have to be in the database. 
-	 *	It can also be an SQL statement with auto replaces with fields in the current row.
-	 * Example: $admin->addListingField('User Posts',array('html'=>'"<a href=\'$row[url]\'>View All Post of this User</a>"'));
-	 * $admin->addListingField('User Posts',array('sql'=>'SELECT COUNT(U.id) FROM User WHERE city_id='%city_id%'));
-	 */
-	function addListingField($title, $data) {
-		if(($this->action == 'list') or ($this->action == 'add_save') or ($this->action == 'edit_save')) {
-			if(is_array($data)) $data_array = $data;
-			else $data_array = array('html'=>$data);
-
-			$this->addField(unformat($title), $title, 'virtual', array(), $data_array);
-		}
-		$this->setListingFields();
-	}
 	
 	/**
 	 * Specify all the fields that could be searched in.
@@ -431,6 +407,44 @@ class Crud {
 		$this->urls['delete'] = getLink($url, array('action'=>'delete'));
 		
 		return $url;
+	}
+
+	/// This function does the job of guessing what the field and value type is based on the field name, data type, validations etc.
+	function _guessFieldTypes($field, $name, $data_type, $validation) {
+		$field_type = false;
+		$value_type = false;
+		if(!$validation) $validation = array();
+		
+		$field_type = $this->data_type_field_type_map[$data_type];
+		$value_type = $field_type;
+		
+		// Special Field handles.
+		if($data_type == 'enum' and strpos($field,'status') !== false) { // Status Checkbox.
+			$field_type = 'checkbox';
+		
+		} elseif($data_type == 'varchar' and $field == 'name') {
+			$validation['must'] = true;
+			
+		} elseif($data_type == 'varchar' and (preg_match('/\burl\b/', $field) or preg_match('/\blink\b/', $field))) { 
+			$value_type = 'url';
+		
+		} elseif($data_type == 'varchar' and (
+				(strpos($field,'image') !== false) or 
+				(strpos($field,'file') !== false) or 
+				(strpos($field,'path') !== false))) { 
+			$value_type = 'file';
+			$field_type = 'file';
+			
+			if(strpos($field,'image') !== false) {
+				$validation['extension'] = array('png','jpg','jpeg','gif','bmp');
+			}
+		
+		} elseif($data_type == 'datetime' and ($field == 'added_on' or $field == 'edited_on')) {
+			$field_type = 'hidden';
+			$value_type = 'now';
+		}
+		
+		return array('field_type'=>$field_type, 'validation'=>$validation, 'value_type'=>$value_type);
 	}
 	
 	////////////////////////////////////////// Action Functions //////////////////////////////////////////////

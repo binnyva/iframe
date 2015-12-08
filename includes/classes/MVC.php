@@ -179,12 +179,16 @@ class MVC {
 		
 		if(!$type) {
 			$info = pathinfo($file);
-			$type = $parts['extension'];
+			$type = $info['extension'];
 		}
+
 		$folder = ($type == 'js') ? $this->js_folder : $this->css_folder ;
 		$link = '';
-		
+
 		if($use_exact_path) $link = $file;
+		elseif(file_exists(joinPath($config['site_folder'], $file))) {
+			$link = joinPath($config['site_home'], $file);	
+		}
 		else $link = joinPath($config['site_home'], $folder, $file);
 
 		if($type=='css' or $type=='stylesheet' or $type=='style' or $type=='stylesheets') {
@@ -226,7 +230,8 @@ class MVC {
 		$css_includes = implode($this->css_includes,"\n");
 		$js_includes = implode($this->js_includes,"\n");
 
-		include(joinPath($config['site_folder'], $this->options['layout_file']));
+		if(file_exists(joinPath($config['site_folder'], $this->options['layout_file'])))
+			include(joinPath($config['site_folder'], $this->options['layout_file']));
 	}
 	
 	//////////////////////////////// Action functions ////////////////////////////////

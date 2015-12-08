@@ -105,3 +105,8 @@ ul.horizontal li {
 .no-icon {
 	background-image:none !important;
 }
+.navbar .with-icon {
+	padding-left: 18px !important;
+	background-position:center left;
+}
+
