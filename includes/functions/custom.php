@@ -46,6 +46,7 @@ function error($error_message, $error_title='Error', $file="", $line="", $priori
 			if($config['iframe_url']) $template->addResource(joinPath($config['iframe_url'], 'css/iframe.css'), 'css', true);
 			$template->render(joinPath(dirname(__FILE__), '../classes/templates/error.php'), true, true, array('error_message' => $error_message, 'error_title' => $error_title));
 			exit;
+
 		}
 	} else {
 		if($priority >= 10) die($msg);

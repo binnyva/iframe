@@ -151,20 +151,22 @@ if($this->current_page_data) {
 </table>
 <input type='hidden' name='action' id='list-form-action' value='list' />
 <?php
-
-$this->pager->link_template = '<a href="%%PAGE_LINK%%" class="page-%%CLASS%%"><img alt="%%TEXT%%" src="images/icons/arrows/%%CLASS%%.png" /></a>';
-if($this->pager->total_pages > 1) {
-	print $this->pager->getLink("first") . $this->pager->getLink("back");
-	$this->pager->printPager();
-	print $this->pager->getLink("next") . $this->pager->getLink("last") . '<br />';
+if($this->pager) {
+	$this->pager->link_template = '<a href="%%PAGE_LINK%%" class="page-%%CLASS%%"><img alt="%%TEXT%%" src="images/icons/arrows/%%CLASS%%.png" /></a>';
+	if($this->pager->total_pages > 1) {
+		print $this->pager->getLink("first") . $this->pager->getLink("back");
+		$this->pager->printPager();
+		print $this->pager->getLink("next") . $this->pager->getLink("last") . '<br />';
+	}
+	if($this->pager->total_items) print $this->pager->getStatus();
 }
-if($this->pager->total_items) print $this->pager->getStatus();
 
 $save_current_state = array('search','search_in', 'sp_page','sp_items_per_page', 'sortasc', 'sortdesc');
 foreach($save_current_state as $state_name) {
 	if(!empty($QUERY[$state_name]))
 		$html->buildInput($state_name, "", "hidden", $QUERY[$state_name]);
 }
+
 ?>
 </form><br />
 

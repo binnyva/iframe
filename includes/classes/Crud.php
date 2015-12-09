@@ -289,12 +289,12 @@ class Crud {
 	 * $admin->addListingField('User Posts',array('sql'=>'SELECT COUNT(U.id) FROM User WHERE city_id='%city_id%'));   // Get data from the DB and show it.
 	 */
 	function addListingField($title, $data) {
-		if(($this->action == 'list') or ($this->action == 'add_save') or ($this->action == 'edit_save')) {
+		// if(($this->action == 'list') or ($this->action == 'add_save') or ($this->action == 'edit_save')) { // These where here originally. Removed it because I don't know why I put them there.
 			if(is_array($data)) $data_array = $data;
 			else $data_array = array('html'=>$data);
 
 			$this->addField(unformat($title), $title, 'virtual', array(), $data_array);
-		}
+		// }
 		$this->setListingFields();
 	}
 	
@@ -748,7 +748,6 @@ class Crud {
 				if(isset($row[$field_name])) $value = $row[$field_name];
 				$new_value = '';
 
-				
 				switch($f['type']) {
 					// Enum - or the listing.
 					case 'enum':						
@@ -766,9 +765,9 @@ class Crud {
 					
 					case 'virtual': //Not actually a DB column.
 						$new_value = $value;
+
 						if(isset($f['data']['html'])) {
 							$new_value = eval("return " . $f['data']['html'] . ';');
-							// print $f['data']['html'] . " : " . $new_value;
 							
 						} elseif(isset($f['data']['function'])) {
 							$new_value = '';
@@ -925,6 +924,9 @@ class Crud {
 		$this->current_page_data = $this->pager->getPage();
 		$this->makeListingDisplayData();
 		
+		$this->listData();
+	}
+	function listData() {
 		require('templates/Crud/listing.php');
 	}
 	

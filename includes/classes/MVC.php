@@ -258,7 +258,7 @@ class MVC {
 	 			error('The template file for "' . $this->page . '" does not exist.', '');
  			}
  		}
-		
+
 		if($use_layout and $this->options['insert_layout']) $this->printLayout($variable_array);
 		else {
 			$title = ($this->title) ? $this->title : $config['site_title'];

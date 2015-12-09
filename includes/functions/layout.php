@@ -5,7 +5,7 @@ function render($file='', $use_layout=true, $use_exact_path = false) {
 		print '{"success":"Done","error":false}';
 		return;
 	}
-
+	
 	//Otherwise, render it.
 	$GLOBALS['template']->render($file, $use_layout, $use_exact_path);
 }
