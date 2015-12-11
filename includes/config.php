@@ -47,10 +47,13 @@ if(!isset($config['site_url']) and isset($_SERVER['HTTP_HOST'])) {
  *	t = Testing Mode
  *	p = Production Mode
  */
-if(!isset($config['mode'])) $config['mode']	= 'd'; //Default Config Mode
+if(!isset($config['mode']) or isset($_GET['enable_debug_mode'])) $config['mode']	= 'd'; //Default Config Mode // :UNSAFE:
 
 if($config['mode'] == 'd') {
-	error_reporting(E_ALL);
+	// Error Handling
+	error_reporting(E_ALL); 
+	ini_set('display_errors', 1);
+
 	
 	$Logger = false;
 	if(i($QUERY,'debug') == 'log') {

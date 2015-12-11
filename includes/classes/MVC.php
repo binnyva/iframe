@@ -230,8 +230,15 @@ class MVC {
 		$css_includes = implode($this->css_includes,"\n");
 		$js_includes = implode($this->js_includes,"\n");
 
-		if(file_exists(joinPath($config['site_folder'], $this->options['layout_file'])))
+		// If the App does have a layout file.
+		if(file_exists(joinPath($config['site_folder'], $this->options['layout_file']))) {
 			include(joinPath($config['site_folder'], $this->options['layout_file']));
+		
+		} else { // And if it doesn't
+			showTop($title);
+			include($this->template);
+			showEnd();
+		}
 	}
 	
 	//////////////////////////////// Action functions ////////////////////////////////
