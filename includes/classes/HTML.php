@@ -23,12 +23,13 @@ class HTML {
 		$attributes = '';
 
 		$select = $this->getBeginTag("select", $extra + array('name'=>$name,'id'=>$name)) . "\n";// The $extra must go first to make sure that user specified name/id will overwrite the default ones.
-		foreach ($array as $key=>$value) {
-			$attrbs = array('value'=>$key);
+		foreach ($array as $key => $value) {
+			$attrbs = array('value' => $key);
 			
 			if(is_array($selected) and in_array($key, $selected)) $attrbs['selected']="selected"; // Multiple selected items
 			else if($key == $selected) $attrbs['selected']="selected";
-			$select .= $this->getTag('option',$attrbs,$value) . "\n";
+			
+			$select .= $this->getTag('option', $attrbs, $value) . "\n";
 		}
 		$select .= $this->getEndTag("select");
 		if($print_select) print $select;

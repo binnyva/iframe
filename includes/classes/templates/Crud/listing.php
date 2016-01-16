@@ -12,14 +12,14 @@ if($this->title) { ?>
 
 <?php if($this->allow['searching'] and count($this->search_fields)) { ?>
 <form name="search-form" method="post" action="">
-<label for="search">Search</label>
+<label for="iframe_crud_search">Search</label>
 <?php 
-$html->buildInput('search', '');
+$html->buildInput('iframe_crud_search', '');
 if(count($this->search_fields) == 1) { // If there is only one field to search in, don't show the select box.
 	$searh_keys = array_keys($this->search_fields);
-	$html->buildInput('search_in','', 'hidden', $searh_keys[0]);
+	$html->buildInput('iframe_crud_search_in','', 'hidden', $searh_keys[0]);
 }
-else $html->buildInput('search_in','', 'select', i($GLOBALS['PARAM'], 'search_in'), array('options'=>$this->search_fields));
+else $html->buildInput('iframe_crud_search_in','', 'select', i($GLOBALS['PARAM'], 'iframe_crud_search_in'), array('options'=>$this->search_fields));
 $html->buildInput('action', '', 'submit', 'Search');
 ?>
 </form>

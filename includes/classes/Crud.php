@@ -48,7 +48,7 @@ class Crud {
 		'edit'				=> true,	// Editing existing row is allowed.
 	);
 	
-	public $save_states		= array('search','search_in','sp_page','sp_items_per_page','sortasc','sortdesc');
+	public $save_states		= array('iframe_crud_search','iframe_crud_search_in','sp_page','sp_items_per_page','sortasc','sortdesc');
 
 	private $data_type_field_type_map = array(	// What kind of data type maps to what kind of html field.
 		'virtual'			=> 'text',
@@ -390,7 +390,7 @@ class Crud {
 			}
 			
 			// Remove some unwanted stuff in the URL
-			$items_to_remove = array('id','select_row[]','action','search','search_in', 'sp_page','sp_items_per_page', 'sortasc', 'sortdesc', 'error', 'success');
+			$items_to_remove = array('id','select_row[]','action','iframe_crud_search','iframe_crud_search_in', 'sp_page','sp_items_per_page', 'sortasc', 'sortdesc', 'error', 'success');
 			$remove_dict = array();
 			foreach($items_to_remove as $item) $remove_dict[$item] = null;
 			$url = getLink($url, $remove_dict);
@@ -856,9 +856,9 @@ class Crud {
 		
 		//If user wants to search
 		$search_query = '';
-		if(!empty($_REQUEST['search']) and $this->allow['searching']) {
-			$search_query = " `$QUERY[search_in]` LIKE '%$QUERY[search]%'";
-			$search_link = "search=$QUERY[search]&amp;search_in=$QUERY[search_in]&";
+		if(!empty($_REQUEST['iframe_crud_search']) and $this->allow['searching']) {
+			$search_query = " `$QUERY[iframe_crud_search_in]` LIKE '%$QUERY[iframe_crud_search]%'";
+			$search_link = "iframe_crud_search=$QUERY[iframe_crud_search]&amp;iframe_crud_search_in=$QUERY[iframe_crud_search_in]&";
 		}
 
 		$listing_query = $this->_addSqlFragment("WHERE",	$listing_query, $search_query);
@@ -1106,7 +1106,7 @@ class Crud {
 		
 			$query =  $query_start . " $replace_part " . $new_string . $query_end;
 		} elseif($new_string) {
-			if(strtolower(trim($replace_part)) == 'where') {
+			if((strtolower(trim($replace_part)) == 'where') and (stripos($query, 'ORDER BY') !== false)) {
 				$query = str_replace('ORDER BY', ' WHERE ' . $new_string . ' ORDER BY', $query);
 			} else {
 				$query .= " $replace_part " . $new_string;

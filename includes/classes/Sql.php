@@ -16,6 +16,7 @@ class Sql {
 	public $_query;
 	public $options = array(
 			'error_handling'	=> 'layout',
+			'stripslashes'		=> true
 		);
 
 	//Private Variables
@@ -505,6 +506,8 @@ class Sql {
 	 * Return	: The array given in the argument - stripslashed
 	 */
 	function _stripSlashes($arr) {
+		if(!$this->options['stripslashes']) return $arr;
+
 		if(is_array($arr)) {
 			foreach($arr as $key=>$value) {
 				$arr[$key] = $this->_stripSlashes($value);// :RECURSION:
