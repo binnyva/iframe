@@ -75,6 +75,11 @@ class HTML {
 			$attributes['rows'] = 5;
 			$attributes['cols'] = 50;
 			$value = $data;
+		
+		} else if ($type == 'span' ) { // Span - for readonly stuff.
+			$tag = 'span';
+			unset($attributes['type']);
+			$value = $data;
 		}
 		
 		if($type != 'checkbox') { // If the field is a checkbox, we need the attribute 'value' to be 1 even if its not checked.

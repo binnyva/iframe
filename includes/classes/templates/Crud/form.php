@@ -17,6 +17,12 @@ foreach($this->form_fields as $field_name) {
 	$field_info = $this->fields[$field_name];
 	extract($field_info);
 	$value = i($row_data, $field);
+
+	// This field is read only.
+	if(i($extra_info,'edit', true) === false or i($extra_info,'readonly')) {
+		if($field_type == 'select') $value = $data[$value];
+		$field_type = 'span';
+	}
 	
 	if($field_type != 'hidden') print "<div class='field-area' id='{$field}_area'>";
 	
@@ -66,14 +72,13 @@ JS_END;
 		$html->buildInput($field, '', 'hidden', $hidden_value);
 
 	} else {
-		//if($field_type == 'checkbox' and $value === false) $value = $data;
 		if($field_type == 'checkbox' or $field_type == 'radio' or $field_type == 'textarea') $attributes = array();
 		else $attributes = array('class'=>'text-long');
 		
 		if($data and !$value) $value = $data;
 		if(is_array($value)) $value = i($value, 'data', '');
 		if(!empty($PARAM[$field])) $value = $PARAM[$field];
-		
+
 		$html->buildInput($field, $name, $field_type, $value, $attributes);
 	}
 	if(isset($this->validation_errors[$field])) {
