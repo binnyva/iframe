@@ -272,7 +272,12 @@ class DBTable {
 		
 		foreach($conditions as $key => $cond) {
 			if(is_string($key)) {
-				if(!in_array($cond,$this->conditions)) $this->conditions[] = "`$key`='".$sql->escape($cond)."'";
+				if(!in_array($cond,$this->conditions)) {
+					if(strpos($key, '`') === false) // Handle it right if the field name already has ` to escape it.
+						$this->conditions[] = "`$key`='".$sql->escape($cond)."'";
+					else
+						$this->conditions[] = "$key='".$sql->escape($cond)."'";
+				}
 			
 			} else if(is_string($cond)) {
 				if(!in_array($cond,$this->conditions)) $this->conditions[] = $cond;

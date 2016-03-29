@@ -111,7 +111,7 @@ class HTML {
 	
 	
 		$code = $label . $input . $info;
-		if($title and $title != '&nbsp;') $code .= "<br />";
+		if($title and $title != '&nbsp;' and !isset($extra['no_br'])) $code .= "<br />";
 		$code .= "\n";
 
 		return $this->_output($code);

@@ -149,6 +149,7 @@ class Calendar {
 		$class='';
 		if($d == date('j') and $this->month == date('n') and $this->year == date('Y') and $flag) $class='today';
 		if(!$flag) $class .= ' overflow-days';
+
 		$weekdays = array('saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday');
 		$class .= " weekday-" . $weekdays[($column%7)];
 		
@@ -275,7 +276,7 @@ class Calendar {
 				$d = $this->_each_day();
 			}
 			print "</tr>\n";
-			if($d >= $this->_month_days[$this->month-1]) break;
+			if($d >= $this->_month_days[$this->month-1] + 1) break;
 		}
 	}
 	

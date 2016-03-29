@@ -22,7 +22,7 @@ class SqlPager {
 	 * This is the template used to create links when the getLink() is called.
 	 * %%PAGE_LINK%% - current page url & sp_page=PageNumber . Example: demo.php?param=value&sp_page=3
 	 */
-	public $link_template = '<a href="%%PAGE_LINK%%" class="%%CLASS%%">%%TEXT%%</a>';
+	public $link_template = '<a href="%%PAGE_LINK%%" class="%%CLASS%% icon">%%TEXT%%</a>';
 	
 	/**
 	 * This is the template used to create links when the getStatus() is called. Possible substitutions...
