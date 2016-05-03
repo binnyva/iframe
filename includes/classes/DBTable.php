@@ -36,7 +36,7 @@ class DBTable {
 			}
 		}
 		
-		if(count($this->conditions)) $query .= ' WHERE ' . implode(' AND ',$this->conditions);
+		if(count($this->conditions)) $query .= ' WHERE ' . implode(' AND ',array_values($this->conditions));
 		if($this->order) $query .= ' ORDER BY ' . $this->order;
 		if($this->group) $query .= ' GROUP BY ' . $this->group;
 		if($this->limit) $query .= ' LIMIT ' . $this->offset . ',' . $this->limit;
@@ -133,7 +133,7 @@ class DBTable {
 			$this->query .= implode(', ',$update_array);
 			
 			$this->where("`{$this->primary_key_field}`={$this->primary_key_value}");
-			$this->query .= ' WHERE ' . implode(' AND ',$this->conditions);
+			$this->query .= ' WHERE ' . implode(' AND ',array_values($this->conditions));
 
  			$this->_execQuery('exec', $reset_fields);
  			$return_value = $sql->fetchAffectedRows();
@@ -179,11 +179,11 @@ class DBTable {
 			} else {
 				$this->query .= " WHERE `{$this->primary_key_field}` IN (" . implode(",", $ids). ")";
 			}
-			if(count($this->conditions)) $this->query .= ' AND ' . implode(' AND ',$this->conditions);
+			if(count($this->conditions)) $this->query .= ' AND ' . implode(' AND ', array_values($this->conditions));
 
 		} else { //Remove muliptle rows at once
 			if($this->primary_key_value) $this->query .= " WHERE `{$this->primary_key_field}` = {$this->primary_key_value}"; // If the user made an newRow() call before the delete.
-			if(count($this->conditions)) $this->query .= ' WHERE ' . implode(' AND ',$this->conditions);
+			if(count($this->conditions)) $this->query .= ' WHERE ' . implode(' AND ', array_values($this->conditions));
 		}
 		
 		$this->_execQuery('exec');
@@ -274,9 +274,9 @@ class DBTable {
 			if(is_string($key)) {
 				if(!in_array($cond,$this->conditions)) {
 					if(strpos($key, '`') === false) // Handle it right if the field name already has ` to escape it.
-						$this->conditions[] = "`$key`='".$sql->escape($cond)."'";
+						$this->conditions[$key] = "`$key`='".$sql->escape($cond)."'";
 					else
-						$this->conditions[] = "$key='".$sql->escape($cond)."'";
+						$this->conditions[$key] = "$key='".$sql->escape($cond)."'";
 				}
 			
 			} else if(is_string($cond)) {
@@ -367,10 +367,11 @@ class DBTable {
 		$result = array();
 
 		if(DBTable::$mode == 't') { //Just testing, fools!
-			print $this->query . '<br />';
+			print '<pre><code>' . $this->query . '</code></pre><br />';
 
 		} else {
 			$result = array();
+
 			if($return_type == 'assoc') {
 				$result = $sql->getAssoc($this->query);
 			} elseif($return_type == 'all') {
@@ -383,6 +384,11 @@ class DBTable {
 				$result = $sql->getById($this->query);
 			} else { //exec
 				$sql->getSql($this->query);
+			}
+
+			if(DBTable::$mode == 'd') {
+				print '<pre><code>' . $this->query . '</code></pre><br />';
+				print "Result Size : " . count($result) . "<br />";
 			}
 		}
 		if($reset_fields) $this->newRow();
