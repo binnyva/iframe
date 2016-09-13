@@ -472,8 +472,8 @@ class Sql {
 	 * Argument : $query - The SQL Query in which the error occured.
 	 */
 	private function _error($query='') {
-		$sql_error = 	htmlentities(mysqli_error($this->_db_connection));
-		$query = htmlentities($query);
+		$sql_error 	= 	htmlentities(mysqli_error($this->_db_connection));
+		$query 		= htmlentities($query);
 
 		// This will find the problem code and then we can highlight it in the query display.
 		if(preg_match('/syntax to use near \'(.+)\' at line/', $sql_error, $match)) {
@@ -490,9 +490,13 @@ class Sql {
 		
 		$this->error_message = $error_message;
 		if(self::$mode == 'd') {
-			if($this->options['error_handling'] == 'layout')
+			if($this->options['error_handling'] == 'layout') {
 				error($error_message, 'MySQL Error');
-			else
+
+			} else if($this->options['error_handling'] == 'callback' and function_exists($this->options['error_callback'])) {
+				call_user_func($this->options['error_callback'], $query, $error_message);
+
+			} else
 				die("MySQL Error: $error_message");
 
 		} elseif(self::$mode == 't') {

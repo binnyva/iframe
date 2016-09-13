@@ -61,7 +61,7 @@ class SqlPager {
 	 * 			  $items_per_page - The default number of items per page - defaults to 10 [OPTIONAL]
 	 */
 	function __construct($query, $items_per_page = 10) {
-		$query = preg_replace('/ LIMIT .+/i','',$query);//Remove the 'limitation' if there is one
+		$query = preg_replace('/ LIMIT \d+,\d+\s*$/i','',$query);//Remove the 'limitation' if there is one
 		$this->query = $query;
 
 		//Before anything, get all the necessary data.
@@ -80,8 +80,10 @@ class SqlPager {
 		
 		global $sql;
 		$total_items_sql = $sql->getSql($this->query);
-		$this->total_items = $sql->fetchNumRows($total_items_sql);
-		$this->total_pages = ceil($this->total_items / $this->items_per_page);
+		if($total_items_sql) {
+			$this->total_items = $sql->fetchNumRows($total_items_sql);
+			$this->total_pages = ceil($this->total_items / $this->items_per_page);
+		}
 	}
 	
 	/**
