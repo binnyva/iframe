@@ -162,7 +162,7 @@ class DBTable {
 	/**
 	 * Execute a DELETE statement. If the ID of the deleted row is not specified as the argument, 
 	 *		the function will use just the where clause. Be careful - if the where clauses are not present, 
-	 *		kiss you table goodbye!
+	 *		kiss your table goodbye!
 	 * Arguments : An ID or a list of IDs - Optional
 	 * Returns : Affected Row count
 	 * Example : $user->delete(5,4);

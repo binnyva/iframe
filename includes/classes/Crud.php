@@ -49,6 +49,7 @@ class Crud {
 	);
 	
 	public $save_states		= array('iframe_crud_search','iframe_crud_search_in','sp_page','sp_items_per_page','sortasc','sortdesc');
+	public $search_field_types = array('varchar', 'link'); // The type of fields that should show up in the search option.
 
 	private $data_type_field_type_map = array(	// What kind of data type maps to what kind of html field.
 		'virtual'			=> 'text',
@@ -324,9 +325,10 @@ class Crud {
 		
 		foreach($given_search_fields as $name) {
 			if(isset($this->fields[$name]['type']))
-				if($this->fields[$name]['type'] == 'varchar' or $this->fields[$name]['type'] == 'link') $search_fields[$name] = $this->fields[$name]['name'];
+				if(in_array($this->fields[$name]['type'], $this->search_field_types))
+					$search_fields[$name] = $this->fields[$name]['name'];
 		}
-		
+
 		$this->search_fields = $search_fields;
 	}
 	
@@ -407,6 +409,13 @@ class Crud {
 		$this->urls['delete'] = getLink($url, array('action'=>'delete'));
 		
 		return $url;
+	}
+
+	/// Set the title of the page
+	function setTitle($title, $plural = '') {
+		$this->title = $title;
+		if(!$plural) $this->title_plural = $title . 's';
+		else $this->title_plural = $plural;
 	}
 
 	/// This function does the job of guessing what the field and value type is based on the field name, data type, validations etc.

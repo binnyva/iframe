@@ -87,14 +87,17 @@ foreach($this->current_page_data as $row) {
 		// The Active/Deactive Status column.
 		if($f['field_type'] == 'checkbox' and $f['value_type'] == 'status') {
 			$toggle_action = 'activate';
-			$status_class = 'inactive';
+			$status_class = 'deactive';
 			$state = 'Disabled';
 			if($value) {
 				$toggle_action = 'deactivate';
 				$status_class = 'active';
 				$state = 'Enabled';
 			}
-			print "<a href='" . getLink($this->urls['main'], array('select_row[]'=>$id,'action'=>'toggle_status','field_name'=>$field_name), true) . "' title='".ucfirst($toggle_action)."' class='icon $status_class'>$state</a>";
+			print "<a href='" . getLink($this->urls['main'], array(
+						'select_row[]'	=> $id,
+						'action'		=> 'toggle_status',
+						'field_name'	=> $field_name), true) . "' title='".ucfirst($toggle_action)."' class='icon $status_class'>$state</a>";
 		
 		// The sorter...
 		} elseif($f['value_type'] == 'sort') {

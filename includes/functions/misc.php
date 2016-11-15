@@ -529,8 +529,11 @@ function load($url,$options=array()) {
 		curl_setopt($ch, CURLOPT_MAXREDIRS, 5);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
-		if(isset($url_parts['user']) and isset($url_parts['pass']))
-			$custom_headers[] = "Authorization: Basic ".base64_encode($url_parts['user'].':'.$url_parts['pass']);
+		if(isset($url_parts['user']) and isset($url_parts['pass'])) {
+			// $custom_headers[] = "Authorization: Basic ".base64_encode($url_parts['user'].':'.$url_parts['pass']);
+			curl_setopt($ch, CURLOPT_USERPWD, $url_parts['user'].':'.$url_parts['pass']);
+			dump($url_parts);
+		}
 	   
 		if($custom_headers) curl_setopt($ch, CURLOPT_HTTPHEADER, $custom_headers);
 		$response = curl_exec($ch);

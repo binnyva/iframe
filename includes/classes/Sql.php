@@ -4,9 +4,9 @@
 * Author : Binny V A(binnyva@gmail.com | http://www.bin-co.com/)
 * Date   : 1 Feb, 2007
 ***************************************************************************************************
-* Creates a Database abstration layer - using the most commonly used functions.
-* get* functions require a query as the argument
-* fetch* functions requrire a sql resource as the argument.
+* 	Creates a Database abstration layer - using the most commonly used functions.
+* 		get*: functions require a query as the argument
+* 		fetch*: functions requrire a sql resource as the argument. If none provided, will you existing resourse.
 ***************************************************************************************************/
 class Sql {
 	//All Variables - Public
