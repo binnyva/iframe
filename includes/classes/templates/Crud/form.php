@@ -133,7 +133,8 @@ function validate(e) {
 			}
 		}
 	}
-	print "success = check(" . json_encode($conditions) . ", 1);";
+	if(isset($conditions)) print "success = check(" . json_encode($conditions) . ", 1);";
+	else print "success = true; // No conditios found\n";
 	?>
 	if(!success) e.stopPropagation();
 	return success;

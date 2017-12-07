@@ -80,7 +80,8 @@ class Sql {
 			return false;
 			
 		} else if(self::$mode == 'd') { // Log the query if we are in the Development mode.
-			if($GLOBALS['Logger']) $GLOBALS['Logger']->log("Query: $query");
+			global $Logger;
+			if(!empty($Logger)) $Logger->log("Query: $query");
 		}
 
 		if(is_string($query)) $this->_resource = mysqli_query($this->_db_connection, $query);

@@ -36,7 +36,8 @@
 .print {background-image:url(silk_icons/printer.png);}
 .folder {background-image:url(silk_icons/folder.png);}
 .email,.mail,.write {background-image:url(silk_icons/email.png);}
-.phone,.sms {background-image:url(silk_icons/phone.png);}
+.chart {background-image:url(silk_icons/chart.png);}
+
 
 
 #warning-message,.warning {background-image:url(silk_icons/error.png);}

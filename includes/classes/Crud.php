@@ -7,6 +7,7 @@ class Crud {
 	public $table;						// The name of the table. Eg: User
 	public $primary_key = 'id';			// The name of the primary key of the table Eg: id. You can use the setPrimaryKey() to set this value.
 	public $status_field;				// The field that contains the status bit. Use the setStatusField() to set the value for this variable.
+	public $sort_field;					// The field that contains the sort order. Use the setSortField() to set the value for this variable.
 	public $fields = array();			// Holds all the data of the fields in this page. Do not edit by hand if you don't know what you are doing. Use addField() to edit this.
 	public $action = 'list';			// The action of current page - could be 'list', 'add', 'edit', 'delete', 'add_save', 'edit_save', 'activate', 'deactivate', 'toggle_status'.
 	
@@ -163,6 +164,12 @@ class Crud {
 								$data = array("No Data");
 							}
 						}
+
+						if($Field == 'sort' or $Field == 'order' or $Field == 'sortorder' or $Field == 'sort_order' or $Field == 'sort_by') {
+							$field_type = 'input';
+							$value_type = 'sort';
+							$this->setSortField($Field);
+						}
 						break;
 					case 'varchar':
 						$length = preg_replace('/.*\((.+)\).*/', "$1", $Type);
@@ -187,6 +194,11 @@ class Crud {
 	/// Sets the status field for this table
 	function setStatusField($field_name) {
 		$this->status_field = $field_name;
+	}
+
+	/// Sets the sort order field for this table
+	function setSortField($field_name) {
+		$this->sort_field = $field_name;
 	}
 	
 	/**
@@ -219,9 +231,9 @@ class Crud {
 		}
 		
 		$field_info = array(
-			'field'	=>	$field,
-			'name'	=>	$name,
-			'type'	=>	$type,
+			'field'		 =>	$field,
+			'name'		 =>	$name,
+			'type'		 =>	$type,
 			'field_type' => $field_type,
 			'value_type' => $value_type,
 			'validation' => $validation,
@@ -871,6 +883,7 @@ class Crud {
 		}
 
 		$listing_query = $this->_addSqlFragment("WHERE",	$listing_query, $search_query);
+		if($this->sort_field) $listing_query = $this->_addSqlFragment("ORDER BY",	$listing_query, " `{$this->sort_field}`");
 		$listing_query = $this->_addSqlFragment("ORDER BY",	$listing_query, $sort_query);
 		
 		$this->listing_query = $listing_query;
@@ -1053,14 +1066,25 @@ class Crud {
 	}
 	
 	/// Shows everything - not often called.
-	function render() {
-		showTop($this->title);
-		print $this->code['top'];
-		$this->printAction();
-		print $this->code['bottom'];
-		showEnd();
+	function render($format = 'html') {
+		if($format == 'csv') {
+			global $QUERY, $PARAM;
+			$this->setListingQuery();
+			$this->pager = new SqlPager($this->listing_query, 1000000); // Disable paging by giving a very large number.
+			
+			$this->current_page_data = $this->pager->getPage();
+			$this->makeListingDisplayData();
+
+			require('templates/Crud/listing_csv.php');
+		
+		} else {
+			showTop($this->title);
+			print $this->code['top'];
+			$this->printAction();
+			print $this->code['bottom'];
+			showEnd();
+		}
 	}
-	
 	
 	////////////////////////////////////////////// Library Stuff //////////////////////////////
 	private function execQuery($query, $type='all') {

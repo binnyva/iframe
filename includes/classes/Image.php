@@ -223,12 +223,22 @@ class Image {
 		$this->image = $this->org_image;
 		return $this;
 	}
+
+	/**
+	 * Info about the image.
+	 */
+	function get($name) {
+		if($name == 'width') return $this->width;
+		elseif($name == 'height') return $this->height;
+
+		return false;
+	}
 	
 	/**
 	 * Destroy the image to save the memory. Do this after all operations are complete.
 	 */
 	function destroy() {
-		 imagedestroy($this->image);
-		 imagedestroy($this->org_image);
+		if($this->image) imagedestroy($this->image);
+		if($this->org_image) imagedestroy($this->org_image);
 	}
 }

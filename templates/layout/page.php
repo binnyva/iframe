@@ -1,7 +1,10 @@
 <!DOCTYPE HTML>
 <html lang="en"><head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<title><?php echo $config['site_title'] ?></title>
+<title><?php 
+echo $title;
+if(isset($page_title)) echo ' : ' . $page_title;
+?></title>
 <link href="<?php echo $config['site_url'] ?>css/style.css" rel="stylesheet" type="text/css" />
 <link href="<?php echo $config['site_url'] ?>images/silk_theme.css" rel="stylesheet" type="text/css" />
 <link href="<?php echo $config['site_url'] ?>bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css" />
