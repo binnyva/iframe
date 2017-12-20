@@ -1076,7 +1076,7 @@ class Crud {
 			$this->makeListingDisplayData();
 
 			require('templates/Crud/listing_csv.php');
-		
+
 		} else {
 			showTop($this->title);
 			print $this->code['top'];
