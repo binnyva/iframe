@@ -131,7 +131,7 @@ class MVC {
 				//If thats not there, look for all lowercase model name.
 				} elseif(file_exists( joinPath($model_folder, strtolower($this->controller) . '.php') )) {
 					$this->model = strtolower($this->controller) . '.php';
-					break;
+					return;
 				}
 			}
 		}
