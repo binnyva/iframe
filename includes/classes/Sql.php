@@ -38,7 +38,7 @@ class Sql {
 	function __construct($db_host, $db_user=false, $db_password=false, $db_name=false) {
 		if(self::$mode != 'x') {
 			if($db_user === false) { // Shortcut method
-				$this->_db_connection = mysqli_connect('localhost', 'root', '', $db_host);
+				$this->_db_connection = mysqli_connect('127.0.0.1', 'root', '', $db_host);
 			} else {
 				$this->_db_connection = mysqli_connect($db_host, $db_user, $db_password, $db_name);
 			}
@@ -473,7 +473,7 @@ class Sql {
 	 * Argument : $query - The SQL Query in which the error occured.
 	 */
 	private function _error($query='') {
-		$sql_error 	= 	htmlentities(mysqli_error($this->_db_connection));
+		$sql_error 	= htmlentities(mysqli_error($this->_db_connection));
 		$query 		= htmlentities($query);
 
 		// This will find the problem code and then we can highlight it in the query display.
