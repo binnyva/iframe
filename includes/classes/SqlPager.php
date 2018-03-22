@@ -22,7 +22,7 @@ class SqlPager {
 	 * This is the template used to create links when the getLink() is called.
 	 * %%PAGE_LINK%% - current page url & sp_page=PageNumber . Example: demo.php?param=value&sp_page=3
 	 */
-	public $link_template = '<a href="%%PAGE_LINK%%" class="%%CLASS%% icon">%%TEXT%%</a>';
+	public $link_template = '<a href="%%PAGE_LINK%%" class="%%CLASS%%">%%TEXT%%</a>';
 	
 	/**
 	 * This is the template used to create links when the getStatus() is called. Possible substitutions...
@@ -38,6 +38,8 @@ class SqlPager {
 	public $mode = 'd';
 	public $opt = array(
 		'links_count'	=> 10, // If 0, shows all links
+		'use_existing_arguments' => false,
+		'parameters'	=> ['sp_page' => '%%PAGE%%'],
 	);
 
 	///The text used in the pager is customizable. HTML is allowed.
@@ -164,8 +166,16 @@ class SqlPager {
 	 */
 	function getLinkToPage($page) {
 		if($page > $this->total_pages) return '';
+
+		$parameters = $this->opt['parameters'];
+
+		foreach ($parameters as $key => $value) {
+			if($value == '%%PAGE%%') {
+				$parameters[$key] = $page;
+			}
+		}
 		
-		return $this->_getLinkParameters($this->page_link,array('sp_page'=>$page));
+		return $this->_getLinkParameters($this->page_link, $parameters);
 	}
 	
 	/**
@@ -244,7 +254,7 @@ class SqlPager {
 		?>
 <script language="javascript" type="text/javascript">
 function itemsPerPageChooser(number) {
-	var url = "<?=$page_link?>";
+	var url = "<?php echo $page_link?>";
 	url = url.replace(/__ITEMS_PER_PAGE__/g,number);
 	url = url.replace(/\&amp;/g,"&");
 
@@ -282,8 +292,8 @@ Show <select name="sp_items_per_page" id="sp_items_per_page" onChange="itemsPerP
 		?>
 <form onSubmit="return goToPage(this.sp_page.value)" action="">
 <?php $this->_printHiddenFields(array('sp_page', 'action')); ?>
-Page <input type="text" name="sp_page" size="<?=$size?>" value="<?=$this->page?>" />
-<input type="submit" name="action" value="Go" /> of <?=$this->total_pages?>
+Page <input type="text" name="sp_page" size="<?php echo $size?>" value="<?php echo $this->page?>" />
+<input type="submit" name="action" value="Go" /> of <?php echo $this->total_pages?>
 </form>
 <?php
 	}
@@ -335,11 +345,11 @@ Page <select name="sp_page" onChange="goToPage(this.value);">
 		?>
 <script language="javascript" type="text/javascript">
 function goToPage(page) {
-	var url = "<?=$page_link?>";
+	var url = "<?php echo $page_link?>";
 	url = url.replace(/__PAGE__/g,page);
 	url = url.replace(/\&amp;/g,"&");
 	
-	if(page > <?=$this->total_pages?> || page < 1) alert("Invalid page number. Please use a number between 1 and <?=$this->total_pages?>");
+	if(page > <?php echo $this->total_pages?> || page < 1) alert("Invalid page number. Please use a number between 1 and <?php echo $this->total_pages?>");
 	else document.location.href = url;
 	return false;
 }
@@ -366,8 +376,8 @@ function goToPage(page) {
 	 *			  $params(Array) - An associative array holding the parameters that should be added to the URL. 
 	 * Example : _getLinkParameters('index.php?user=1',array('sp_page'=>7,'sp_items_per_page'=>5))
 	 */
-	function _getLinkParameters($url,$params=array(),$use_existing_arguments=false) {
-		return getLink($url, $params, $use_existing_arguments);
+	function _getLinkParameters($url,$params=array()) {
+		return getLink($url, $params, $this->opt['use_existing_arguments']);
 	}
 
 	/**
