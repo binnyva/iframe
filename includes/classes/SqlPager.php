@@ -213,8 +213,11 @@ class SqlPager {
 		} elseif($dir === "last" or $dir === "end") { //Get the last link.
 			$with_these = array($this->total_pages,"last",$this->text['last']);
 		}
+
+		$params = $this->opt['parameters'];
+		$params['sp_page'] = $with_these[0];
 		
-		$page_link = $this->_getLinkParameters($this->page_link, array('sp_page'=> $with_these[0]));
+		$page_link = $this->_getLinkParameters($this->page_link, $params);
 		array_push($with_these, $page_link); //Add the page link at the beginning of the array.
 		$link = str_replace($replace_these, $with_these, $this->link_template); //Replace the texts
 		
