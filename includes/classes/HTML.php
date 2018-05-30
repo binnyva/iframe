@@ -109,8 +109,11 @@ class HTML {
 			$input = $this->getTag( $tag, $all_attributes, $value );
 		}
 	
-	
-		$code = $label . $input . $info;
+		if($type == 'radio' or $type == 'checkbox')
+			$code = $input . $label . $info;
+		else 
+			$code = $label . $input . $info;
+
 		if($title and $title != '&nbsp;' and !isset($extra['no_br'])) $code .= "<br />";
 		$code .= "\n";
 

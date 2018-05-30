@@ -2,6 +2,7 @@
 //Yes, I know this file is a mess. I'll get around to fixing it. Someday...
 
 //Make including classes easier
+// :TODO: Use autoloader
 set_include_path(get_include_path() 
 	. PATH_SEPARATOR . joinPath($config['iframe_folder'], 'includes/classes')
 	. PATH_SEPARATOR . joinPath($config['iframe_folder'], 'includes/classes/external')
@@ -54,7 +55,6 @@ if($config['mode'] == 'd') {
 	error_reporting(E_ALL); 
 	ini_set('display_errors', 1);
 
-	
 	$Logger = false;
 	if(i($QUERY,'debug') == 'log') {
 		include(joinPath("Development", "Logger.php"));
@@ -89,8 +89,6 @@ $config['time_format']	= '%D %b %Y, %h:%i %p';
 $config['date_format_php']	= phpDateFormat($config['date_format']);
 $config['time_format_php']	= phpDateFormat($config['time_format']);
 
-$abs = $config['site_absolute_path']; // :DEPRECIATED:
-
 $config['iframe_folder'] = preg_replace("/includes/",'',dirname(__FILE__));
 $config['code_path'] = $config['iframe_folder']; // :DEPRECIATED:
 $config['iframe_url'] = '';
@@ -113,3 +111,6 @@ if(file_exists(joinPath($config['site_folder'],'plugins'))) {
 
 	$i_plugin->callHook('init');
 }
+
+// Backward combatability
+$abs = $config['site_absolute_path']; // :DEPRECIATED:
