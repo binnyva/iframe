@@ -91,6 +91,8 @@ class HTML {
 		
 		//Create all the attributes that is to be appended at the end of the tag.
 		$all_attributes = $extra + $attributes;
+		unset($all_attributes['no_br']);
+		unset($all_attributes['options']);
 		if($tag == 'textarea' and isset($all_attributes['value'])) unset($all_attributes['value']); //Textarea don't have a value attribute.
 		
 		// Show the title tag only if there is a label. Hidden stuff don't need a title. Nither does the submit button.

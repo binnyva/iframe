@@ -403,6 +403,8 @@ function load($url,$options=array()) {
 		'headers'		=> array(),		// Custom headers
 		'session'		=> false,		// If this is true, the following load() calls will use the same session - until load() is called with session_close=true.
 		'session_close'	=> false,
+		'username'		=> false,
+		'password'		=> false
 	);
 	// Sets the default options.
 	foreach($default_options as $opt=>$value) {
@@ -473,123 +475,70 @@ function load($url,$options=array()) {
 		}
 	}
 
-	///////////////////////////// Curl /////////////////////////////////////
-	//If curl is available, use curl to get the data.
-	if(function_exists("curl_init") 
-				and (!(isset($options['use']) and $options['use'] == 'fsocketopen'))) { //Don't use curl if it is specifically stated to use fsocketopen in the options
+	if(!function_exists("curl_init")) {
+		return false;
+	}
 		
-		if(isset($options['post_data']) and $options['post_data']) { //There is an option to specify some data to be posted.
+	if(isset($options['post_data']) and $options['post_data']) { //There is an option to specify some data to be posted.
+		$page = $url;
+		$options['method'] = 'post';
+		
+		if(is_array($options['post_data'])) { //The data is in array format.
+			$post_data = array();
+			foreach($options['post_data'] as $key => $value) {
+				$post_data[] = "$key=" . urlencode($value);
+			}
+			$url_parts['query'] = implode('&', $post_data);
+		
+		} else { //Its a string
+			$url_parts['query'] = $options['post_data'];
+		}
+	} else {
+		if(isset($options['method']) and $options['method'] == 'post') {
+			$page = $url_parts['scheme'] . '://' . $url_parts['host'] . $url_parts['path'];
+		} else {
 			$page = $url;
-			$options['method'] = 'post';
-			
-			if(is_array($options['post_data'])) { //The data is in array format.
-				$post_data = array();
-				foreach($options['post_data'] as $key=>$value) {
-					if($value)  $post_data[] = "$key=" . urlencode($value);
-					else $post_data[] = $key;
-				}
-				$url_parts['query'] = implode('&', $post_data);
-			
-			} else { //Its a string
-				$url_parts['query'] = $options['post_data'];
-			}
-		} else {
-			if(isset($options['method']) and $options['method'] == 'post') {
-				$page = $url_parts['scheme'] . '://' . $url_parts['host'] . $url_parts['path'];
-			} else {
-				$page = $url;
-			}
-		}
-
-		if($options['session'] and isset($GLOBALS['_binget_curl_session'])) $ch = $GLOBALS['_binget_curl_session']; //Session is stored in a global variable
-		else $ch = curl_init($url_parts['host']);
-		
-		curl_setopt($ch, CURLOPT_URL, $page) or die("Invalid cURL Handle Resouce");
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); //Just return the data - not print the whole thing.
-		curl_setopt($ch, CURLOPT_HEADER, true); //We need the headers
-		curl_setopt($ch, CURLOPT_NOBODY, !($options['return_body'])); //The content - if true, will not download the contents. There is a ! operation - don't remove it.
-		if(isset($options['encoding'])) curl_setopt($ch, CURLOPT_ENCODING, $options['encoding']); // Used if the encoding is gzip.
-		if(isset($options['method']) and $options['method'] == 'post' and isset($url_parts['query'])) {
-			curl_setopt($ch, CURLOPT_POST, true);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $url_parts['query']);
-		}
-		//Set the headers our spiders sends
-		curl_setopt($ch, CURLOPT_USERAGENT, $send_header['User-Agent']); //The Name of the UserAgent we will be using ;)
-		unset($send_header['User-Agent']);
-		
-		$custom_headers = array();
-		foreach($send_header as $key => $value) $custom_headers[] = "$key: $value";
-		if(isset($options['modified_since']))
-			$custom_headers[] = "If-Modified-Since: ".gmdate('D, d M Y H:i:s \G\M\T',strtotime($options['modified_since']));
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $custom_headers);
-		if($options['referer']) curl_setopt($ch, CURLOPT_REFERER, $options['referer']);
-
-		curl_setopt($ch, CURLOPT_COOKIEJAR, "/tmp/binget-cookie.txt"); //If ever needed...
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_MAXREDIRS, 5);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-
-		if(isset($url_parts['user']) and isset($url_parts['pass'])) {
-			// $custom_headers[] = "Authorization: Basic ".base64_encode($url_parts['user'].':'.$url_parts['pass']);
-			curl_setopt($ch, CURLOPT_USERPWD, $url_parts['user'].':'.$url_parts['pass']);
-			dump($url_parts);
-		}
-	   
-		if($custom_headers) curl_setopt($ch, CURLOPT_HTTPHEADER, $custom_headers);
-		$response = curl_exec($ch);
-		$info = curl_getinfo($ch); //Some information on the fetch
-		
-		if($options['session'] and !$options['session_close']) $GLOBALS['_binget_curl_session'] = $ch; //Dont close the curl session. We may need it later - save it to a global variable
-		else curl_close($ch);  //If the session option is not set, close the session.
-
-	//////////////////////////////////////////// FSockOpen //////////////////////////////
-	} else { //If there is no curl, use fsocketopen - but keep in mind that most advanced features will be lost with this approch.
-		if(isset($url_parts['query'])) {
-			if(isset($options['method']) and $options['method'] == 'post')
-				$page = $url_parts['path'];
-			else
-				$page = $url_parts['path'] . '?' . $url_parts['query'];
-		} else {
-			$page = $url_parts['path'];
-		}
-		
-		if(!isset($url_parts['port'])) $url_parts['port'] = 80;
-		$fp = fsockopen($url_parts['host'], $url_parts['port'], $errno, $errstr, 30);
-		if ($fp) {
-			$out = '';
-			if(isset($options['method']) and $options['method'] == 'post' and isset($url_parts['query'])) {
-				$out .= "POST $page HTTP/1.1\r\n";
-			} else {
-				$out .= "GET $page HTTP/1.0\r\n"; //HTTP/1.0 is much easier to handle than HTTP/1.1
-			}
-			$out .= "Host: $url_parts[host]\r\n";
-			if(isset($send_header['Accept'])) $out .= "Accept: $send_header[Accept]\r\n";
-			$out .= "User-Agent: {$send_header['User-Agent']}\r\n";
-			if(isset($options['modified_since']))
-				$out .= "If-Modified-Since: ".gmdate('D, d M Y H:i:s \G\M\T',strtotime($options['modified_since'])) ."\r\n";
-
-			$out .= "Connection: Close\r\n";
-			
-			//HTTP Basic Authorization support
-			if(isset($url_parts['user']) and isset($url_parts['pass'])) {
-				$out .= "Authorization: Basic ".base64_encode($url_parts['user'].':'.$url_parts['pass']) . "\r\n";
-			}
-
-			//If the request is post - pass the data in a special way.
-			if(isset($options['method']) and $options['method'] == 'post' and $url_parts['query']) {
-				$out .= "Content-Type: application/x-www-form-urlencoded\r\n";
-				$out .= 'Content-Length: ' . strlen($url_parts['query']) . "\r\n";
-				$out .= "\r\n" . $url_parts['query'];
-			}
-			$out .= "\r\n";
-
-			fwrite($fp, $out);
-			while (!feof($fp)) {
-				$response .= fgets($fp, 128);
-			}
-			fclose($fp);
 		}
 	}
+
+	if($options['session'] and isset($GLOBALS['_binget_curl_session'])) $ch = $GLOBALS['_binget_curl_session']; //Session is stored in a global variable
+	else $ch = curl_init($url_parts['host']);
+	
+	curl_setopt($ch, CURLOPT_URL, $page) or die("Invalid cURL Handle Resouce");
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); //Just return the data - not print the whole thing.
+	curl_setopt($ch, CURLOPT_HEADER, true); //We need the headers
+	curl_setopt($ch, CURLOPT_NOBODY, !($options['return_body'])); //The content - if true, will not download the contents. There is a ! operation - don't remove it.
+	if(isset($options['encoding'])) curl_setopt($ch, CURLOPT_ENCODING, $options['encoding']); // Used if the encoding is gzip.
+	if(isset($options['method']) and $options['method'] == 'post' and isset($url_parts['query'])) {
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $url_parts['query']);
+	}
+	//Set the headers our spiders sends
+	curl_setopt($ch, CURLOPT_USERAGENT, $send_header['User-Agent']); //The Name of the UserAgent we will be using ;)
+	unset($send_header['User-Agent']);
+	
+	$custom_headers = array();
+	foreach($send_header as $key => $value) $custom_headers[] = "$key: $value";
+	if(isset($options['modified_since']))
+		$custom_headers[] = "If-Modified-Since: ".gmdate('D, d M Y H:i:s \G\M\T',strtotime($options['modified_since']));
+	curl_setopt($ch, CURLOPT_HTTPHEADER, $custom_headers);
+	if($options['referer']) curl_setopt($ch, CURLOPT_REFERER, $options['referer']);
+
+	curl_setopt($ch, CURLOPT_COOKIEJAR, "/tmp/binget-cookie.txt"); //If ever needed...
+	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+	curl_setopt($ch, CURLOPT_MAXREDIRS, 5);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+	if($options['username'] and $options['password']) {
+		curl_setopt($ch, CURLOPT_USERPWD, $options['username'].':'.$options['password']);
+	}
+   
+	if($custom_headers) curl_setopt($ch, CURLOPT_HTTPHEADER, $custom_headers);
+	$response = curl_exec($ch);
+	$info = curl_getinfo($ch); //Some information on the fetch
+	
+	if($options['session'] and !$options['session_close']) $GLOBALS['_binget_curl_session'] = $ch; //Dont close the curl session. We may need it later - save it to a global variable
+	else curl_close($ch);  //If the session option is not set, close the session.
 
 	//Get the headers in an associative array
 	$headers = array();

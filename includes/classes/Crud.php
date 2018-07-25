@@ -792,8 +792,9 @@ class Crud {
 							
 						} elseif(isset($f['data']['function'])) {
 							$new_value = '';
-							if(function_exists($f['data']['function']))
+							if(function_exists($f['data']['function'])) {
 								$new_value = call_user_func($f['data']['function'], $row);
+							}
 							
 						} elseif(isset($f['data']['sql'])) {
 							$sql = preg_replace_callback('/\%(.+?)\%/', function($m) use($row) {
@@ -842,6 +843,7 @@ class Crud {
 						$new_value = $value;
 						if(!empty($f['data']['function'])) {
 							$new_value = call_user_func($f['data']['function'], $value);
+							dump($value, $new_value);
 						}
 				}
 
