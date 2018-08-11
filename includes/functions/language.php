@@ -169,3 +169,8 @@ function colFormat($data) {
 	
 	return $return;
 }
+
+function idNameFormat($data, $fields = false) {
+	if(!$fields) $fields = ['id', 'name'];
+	return keyFormat($data, $fields);
+}
