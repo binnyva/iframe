@@ -38,7 +38,7 @@ if($this->allow['header']) {
 	foreach($this->listing_fields as $field_name) {
 	if(!isset($this->fields[$field_name])) continue;
 
-	print "<th>" . $this->fields[$field_name]['name'];
+	print "<th class='field-$field_name'>" . $this->fields[$field_name]['name'];
 	if($this->allow['sorting']
 		 and $this->fields[$field_name]['type'] != 'virtual'
 		 and $this->fields[$field_name]['type'] != 'manytomany') { //Links to Sort the data.
@@ -82,7 +82,7 @@ foreach($this->current_page_data as $row) {
 		// Data is created at Crud::makeListingDisplayData()
 
 		$value = $row[$field_name];
-		print '<td>';
+		print "<td class='value-$field_name'>";
 		
 		// The Active/Deactive Status column.
 		if($f['field_type'] == 'checkbox' and $f['value_type'] == 'status') {

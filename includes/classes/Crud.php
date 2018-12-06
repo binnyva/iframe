@@ -358,14 +358,14 @@ class Crud {
 			foreach ($listing_fields as $field_name) {
 				if(!isset($this->fields[$field_name])) { // If the given field is not there in the List of existing fields, initiate that field.
 					$this->fields[$field_name] = array(
-						'field'	=>	$field_name,
-						'name'	=>	format($field_name),
-						'type'	=>	'varchar',
+						'field'			=> $field_name,
+						'name'			=> format($field_name),
+						'type'			=> 'varchar',
 						'field_type'	=> 'varchar',
 						'value_type'	=> 'text',
 						'validation'	=> array(),
-						'data'			=>	array(),
-						'extra_info' => array(),
+						'data'			=> array(),
+						'extra_info' 	=> array(),
 					);
 				}
 			}			
@@ -843,7 +843,6 @@ class Crud {
 						$new_value = $value;
 						if(!empty($f['data']['function'])) {
 							$new_value = call_user_func($f['data']['function'], $value);
-							dump($value, $new_value);
 						}
 				}
 
