@@ -101,7 +101,9 @@ class Crud {
 		
 		//Set some member variables
 		if(!empty($_REQUEST['action'])) $this->action = $_REQUEST['action'];
-		$this->urls['image_folder'] = joinPath($config['site_url'], 'images/', $this->urls['image_folder']);
+
+		if(!empty($config['common_library_url'])) $this->urls['image_folder'] = joinPath($config['common_library_url'], 'images/', $this->urls['image_folder']);
+		else $this->urls['image_folder'] = joinPath($config['site_url'], 'images/', $this->urls['image_folder']);
 		
 		$this->setPrimaryKey($primary_key);
 		$this->setUrl();
@@ -1125,7 +1127,8 @@ class Crud {
 			$file = joinPath($type, $this->urls[$type.'_folder'], $file);
 			if(preg_match('#https?\://#', $file)) $use_exact_path = true; // Starts with 'http://' - so no checks necessary.
 			else {
-				$file = joinPath($config['site_url'], $file);
+				if(!empty($config['common_library_url'])) $file = joinPath($config['common_library_url'], $file);
+				else $file = joinPath($config['site_url'], $file);
 				$use_exact_path = true;
 			}
 		}
