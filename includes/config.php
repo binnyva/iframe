@@ -1,5 +1,51 @@
 <?php
-//Yes, I know this file is a mess. I'll get around to fixing it. Someday...
+/*
+Yes, I know this file is a mess. I'll get around to fixing it. Someday...
+
+This file creates an global array with the following values...
+
+$config = array(
+	// Database Connection details...
+    [db_host] => localhost
+    [db_user] => root
+    [db_password] => 
+    [db_database] => makeadiff_madapp
+
+    // Paths
+    [site_url] => http://localhost/MAD/apps/worker/
+    [common_library_url] => http://localhost/MAD/apps/common/
+    [site_folder] => /mnt/x/Data/www/MAD/apps/worker
+    [site_relative_path] => ''
+    [PHP_SELF] => /MAD/apps/worker/index.php
+    [site_absolute_path] => /MAD/apps/worker/
+    [current_page] => /index.php
+
+	
+	// Flags
+    [server_cli] => server 		// Is this code being called on the 'server' or as a 'cli' command
+    [server_host] => localhost
+    [server_online] => false 	// Is this run online or on localhost
+    [mode] => d 				// Envionment - The current mode of the system. This will affect how errors will be shown: d = Development Mode, t = Testing Mode, p = Production Mode
+
+	// Site Info
+    [site_title] => Worker
+
+    // Iframe Info
+    [iframe_folder] => /mnt/x/Data/www/iframe/
+	[iframe_url] => http://localhost/iframe/
+
+	// Shortcuts
+    [date_format] => %D %b %Y
+    [time_format] => %D %b %Y, %h:%i %p
+    [date_format_php] => j\<\s\u\p\>S\<\/\s\u\p\> M Y
+    [time_format_php] => j\<\s\u\p\>S\<\/\s\u\p\> M Y, h:i A
+
+    // Backward compatibility
+    [code_path] => /mnt/x/Data/www/iframe/
+    [site_home] => http://localhost/MAD/apps/common/
+    [home_url] => http://localhost/MAD/apps/common/
+)
+*/
 
 //Make including classes easier
 // :TODO: Use autoloader
@@ -72,10 +118,13 @@ if(isset($config['db_host']) and $config['db_host']) {
 }
 if(!isset($config['use_mvc']) or $config['use_mvc'] === false) $template = new MVC;
 
+$config['server_cli'] = 'server';
+if (php_sapi_name() == "cli") $config['server_cli'] = 'cli';
+
 //Otherways it is a mess with google
 ini_set('url_rewriter.tags',"");
-ini_set('session.use_trans_sid',false); 
-if(isset($_SERVER["HTTP_HOST"])) session_start(); //Don't start the session for a console app.
+ini_set('session.use_trans_sid',false);
+if($config['server_cli'] == 'server') session_start(); //Don't start the session for a console app.
 
 // Single user config option enabled. Login functions are not required.
 if(isset($config['single_user']) and $config['single_user']) {
@@ -89,15 +138,13 @@ $config['time_format']	= '%D %b %Y, %h:%i %p';
 $config['date_format_php']	= phpDateFormat($config['date_format']);
 $config['time_format_php']	= phpDateFormat($config['time_format']);
 
+if(isset($config['site_url']) and !isset($config['common_library_url'])) {
+	$config['common_library_url'] = $config['site_url'];
+}
+
 $config['iframe_folder'] = preg_replace("/includes/",'',dirname(__FILE__));
-$config['code_path'] = $config['iframe_folder']; // :DEPRECIATED:
 $config['iframe_url'] = '';
 if(!$config['server_online']) $config['iframe_url'] = "http://" . $config['server_host'] . '/iframe/';
-
-if(isset($config['site_url']) and !isset($config['site_home'])) {
-	$config['home_url'] = $config['site_url']; // :DEPRECIATED:
-	$config['site_home'] = $config['site_url'];
-}
 
 //Auto-include the application.php file
 if(isset($config['site_relative_path']) and file_exists($config['site_relative_path'] . 'includes/application.php')) {
@@ -114,3 +161,8 @@ if(file_exists(joinPath($config['site_folder'],'plugins'))) {
 
 // Backward combatability
 $abs = $config['site_absolute_path']; // :DEPRECIATED:
+$config['code_path'] = $config['iframe_folder']; // :DEPRECIATED:
+if(isset($config['site_url']) and !isset($config['site_home'])) {
+	$config['home_url'] = $config['site_url']; // :DEPRECIATED:
+	$config['site_home'] = $config['site_url'];
+}

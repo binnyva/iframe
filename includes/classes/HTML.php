@@ -111,7 +111,7 @@ class HTML {
 			$input = $this->getTag( $tag, $all_attributes, $value );
 		}
 	
-		if($type == 'radio' or $type == 'checkbox')
+		if($type == 'radio' or $type == 'checkbox' and !i($extra, 'label_first', 0))
 			$code = $input . $label . $info;
 		else 
 			$code = $label . $input . $info;

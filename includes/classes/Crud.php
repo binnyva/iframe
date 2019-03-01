@@ -135,13 +135,22 @@ class Crud {
 						foreach($all_vals as $v) {
 							$data[$v] = format($v);
 						}
-						
+
 						if($Field == 'status') {
 							$this->setStatusField($Field);
 							$field_type = 'checkbox';
 							$value_type = 'status';
 							$data_keys = array_keys($data);
 							$data = array_shift($data_keys); // First element in the enum list is the default value.
+							
+						} else if($Type == "enum('1','0')" or $Type == "enum('0','1')") {
+							$field_type = 'checkbox';
+							if($Default == '1' or $Default == '0') {
+								$data = $Default;
+							} else {
+								$data_keys = array_keys($data);
+								$data = array_shift($data_keys); // First element in the enum list is the default value.
+							}
 						}
 						break;
 					case 'int':
@@ -259,6 +268,9 @@ class Crud {
 
 		$fields = i($options, 'fields', 'id,name');
 		$values = $this->execQuery("SELECT $fields FROM {$table} $where", "byid");
+		if(isset($options['none'])) {
+			$values[0] = $options['none'][0];
+		}
 
 		$this->addField($field, $name, 'enum', array(), $values);
 	}

@@ -72,7 +72,7 @@ JS_END;
 		$html->buildInput($field, '', 'hidden', $hidden_value);
 
 	} else {
-		if($field_type == 'checkbox' or $field_type == 'radio' or $field_type == 'textarea') $attributes = array();
+		if($field_type == 'checkbox' or $field_type == 'radio' or $field_type == 'textarea') $attributes = array('label_first' => 1);
 		else $attributes = array('class'=>'text-long');
 		
 		if($data and !$value) $value = $data;

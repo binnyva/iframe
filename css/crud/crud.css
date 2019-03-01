@@ -112,3 +112,7 @@ h1 {
 .calendar table {
 	border-collapse:separate !important;
 }
+
+input[type="radio"], input[type="checkbox"] {
+    width: 30px !important;
+}
