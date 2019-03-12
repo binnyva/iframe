@@ -54,12 +54,12 @@ function showBegin() {
 	    <span class="icon-bar"></span>
 	    <span class="icon-bar"></span>
 	  </button>
-	  <a class="navbar-brand"  href="<?php echo $config['home_url']?>"><?php echo $config['site_title']?></a>
+	  <a class="navbar-brand"  href="<?php echo $config['site_home']?>"><?php echo $config['site_title']?></a>
 	</div>
 	<div class="collapse navbar-collapse">
 	</div>
 </div>
-</div><br /><br /><br />
+</div>
 <?php } ?>
 
 <div id="content" class="container">

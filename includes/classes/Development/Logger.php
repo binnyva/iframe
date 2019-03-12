@@ -20,7 +20,7 @@ class Logger {
 	 * 			 $log_type: file/mysql - What kind of log should be maintained. Right now only file and mysql are supported.
 	 * 			 $log_group - usually the app name that logs. Useful for grouping all the logs together.
 	 */
-	function Logger($log_destination = '', $log_type = 'file', $log_group = '') {
+	function __construct($log_destination = '', $log_type = 'file', $log_group = '') {
 		global $config;
 		
 		if($log_type == 'file') {
