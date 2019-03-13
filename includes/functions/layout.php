@@ -21,6 +21,8 @@ function showPager() {
 //////////////////////// Layout Functions - DEPRECATED ///////////////////
 function showHead($title='') {
 	global $template, $config;
+	$library_path = $config['site_url'];
+	if(!empty($config['common_library_url'])) $library_path = $config['common_library_url'];
 ?>
 <!DOCTYPE html>
 <html lang="en"><head>
@@ -28,10 +30,10 @@ function showHead($title='') {
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?php echo $title; ?></title>
-<link href="<?php echo joinPath($config['site_url'],'css/style.css')?>" rel="stylesheet" type="text/css" />
-<link href="<?php echo joinPath($config['site_url'],'images/silk_theme.css')?>" rel="stylesheet" type="text/css" />
-<link href="<?php echo $config['site_url'] ?>bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css" />
-<link href="<?php echo $config['site_url'] ?>bower_components/bootstrap/dist/css/bootstrap-theme.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo joinPath($library_path,'css/style.css')?>" rel="stylesheet" type="text/css" />
+<link href="<?php echo joinPath($library_path,'images/silk_theme.css')?>" rel="stylesheet" type="text/css" />
+<link href="<?php echo $library_path ?>bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo $library_path ?>bower_components/bootstrap/dist/css/bootstrap-theme.css" rel="stylesheet" type="text/css" />
 <?php echo implode("\n", $template->css_includes);?>
 <?php
 }
@@ -79,12 +81,14 @@ function showTop($title='') {
 
 function showEnd() {
 	global $template, $config;
+	$library_path = $config['site_url'];
+	if(!empty($config['common_library_url'])) $library_path = $config['common_library_url'];
 ?>
 <!-- End Content -->
 </div>
 
-<script src="<?php echo joinPath($config['site_url'],'js/library/jquery.js')?>" type="text/javascript"></script>
-<script src="<?php echo joinPath($config['site_url'],'js/application.js')?>" type="text/javascript"></script>
+<script src="<?php echo joinPath($library_path,'js/library/jquery.js')?>" type="text/javascript"></script>
+<script src="<?php echo joinPath($library_path,'js/application.js')?>" type="text/javascript"></script>
 <?php echo implode("\n", $template->js_includes);?>
 </body>
 </html>
