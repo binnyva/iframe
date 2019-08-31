@@ -15,17 +15,29 @@ class Image {
 	private $height;
 	private $image;
 	private $org_image;
+	public $errors;
 
 	/** 
 	 * Constructor - 
 	 * Arguments : Image Filepath
 	 */
-	function Image($image_file) {
-		if(!function_exists('imagecreatefrompng')) return; //GD not available
-		if(!file_exists($image_file) or !is_readable($image_file)) return;
+	function __construct($image_file) {
+		if(!function_exists('imagecreatefrompng')) {
+			$this->errors = 'GD Library is not available';
+			return; //GD not available
+		}
+		if(!file_exists($image_file)) {
+			$this->errors = 'Image file "'. $image_file . '" not found';
+			return;
+		}
+		if(!is_readable($image_file)) {
+			$this->errors = 'Image file "'. $image_file . '" not readable';
+			return;
+		}
 		
 		$this->file_name = $image_file;
 		$img = getimagesize($image_file);
+		dump($img, $image_file);
 
 		//Create the image depending on what kind of file it is.
 		switch($img['mime']) {

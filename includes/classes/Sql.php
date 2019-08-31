@@ -368,16 +368,16 @@ class Sql {
 	 *				'something' => 'Xrats'
 	 *			),'id=14');</pre>
 	 */
-	function update($table,$data,$where) {
+	function update($table, $data, $where) {
 		if(!$data or !$table) return;
 	
 		$update_query = "UPDATE `$table` SET ";
 		$update_fields = array();
 		foreach($data as $field=>$value) {
 			if ($this->isKeyword($value)) { //If the is values has a special meaning - like NOW() give it special consideration
-				$update_fields[] = "$field=$value";
+				$update_fields[] = "`$field` = $value";
 			} else {
-				$update_fields[] = "$field='" . $this->escape($value) . "'";
+				$update_fields[] = "`$field` = '" . $this->escape($value) . "'";
 			}
 		}
 		$update_query .= implode(',',$update_fields);
