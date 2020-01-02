@@ -62,7 +62,7 @@ class SqlPager {
 	 * Argument : $query - The query that should be used for paging
 	 * 			  $items_per_page - The default number of items per page - defaults to 10 [OPTIONAL]
 	 */
-	function __construct($query, $items_per_page = 10) {
+	function __construct($query, $items_per_page = 10, $options) {
 		$query = preg_replace('/ LIMIT \d+,\d+\s*$/i','',$query);//Remove the 'limitation' if there is one
 		$this->query = $query;
 
@@ -79,12 +79,18 @@ class SqlPager {
 
 		$offset = ($this->page - 1) * $this->items_per_page;
 		$this->_pager_query = $query . " LIMIT $offset," . $this->items_per_page;
+
+		if(isset($options['total_items'])) $this->total_items = $options['total_items'];
 		
 		global $sql;
-		$total_items_sql = $sql->getSql($this->query);
-		if($total_items_sql) {
-			$this->total_items = $sql->fetchNumRows($total_items_sql);
+		if($this->total_items) { // If application is throwing a out of memory error, just assign total items already.
 			$this->total_pages = ceil($this->total_items / $this->items_per_page);
+		} else {
+			$total_items_sql = $sql->getSql($this->query);
+			if($total_items_sql) {
+				$this->total_items = $sql->fetchNumRows($total_items_sql);
+				$this->total_pages = ceil($this->total_items / $this->items_per_page);
+			}
 		}
 	}
 	

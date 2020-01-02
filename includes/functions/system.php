@@ -65,7 +65,7 @@ function escapeQuery($param_array = array(),$ignore_magic_quote_setting = false)
 
 	if(!$ignore_magic_quote_setting and get_magic_quotes_gpc()) return $param_array;//If Magic quotes is enabled, just return the data - it is already escaped.
 
-	while(list($key,$value) = each($param_array)) {
+	foreach($param_array as $key => $value) {
 		if(is_array($value)) { //Escape Arrays recursively
 			$QUERY[$key] = escapeQuery($value,$ignore_magic_quote_setting); //:RECURSION:
 		} else {
@@ -135,6 +135,7 @@ function dump() {
 }
 
 //http://php.net/autoload
-function __autoload($class_name) {
+function iframeAutoloader($class_name) {
 	require_once $class_name . '.php';
 }
+spl_autoload_register('iframeAutoloader');
