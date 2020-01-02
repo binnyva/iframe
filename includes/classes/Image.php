@@ -37,7 +37,6 @@ class Image {
 		
 		$this->file_name = $image_file;
 		$img = getimagesize($image_file);
-		dump($img, $image_file);
 
 		//Create the image depending on what kind of file it is.
 		switch($img['mime']) {

@@ -8,7 +8,7 @@ class Crud {
 	public $primary_key = 'id';			// The name of the primary key of the table Eg: id. You can use the setPrimaryKey() to set this value.
 	public $status_field;				// The field that contains the status bit. Use the setStatusField() to set the value for this variable.
 	public $sort_field;					// The field that contains the sort order. Use the setSortField() to set the value for this variable.
-	public $fields = array();			// Holds all the data of the fields in this page. Do not edit by hand if you don't know what you are doing. Use addField() to edit this.
+	public $fields = [];			// Holds all the data of the fields in this page. Do not edit by hand if you don't know what you are doing. Use addField() to edit this.
 	public $action = 'list';			// The action of current page - could be 'list', 'add', 'edit', 'delete', 'add_save', 'edit_save', 'activate', 'deactivate', 'toggle_status'.
 	
 	public $items_per_page = 20;		// Number of items per page - this will be sent into the SqlPager class.
@@ -24,9 +24,9 @@ class Crud {
 	);
 	
 	public $listing_query	= '';		// The query use to create the listing page. Use setListingQuery() to set this query. That will make sure all the extra parts(sorting, paging) etc. stays intact.
-	public $listing_fields	= array();	// An array of list of fields that should be shown in the listing page - use setListingFields() to set this value.
-	public $form_fields		= array();	// A list of fields to be shown in the add/edit pages. Use setFormFields() to set this.
-	public $search_fields	= array();	// The fields that should allow searching. Use setSearchFields() to edit this.
+	public $listing_fields	= [];	// An array of list of fields that should be shown in the listing page - use setListingFields() to set this value.
+	public $form_fields		= [];	// A list of fields to be shown in the add/edit pages. Use setFormFields() to set this.
+	public $search_fields	= [];	// The fields that should allow searching. Use setSearchFields() to edit this.
 		
 	public $current_page_data;			// An associate array that holds all the data of the current page. This is for the listing action.
 	public $pager;						// The pager for the listing page. Holds the object of the Pager class.
@@ -61,6 +61,7 @@ class Crud {
 		'tinyint'			=> 'text',
 		'bigint'			=> 'text',
 		'float'				=> 'text',
+		'double'			=> 'text',
 		'datetime'			=> 'datetime',
 		'timestamp'			=> 'datetime',
 		'date'				=> 'date',
@@ -120,8 +121,8 @@ class Crud {
 
 			$field_type = false;
 			$value_type = false;
-			$validation = array();
-			$data = array();
+			$validation = [];
+			$data = [];
 			$field_title = format($Field);
 			
 			if($Key == 'PRI') $this->setPrimaryKey($Field);
@@ -159,7 +160,7 @@ class Crud {
 						// If it is a foreign key...
 						if(preg_match('/^(.+)_id$/', $Field, $matches)) {
 							$data_type = 'enum';
-							$validation = array();
+							$validation = [];
 							$reference_table = str_replace(array('parent_', 'parent'), '', $matches[1]);
 							
 							if(ctype_upper($this->table[0])) $reference_table = ucfirst($reference_table); // In my designs, I tend to upper case the first char of the table. If the current table has first char uppercased, try doing the same to the reference table.
@@ -216,7 +217,7 @@ class Crud {
 	 * Add a field to the field list - if a field with the same name is present in the list, overwrite it.
 	 * Example:
  	 * Makes a list field - with a select when edited...
-	 * $crud->addField("donation_status", 'Donation Status', 'enum', array(), array(
+	 * $crud->addField("donation_status", 'Donation Status', 'enum', [], array(
 	 *			'TO_BE_APPROVED_BY_POC' => 'Not Approved',
 	 *			'DEPOSIT COMPLETE'		=> 'Approved'
 	 * 		), 'select');
@@ -231,7 +232,7 @@ class Crud {
 	 * 			  $value_type - what kind of data(email, name, url, etc).
 	 *			  $extra_info - More info if needed.
 	 */
-	function addField($field, $name=false, $type='varchar', $validation=array(), $data=array(), $field_type=false, $value_type=false, $extra_info=array()) {
+	function addField($field, $name=false, $type='varchar', $validation=[], $data=[], $field_type=false, $value_type=false, $extra_info=[]) {
 		if($name === false) $name = format($field);
 		
 		if(!$field_type or !$value_type or !$validation) {
@@ -265,7 +266,7 @@ class Crud {
 	 *            $table - the table wth the date that should be used n the dropdown.
 	 *            $where - the conditions for the data.
 	 */
-	function addListDataField($field, $table, $name=false, $where='', $options=array()) {
+	function addListDataField($field, $table, $name=false, $where='', $options=[]) {
 		if(!empty($where)) $where = " WHERE $where";
 
 		$fields = i($options, 'fields', 'id,name');
@@ -274,7 +275,7 @@ class Crud {
 			$values[0] = $options['none'][0];
 		}
 
-		$this->addField($field, $name, 'enum', array(), $values);
+		$this->addField($field, $name, 'enum', [], $values);
 	}
 
 	
@@ -296,7 +297,7 @@ class Crud {
 	 *				'where' => array('item_type'=>"engagement"),
 	 *			), 'Selected Users');
 	 */
-	function addManyToManyField($field, $reference_table, $field_list, $title='', $data=array()) {
+	function addManyToManyField($field, $reference_table, $field_list, $title='', $data=[]) {
 		if(!$data) {
 			$where = i($field_list[0], 'where');
 			if($where) $where = ' WHERE ' . $where;
@@ -304,7 +305,7 @@ class Crud {
 			$data = $this->execQuery("SELECT ".i($field_list[0], 'select', 'id,name')." FROM `".$field_list[0]['table']."` $where", "byid");
 		}
 	
-		$this->addField($field, $title, 'manytomany', array(), $data, 'select', false, 
+		$this->addField($field, $title, 'manytomany', [], $data, 'select', false, 
 				array('reference_table' => $reference_table, 'field_list' => $field_list));
 	}
 
@@ -320,7 +321,7 @@ class Crud {
 			if(is_array($data)) $data_array = $data;
 			else $data_array = array('html'=>$data);
 
-			$this->addField(unformat($title), $title, 'virtual', array(), $data_array);
+			$this->addField(unformat($title), $title, 'virtual', [], $data_array);
 		// }
 		$this->setListingFields();
 	}
@@ -344,7 +345,7 @@ class Crud {
 	 */
 	function setSearchFields() {
 		$given_search_fields = $this->_getArguments(func_get_args());
-		$search_fields = array();
+		$search_fields = [];
 		
 		// If fields are not specified, include all varchar fields
 		if(!$given_search_fields) $given_search_fields = array_keys($this->fields);
@@ -377,9 +378,9 @@ class Crud {
 						'type'			=> 'varchar',
 						'field_type'	=> 'varchar',
 						'value_type'	=> 'text',
-						'validation'	=> array(),
-						'data'			=> array(),
-						'extra_info' 	=> array(),
+						'validation'	=> [],
+						'data'			=> [],
+						'extra_info' 	=> [],
 					);
 				}
 			}			
@@ -419,7 +420,7 @@ class Crud {
 			
 			// Remove some unwanted stuff in the URL
 			$items_to_remove = array('id','select_row[]','action','iframe_crud_search','iframe_crud_search_in', 'sp_page','sp_items_per_page', 'sortasc', 'sortdesc', 'error', 'success');
-			$remove_dict = array();
+			$remove_dict = [];
 			foreach($items_to_remove as $item) $remove_dict[$item] = null;
 			$url = getLink($url, $remove_dict);
 			/*
@@ -448,9 +449,9 @@ class Crud {
 	function _guessFieldTypes($field, $name, $data_type, $validation) {
 		$field_type = false;
 		$value_type = false;
-		if(!$validation) $validation = array();
+		if(!$validation) $validation = [];
 		
-		$field_type = $this->data_type_field_type_map[$data_type];
+		$field_type = i($this->data_type_field_type_map, $data_type, 'text');
 		$value_type = $field_type;
 		
 		// Special Field handles.
@@ -580,7 +581,7 @@ class Crud {
 		if(!$this->validateForm()) return false;
 
 		// Remove invalid fields(stuff not in the DB)
-		$save_data = array();
+		$save_data = [];
 		foreach($this->fields as $field_name => $field_info) {
 			if(!isset($field_data[$field_name]) 				// Make sure that the field shows up in the submit list.
 					and $field_info['field_type'] != 'file'	 	// File type don't show in the $_POST array
@@ -720,7 +721,7 @@ class Crud {
 	 * Return: true - if there are no errors and false if there are errors.
 	 */
 	function validateForm() {
-		$conditions = array();
+		$conditions = [];
 		foreach($this->fields as $field) {
 			if(isset($field['validation'])) {
 				$validation_rules = $field['validation'];
@@ -912,7 +913,7 @@ class Crud {
 	 */
 	function setHeaders() {
 		global $config;
-		$done = array();
+		$done = [];
 		
 		$this->_addResource('crud.css');
 		if($this->action == 'edit' or $this->action == 'add') {
@@ -950,7 +951,7 @@ class Crud {
 		$this->pager = new SqlPager($this->listing_query, $this->items_per_page);
 		
 		// Create the URL for the pager
-		$save_params = array();
+		$save_params = [];
 		// This states will be saved when going thru pages.
 		foreach($this->save_states as $state_name) {
 			if(!empty($QUERY[$state_name]) and empty($save_params[$state_name]))
@@ -1021,8 +1022,8 @@ class Crud {
 						$this->action = 'add';
 						$QUERY['action'] = 'add';
 						global $PARAM;
-						$PARAM = array();
-						$this->current_page_data = array();
+						$PARAM = [];
+						$this->current_page_data = [];
 						$this->printForm();
 					}
 				} else { // Validation errors.
