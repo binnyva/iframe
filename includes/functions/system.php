@@ -136,6 +136,6 @@ function dump() {
 
 //http://php.net/autoload
 function iframeAutoloader($class_name) {
-	require_once $class_name . '.php';
+	include_once $class_name . '.php';
 }
 spl_autoload_register('iframeAutoloader');

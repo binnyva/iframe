@@ -62,7 +62,7 @@ class SqlPager {
 	 * Argument : $query - The query that should be used for paging
 	 * 			  $items_per_page - The default number of items per page - defaults to 10 [OPTIONAL]
 	 */
-	function __construct($query, $items_per_page = 10, $options) {
+	function __construct($query, $items_per_page = 10, $options = []) {
 		$query = preg_replace('/ LIMIT \d+,\d+\s*$/i','',$query);//Remove the 'limitation' if there is one
 		$this->query = $query;
 
