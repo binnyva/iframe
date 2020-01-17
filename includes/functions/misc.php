@@ -333,58 +333,6 @@ function upload($file_id, $folder="", $types="") {
 
 	return array($file_name,$result);
 }
-
-/**
- * Function  : sendEMail()
- * Agruments : $from - don't make me explain these
- *			  $to
- *			  $message
- *			  $subject 
- * Sends an email with the minimum amount of fuss.
- */
-function sendEMail($from_email,$to,$message,$subject) {
-	global $config;
-	
-	$from_name = $config['site_title'];
-	$site = $config['site_url'];
-	if(!$from_email) $from_email = $config['site_email'];
-	
-	/*Clean The mail of BCC Header Injections before sending the mail*/
-	//Code taken from http://in.php.net/manual/en/ref.mail.php#59012
-
-	// Attempt to defend against header injections: 
-	$badStrings = array("Content-Type:", 
-						"MIME-Version:", 
-						"Content-Transfer-Encoding:", 
-						"bcc:", 
-						"cc:"); 
-	
-	// Loop through each POST'ed value and test if it contains 
-	// one of the $badStrings: 
-	foreach($_POST as $k => $v){ 
-		foreach($badStrings as $v2){ 
-			if(strpos($v, $v2) !== false){ 
-				header("HTTP/1.0 403 Forbidden"); 
-				exit; 
-			} 
-		} 
-	}	 
-	/*******************************************************************************/
-	$from_str = "$from_name <$from_email>";
-	
-	if(strpos($message,"<br")===false) { //A Plain Text message
-		$type = "text/plain";
-	} else { //HTML message
-		$type = "text/html";
-	}
-
-	$headers  = "MIME-Version: 1.0\r\n";
-	$headers .= "Content-type: $type; charset=iso-8859-1\r\n";
-	$headers .= "From: $from_str";
-	
-	if(mail($to,$subject,$message,$headers)) return true;
-	else return false;
-}
  
 /**
  * Link: http://www.bin-co.com/php/scripts/load/
