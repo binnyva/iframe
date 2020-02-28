@@ -1,5 +1,4 @@
-Documentation/
-Scripts/templates/layout/old-page.php
-Tests/
-bower_components/
+/bower_components
+/node_modules
+/vendor
 iframe.sublime-workspace

@@ -2,19 +2,19 @@
 <html lang="en"><head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <title><?php 
-echo $title;
+echo $app_config['app_name'];
 if(isset($page_title)) echo ' : ' . $page_title;
 ?></title>
-<link href="<?php echo $config['site_url'] ?>css/style.css" rel="stylesheet" type="text/css" />
-<link href="<?php echo $config['site_url'] ?>images/silk_theme.css" rel="stylesheet" type="text/css" />
-<link href="<?php echo $config['site_url'] ?>bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css" />
-<link href="<?php echo $config['site_url'] ?>bower_components/bootstrap/dist/css/bootstrap-theme.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo $app_config['app_url'] ?>assets/css/style.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo $app_config['app_url'] ?>assets/images/silk_theme.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo $app_config['app_url'] ?>node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo $app_config['app_url'] ?>node_modules/bootstrap/dist/css/bootstrap-theme.css" rel="stylesheet" type="text/css" />
 <?php echo $css_includes ?>
 </head>
 <body>
 <div id="loading">loading...</div>
 <div id="header">
-<h1 id="logo"><a href="<?php echo $config['site_home']; ?>"><?php echo $config['site_title'] ?></a></h1>
+<h1 id="logo"><a href="<?php echo $app_config['app_url']; ?>"><?php echo $app_config['app_name'] ?></a></h1>
 </div>
 
 <div id="content">
@@ -28,7 +28,7 @@ if(isset($page_title)) echo ' : ' . $page_title;
 <?php 
 /////////////////////////////////// The Template file will appear here ////////////////////////////
 
-include($GLOBALS['template']->template); 
+include(iframe\App::$template->template); 
 
 /////////////////////////////////// The Template file will appear here ////////////////////////////
 ?>
@@ -37,9 +37,9 @@ include($GLOBALS['template']->template);
 
 <div id="footer">An <a href="http://www.bin-co.com/php/scripts/iframe/">iFrame</a> Application</div>
 
-<script src="<?php echo $config['site_url'] ?>bower_components/jquery/dist/jquery.min.js" type="text/javascript"></script>
-<script src="<?php echo $config['site_url'] ?>bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-<script src="<?php echo $config['site_url'] ?>js/application.js" type="text/javascript"></script>
+<script src="<?php echo $app_config['app_url'] ?>node_modules/jquery/dist/jquery.min.js" type="text/javascript"></script>
+<script src="<?php echo $app_config['app_url'] ?>node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="<?php echo $app_config['app_url'] ?>js/application.js" type="text/javascript"></script>
 <?php echo $js_includes ?>
 </body>
 </html>

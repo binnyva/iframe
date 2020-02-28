@@ -1,0 +1,29 @@
+{
+  "name": "iframe2",
+  "version": "2.0.0",
+  "description": "PHP Micro Framework",
+  "main": "index.php",
+  "dependencies": {
+    "bootstrap": "^4.4.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/binnyva/iframe.git"
+  },
+  "keywords": [
+    "php",
+    "microframework",
+    "framework",
+    "mvc"
+  ],
+  "author": "Binny V A",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/binnyva/iframe/issues"
+  },
+  "homepage": "https://github.com/binnyva/iframe#readme"
+}

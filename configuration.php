@@ -1,6 +1,5 @@
 <?php
-//Configuration file for iFrame
-$config = array(
-	'site_title'	=>	'iFrame',
-	'site_url'		=>	'http://localhost/iframe/',
+return array(
+	'app_name'	=>	'iFrame2',
+	'app_url'	=>	'http://localhost/iframe2/',
 );

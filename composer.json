@@ -1,0 +1,11 @@
+{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "/mnt/x/Data/www/iframe2/PACKAGE/iframe"
+        }
+    ],
+    "require": {
+        "binnyva/iframe": "^2.0"
+    }
+}
