@@ -1,12 +1,18 @@
 {
   "name": "binnyva/iframe",
   "description": "iFrame is a PHP framework",
+  "version": "2.0.0",
   "keywords": [
     "php",
     "framework",
-    "mvc"
+    "mvc",
+    "microframework"
   ],
   "license": "MIT",
+  "repositories": [{
+    "type": "git",
+    "url": "https://github.com/binnyva/iframe.git"
+  }],
   "authors": [{
     "name": "Binny V A",
     "email": "binnyva@gmail.com",
@@ -14,7 +20,31 @@
     "role": "Developer"
   }],
   "require": {
-    "php" : "^5.5 || ^7.0",
-    "twbs/bootstrap": "4.0.*"
-  }
+    "php" : "^5.5 || ^7.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "iframe\\": "src/classes"
+    },
+    "files": [
+      "src/helpers/shortcuts.php",
+      "src/helpers/misc.php"
+    ]
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "@php scripts/install.php"
+    ]
+  },
+
+
+  "repositories": [
+    {
+      "type": "path",
+      "url": "/mnt/x/Data/www/iframe2/iframe",
+      "options": {
+        "symlink": true
+      }
+    }
+  ]
 }

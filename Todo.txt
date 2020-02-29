@@ -1,0 +1,9 @@
+# Todo
+
+- Crud should work
+- Helper function should be cleaned up.
+- Error handling
+- Check pager working
+- Create Skeloton
+- Check calender
+- Template should use assets folder
