@@ -1,5 +1,5 @@
 <?php
-function render($file='', $use_layout=true, $use_exact_path = false) {
+function render($file='', $use_layout=true, $use_exact_path = false, $variable_array=false) {
 	//If it is an ajax request, we don't have to render the page.
 	if(isset($_REQUEST['ajax'])) {
 		print '{"success":"Done","error":false}';
@@ -7,7 +7,7 @@ function render($file='', $use_layout=true, $use_exact_path = false) {
 	}
 	
 	//Otherwise, render it.
-	$GLOBALS['template']->render($file, $use_layout, $use_exact_path);
+	iframe\App::$template->render($file, $use_layout, $use_exact_path, $variable_array);
 }
 
 /**
@@ -21,7 +21,7 @@ function showPager() {
 //////////////////////// Layout Functions - DEPRECATED ///////////////////
 function showHead($title='') {
 	global $template, $config;
-	$library_path = $config['site_url'];
+	$library_path = $config['app_url'];
 	if(!empty($config['common_library_url'])) $library_path = $config['common_library_url'];
 ?>
 <!DOCTYPE html>
@@ -32,8 +32,8 @@ function showHead($title='') {
 <title><?php echo $title; ?></title>
 <link href="<?php echo joinPath($library_path,'css/style.css')?>" rel="stylesheet" type="text/css" />
 <link href="<?php echo joinPath($library_path,'images/silk_theme.css')?>" rel="stylesheet" type="text/css" />
-<link href="<?php echo $library_path ?>bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css" />
-<link href="<?php echo $library_path ?>bower_components/bootstrap/dist/css/bootstrap-theme.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo $library_path ?>node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo $library_path ?>node_modules/bootstrap/dist/css/bootstrap-theme.css" rel="stylesheet" type="text/css" />
 <?php echo implode("\n", $template->css_includes);?>
 <?php
 }
@@ -46,7 +46,7 @@ function showBegin() {
 <body>
 <div id="loading">loading...</div>
 
-<?php if(isset($config['site_title'])) { ?>
+<?php if(isset($config['app_title'])) { ?>
 <div id="header" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 <div id="nav" class="container">
 	<div class="navbar-header">
@@ -56,7 +56,7 @@ function showBegin() {
 	    <span class="icon-bar"></span>
 	    <span class="icon-bar"></span>
 	  </button>
-	  <a class="navbar-brand"  href="<?php echo $config['site_home']?>"><?php echo $config['site_title']?></a>
+	  <a class="navbar-brand"  href="<?php echo $config['app_home']?>"><?php echo $config['app_title']?></a>
 	</div>
 	<div class="collapse navbar-collapse">
 	</div>
@@ -81,7 +81,7 @@ function showTop($title='') {
 
 function showEnd() {
 	global $template, $config;
-	$library_path = $config['site_url'];
+	$library_path = $config['app_url'];
 	if(!empty($config['common_library_url'])) $library_path = $config['common_library_url'];
 ?>
 <!-- End Content -->

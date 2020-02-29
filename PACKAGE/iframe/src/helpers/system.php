@@ -134,8 +134,15 @@ function dump() {
 	print "</pre>\n";
 }
 
-//http://php.net/autoload
-function iframeAutoloader($class_name) {
-	include_once $class_name . '.php';
+function app($obj) {
+	if($obj === 'db') return iframe\App::$db;
+	elseif($obj === 'template') return iframe\App::$template;
+
+	return false;
 }
-spl_autoload_register('iframeAutoloader');
+
+// //http://php.net/autoload
+// function iframeAutoloader($class_name) {
+// 	include_once $class_name . '.php';
+// }
+// spl_autoload_register('iframeAutoloader');

@@ -1,0 +1,5 @@
+These should work
+	composer create-project iframe/install path 2.00.*
+	composer create-project iframe/link path 2.00.*
+	composer install
+		Search for something along the lines of 'composer post-install-cmd' - will get docs
