@@ -31,7 +31,9 @@ class App {
 			$rel = $this->findRelation();
 			static::$config = [];
 			if(file_exists($rel . "configuration.php")) {
-				static::$config = require($rel . "configuration.php"); // Load app spcific config file.
+				static::$config = require($rel . "configuration.php"); // Load app specific config file.
+			} else {
+				static::$config = ['app_name' => 'iFrame']; // Base template if no config file found.
 			}
 
 			if($rel == '') static::$config['app_folder'] = realpath('.');
@@ -75,9 +77,9 @@ class App {
 		if(!isset(static::$config['app_url']) and isset($_SERVER['HTTP_HOST'])) {
 			static::$config['app_url']	= "http://" . $_SERVER['HTTP_HOST'] . static::$config['app_absolute_path'];
 		}
-		static::$config['app_asset_url'] = static::$config['app_url'];
+		static::$config['app_assets_url'] = static::$config['app_url'];
 		if(file_exists(static::$config['app_folder'] . '/assets')) {
-			static::$config['app_asset_url'] = static::$config['app_url'] . '/assets';
+			static::$config['app_assets_url'] = static::$config['app_url'] . '/assets';
 		}
 
 		// Default Date and time formats.
