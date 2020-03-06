@@ -186,9 +186,9 @@ class Template {
 
 		if($use_exact_path) $link = $file;
 		elseif(file_exists(joinPath(App::$config['app_folder'], $file))) {
-			$link = joinPath(App::$config['app_home'], $file);	
+			$link = joinPath(App::$config['app_url'], $file);	
 		}
-		else $link = joinPath(App::$config['app_home'], $folder, $file);
+		else $link = joinPath(App::$config['app_url'], $folder, $file);
 
 		if($type=='css' or $type=='stylesheet' or $type=='style' or $type=='stylesheets') {
 			$current_include = '<link href="' . $link . '" type="text/css" rel="stylesheet" />';
@@ -253,7 +253,7 @@ class Template {
 	function render($variable_array = false, $options = []) {
 		if($variable_array) extract($variable_array);
 
-		$template_file = i($options, 'template_file');
+		$template_file = i($options, 'template');
 		$use_layout = i($options, 'use_layout', true);
 		$use_exact_path = i($options, 'use_exact_path', false);
 
@@ -267,7 +267,7 @@ class Template {
 		} elseif(!$this->template) {
 			$this->setTemplate($this->page);
 		}
-		
+	
  		if(!$this->template) {
  			if($template_file != 'crud' or !isset($crud)) { // Couldn't find the page. And there is no crud rendering to do.
 	 			App::error('The template file for "' . $this->page . '" does not exist.', '');

@@ -6,9 +6,9 @@ class App {
 	public static $db;
 	public static $template;
 
-	function __construct()
+	function __construct($options = [])
 	{
-		$this->bootstrap();
+		$this->bootstrap($options);
 	}
 
 	public function render($variable_array = [], $options = [])
@@ -16,30 +16,32 @@ class App {
 		static::$template->render($variable_array, $options);
 	}
 
-	public function bootstrap()
+	public function bootstrap($options)
 	{
-		// <app>/common.php
-		// Iframe root folder. Absolute.
-		$iframe_folder = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR;
+		// Iframe src folder. Absolute.
+		$iframe_folder = dirname(__DIR__) . DIRECTORY_SEPARATOR;
 
 		// App Folder. Absolute
 		$full_self = $_SERVER['SCRIPT_FILENAME'];
 		$app_folder = dirname($full_self);
 		chdir($app_folder);
 
-		if(empty(static::$config)) {
-			$rel = $this->findRelation();
-			static::$config = [];
-			if(file_exists($rel . "configuration.php")) {
-				static::$config = require($rel . "configuration.php"); // Load app specific config file.
-			} else {
-				static::$config = ['app_name' => 'iFrame']; // Base template if no config file found.
-			}
-
-			if($rel == '') static::$config['app_folder'] = realpath('.');
-			else static::$config['app_folder'] = realpath($rel);
-			static::$config['app_relative_path'] = $rel;
+		if(isset($options['config'])) {
+			static::$config = $options['config'];
+		} else {
+			static::$config = ['app_name' => 'iFrame']; // Base template if no config file found.
 		}
+
+		$rel = $this->findRelation();
+		if(file_exists($rel . "configuration.php")) {
+			$app_config = require($rel . "configuration.php"); // Load app specific config file.
+			static::$config = array_merge(static::$config, $app_config);
+		}
+
+		if($rel == '') static::$config['app_folder'] = realpath('.');
+		else static::$config['app_folder'] = realpath($rel);
+		static::$config['app_relative_path'] = $rel;
+
 		static::$config['iframe_folder'] = $iframe_folder;
 
 		//Find all path info
@@ -94,10 +96,13 @@ class App {
 
 		static::$config['iframe_backward_compatible'] = true; // :TODO:
 
-		$this->initDevHelpers();
-		$this->setupAutoIncludes();
+		// dump(static::$config); exit;
+
 		$this->registerGlobals();
-		
+		// $this->setupAutoIncludes();
+		$this->initDevHelpers();
+		$this->includeAppFiles();
+
 		// Plugin System
 		$i_plugin = false;
 		if(file_exists(joinPath(static::$config['app_folder'],'plugins'))) {
@@ -106,7 +111,6 @@ class App {
 			$i_plugin->callHook('init');
 		}
 	}
-
 
 	public function registerGlobals()
 	{
@@ -144,7 +148,8 @@ class App {
 		// Database connection is optional
 		if(isset(static::$config['db_host']) and static::$config['db_host']) {
 			static::$db = new DB\Sql(static::$config['db_host'], static::$config['db_user'], static::$config['db_password'], static::$config['db_database']); // Connect to DB
-			DB\Sql::$mode = static::$config['env'];
+			DB\Sql::$env = static::$config['env'];
+			// dump("DB Connection Established");
 		}
 		if(!isset(static::$config['use_mvc']) or static::$config['use_mvc'] === false) static::$template = new iframe\Template;
 
@@ -159,14 +164,21 @@ class App {
 		}
 	}
 
+	// :TODO: Not working.
 	private function setupAutoIncludes()
 	{
 		// Register Models folder if it exist
-		if(file_exists(joinPath(static::$config['app_folder'] , 'envls'))) set_include_path(get_include_path() . PATH_SEPARATOR .  joinPath(static::$config['app_folder'] , 'envls'));
+		if(file_exists(joinPath(static::$config['app_folder'] , 'models'))) set_include_path(get_include_path() . PATH_SEPARATOR .  joinPath(static::$config['app_folder'] , 'models'));
+		spl_autoload_register(function ($class_name) {
+			include_once $class_name . '.php';
+		});
+	}
 
-		//Auto-include the application.php file
+	private function includeAppFiles()
+	{
+		//Auto-include the includes/application.php file
 		if(isset(static::$config['app_relative_path']) and file_exists(static::$config['app_relative_path'] . 'includes/application.php')) {
-			require(static::$config['app_relative_path'] . 'includes/application.php');
+			require_once(static::$config['app_relative_path'] . 'includes/application.php');
 		}
 	}
 
@@ -203,7 +215,7 @@ class App {
 
 		foreach($param_array as $key => $value) {
 			if(is_array($value)) { //Escape Arrays recursively
-				$QUERY[$key] = escapeQuery($value,$ignore_magic_quote_setting); //:RECURSION:
+				$QUERY[$key] = $this->escapeQuery($value,$ignore_magic_quote_setting); //:RECURSION:
 			} else {
 				if(isset($GLOBALS['sql'])) $value = $GLOBALS['sql']->escape($value); //If there is an SQL Connection,
 				else $value = addslashes($value);
@@ -231,7 +243,7 @@ class App {
 
 		while(list($key,$value) = each($param_array)) {
 			if(is_array($value)) { //UnEscape Arrays recursively
-				$PARAM[$key] = unescapeQuery($value,$ignore_magic_quote_setting); //:RECURSION:
+				$PARAM[$key] = $this->unescapeQuery($value,$ignore_magic_quote_setting); //:RECURSION:
 			} else {
 				$PARAM[$key] = stripslashes($value);
 			}
@@ -247,7 +259,7 @@ class App {
 	 *	$line - The line where the error occured [OPTIONAL]
 	 *	$priority - The priority or the error - if its to high(>=10) the app will die. 10 has more priority than 1
 	 */
-	public function error($error_message, $error_title='Error', $file="", $line="", $priority=5) {
+	public static function error($error_message, $error_title='Error', $file="", $line="", $priority=5) {
 		static $error_call_count = 1;
 
 		// This is to prevent recursion. Some of the functions used in the this fuction can return error.
@@ -280,7 +292,7 @@ class App {
 
 				if($config['iframe_url']) static::$template->addResource(joinPath($config['iframe_url'], 'css/iframe.css'), 'css', true);
 				static::$template->render(['error_message' => $error_message, 'error_title' => $error_title], 
-											[ 	'template' => joinPath(__DIR__, '../classes/templates/error.php'),
+											[ 	'template' => joinPath(__DIR__, '../templates/error.php'),
 												'use_layout'=>true,
 												'use_exact_path'=> true]);
 				exit;

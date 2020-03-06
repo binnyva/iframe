@@ -1,6 +1,6 @@
 <?php
-global $config, $sql;
-$html = new HTML;
+global $sql;
+$html = new iframe\HTML\HTML;
 $column_count = count($this->listing_fields);
 
 if($this->title) { ?>

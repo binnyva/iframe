@@ -1,5 +1,7 @@
 <?php
 namespace iframe\iframe;
+use iframe\App;
+use iframe\HTML\HTML;
 
 $html = new HTML;
  
@@ -20,9 +22,9 @@ class Crud {
 		'edit'				=> '?action=edit',		// The edit page URL
 		'delete'			=> '?action=delte',		// The delete page URL
 		
-		'js_folder'			=> 'crud/',			// The Javascript folder. This folder is inside the js/ folder. So if this is crud/, that means the js files are in /js/crud/
-		'css_folder'		=> 'crud/',			// The folder that holds CSS files.
-		'image_folder'		=> 'crud/', 		// The folder in which the images are kept - Will be dynamially set in the consturctor.
+		'js_folder'			=> 'assets/js/crud/',			// The Javascript folder. This folder is inside the js/ folder. So if this is crud/, that means the js files are in /js/crud/
+		'css_folder'		=> 'assets/css/crud/',			// The folder that holds CSS files.
+		'image_folder'		=> 'assets/images/crud/', 		// The folder in which the images are kept - Will be dynamially set in the consturctor.
 	);
 	
 	public $listing_query	= '';		// The query use to create the listing page. Use setListingQuery() to set this query. That will make sure all the extra parts(sorting, paging) etc. stays intact.
@@ -84,10 +86,9 @@ class Crud {
 		'multi_select_choice'	=> '',	// In the Delete, Activate, Deactivate part - below all the rows.
 	);
 	
-	
 	///////////////////////////////////////// Configuration Function ////////////////////////////////////
 	function __construct($table, $title='', $primary_key='id', $guess=true) {
-		global $config, $template;
+		global $template;
 		$this->table = $table;
 		
 		if($title) $this->title = $title;
@@ -105,9 +106,14 @@ class Crud {
 		//Set some member variables
 		if(!empty($_REQUEST['action'])) $this->action = $_REQUEST['action'];
 
-		if(!empty($config['common_library_url'])) $this->urls['image_folder'] = joinPath($config['common_library_url'], 'images/', $this->urls['image_folder']);
-		else $this->urls['image_folder'] = joinPath($config['site_url'], 'images/', $this->urls['image_folder']);
-		
+		$config = App::$config;
+		$base_path = $config['app_url'];
+		if(!empty($config['common_library_url'])) $base_path = $config['common_library_url'];
+
+		$this->urls['js_folder'] = joinPath($base_path, $this->urls['js_folder']);
+		$this->urls['css_folder'] = joinPath($base_path, $this->urls['css_folder']);
+		$this->urls['image_folder'] = joinPath($base_path, $this->urls['image_folder']);
+	
 		$this->setPrimaryKey($primary_key);
 		$this->setUrl();
 		
@@ -935,7 +941,7 @@ class Crud {
 			extract($field_info);
 			if(($type == 'datetime' or $type == 'date') and !isset($done[$type])
 					and ($this->action == 'edit' or $this->action == 'add' or $this->action == 'add_save' or $this->action == 'edit_save')) {
-				$this->_addResource(joinPath($config['site_url'], 'js', $this->urls['js_folder'], "jscalendar/calendar-blue.css"),	"css", true);
+				$this->_addResource(joinPath($this->urls['js_folder'], "jscalendar/calendar-blue.css"),	"css", true);
 				$this->_addResource("jscalendar/calendar.js",		"js");
 				$this->_addResource("jscalendar/calendar-en.js",	"js");
 				$this->_addResource("jscalendar/calendar-setup.js", "js");
@@ -967,7 +973,7 @@ class Crud {
 		$this->listData();
 	}
 	function listData() {
-		require('templates/Crud/listing.php');
+		require(__DIR__ . '/../../templates/Crud/listing.php');
 	}
 	
 	/// Shows the data editing form - creates and caches the data. Then include the form template file.
@@ -985,7 +991,7 @@ class Crud {
 			}
 		}
 		
-		require('templates/Crud/form.php');
+		require(__DIR__ . '/../../templates/Crud/form.php');
 	}
 	
 	
@@ -1093,7 +1099,7 @@ class Crud {
 			$this->current_page_data = $this->pager->getPage();
 			$this->makeListingDisplayData();
 
-			require('templates/Crud/listing_csv.php');
+			require(__DIR__ . '/../../templates/Crud/listing_csv.php');
 
 		} else {
 			showTop($this->title);
@@ -1120,22 +1126,21 @@ class Crud {
 	
 	// :TODO: :UGLY: This duplicates a lot of functionality in MVC::addResource()
 	private function _addResource($file, $type='', $use_exact_path = false) {
-		global $template, $config;
+		global $config;
 		
 		$file_name_parts = explode(".",$file);
 		if(!$type) $type = array_pop($file_name_parts);
 		if(preg_match('#https?\://#', $file)) $use_exact_path = true;
 		
 		if(!$use_exact_path) {
-			$file = joinPath($type, $this->urls[$type.'_folder'], $file);
+			$file = joinPath($this->urls[$type.'_folder'], $file);
 			if(preg_match('#https?\://#', $file)) $use_exact_path = true; // Starts with 'http://' - so no checks necessary.
 			else {
-				if(!empty($config['common_library_url'])) $file = joinPath($config['common_library_url'], $file);
-				else $file = joinPath($config['site_url'], $file);
+				$file = joinPath($config['app_url'], $file);
 				$use_exact_path = true;
 			}
 		}
-		$template->addResource($file, $type, $use_exact_path);
+		App::$template->addResource($file, $type, $use_exact_path);
 	}
 	
 	/**

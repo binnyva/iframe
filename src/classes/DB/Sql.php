@@ -1,5 +1,6 @@
 <?php
 namespace iframe\DB;
+use iframe\App;
 
 /**
  * 	Creates a Database abstration layer - using the most commonly used functions.
@@ -490,7 +491,7 @@ class Sql {
 		$this->error_message = $error_message;
 		if(self::$env == 'dev') {
 			if($this->options['error_handling'] == 'layout') {
-				iframe\App::error($error_message, 'MySQL Error');
+				App::error($error_message, 'MySQL Error');
 
 			} else if($this->options['error_handling'] == 'callback' and function_exists($this->options['error_callback'])) {
 				call_user_func($this->options['error_callback'], $query, $error_message);
