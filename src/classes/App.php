@@ -179,6 +179,12 @@ class App {
 		//Auto-include the includes/application.php file
 		if(isset(static::$config['app_relative_path']) and file_exists(static::$config['app_relative_path'] . 'includes/application.php')) {
 			require_once(static::$config['app_relative_path'] . 'includes/application.php');
+
+			// All the variables defined in the application file goes into the global scope. :UGLY:
+			$vars = get_defined_vars();
+			foreach($vars as $name => $value) {
+				$GLOBALS[$name] = $value;
+			}
 		}
 	}
 

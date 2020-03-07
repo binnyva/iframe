@@ -1,6 +1,6 @@
 {
   "name": "binnyva/iframe",
-  "description": "iFrame is a PHP framework",
+  "description": "iFrame is a PHP micro framework",
   "version": "2.0.0",
   "keywords": [
     "php",
@@ -20,7 +20,7 @@
     "role": "Developer"
   }],
   "require": {
-    "php" : "^5.5 || ^7.0"
+    "php" : "^7.0"
   },
   "autoload": {
     "psr-4": {
@@ -30,21 +30,5 @@
       "src/helpers/shortcuts.php",
       "src/helpers/misc.php"
     ]
-  },
-  "scripts": {
-    "post-install-cmd": [
-      "@php scripts/install.php"
-    ]
-  },
-
-
-  "repositories": [
-    {
-      "type": "path",
-      "url": "/mnt/x/Data/www/iframe2/iframe",
-      "options": {
-        "symlink": true
-      }
-    }
-  ]
+  }
 }

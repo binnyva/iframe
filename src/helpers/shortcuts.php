@@ -150,7 +150,7 @@ function dump() {
 	print "</pre>\n";
 }
 
-function app($obj) {
+function iapp($obj = false) {
 	if($obj === 'db') return iframe\App::$db;
 	elseif($obj === 'template') return iframe\App::$template;
 
