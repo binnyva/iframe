@@ -1,6 +1,9 @@
 <?php
 global $PARAM;
-$html = new HTML;
+$html = new iframe\HTML\HTML;
+
+// :TODO: Convert the form to bootstap type - use class=form-control
+// :TODO: Change date to type=date instead of using js calendar.
 ?>
 <h2 class="action-title"><?php echo ucfirst($this->action) . ' ' . $this->title?></h2>
 
@@ -38,15 +41,15 @@ foreach($this->form_fields as $field_name) {
 	
 	// Date Field.
 	} elseif($field_type == 'datetime' or $field_type == 'date') {
-		if($field_type == 'datetime') $js_date_format = $GLOBALS['config']['time_format'];
-		else $js_date_format = $GLOBALS['config']['date_format'];
+		if($field_type == 'datetime') $js_date_format = \iframe\App::config['time_format'];
+		else $js_date_format = \iframe\App::config['date_format'];
 		
 		if($value and $value != '0000-00-00 00:00:00' and $value != '0000-00-00') $value = date(phpDateFormat($js_date_format), strtotime($value));
 		elseif($this->action == 'add' and $field == 'added_on') $value = date(phpDateFormat($js_date_format)); // Its the good old added_on field. If we are creating a new row, put the current time there.
 		elseif($this->action == 'edit' and $field == 'edited_on') $value = date(phpDateFormat($js_date_format)); // Same for edited_on field.
 		else $value = '';
 		$js_date_format = jsDateFormat($js_date_format);
-		$value = preg_replace('/<.+?>[^>]+>/','', $value);// Remove the tags. Things like <sup>th</sup>
+		$value = preg_replace('/<.+?>[^>]+>/','', $value); // Remove the tags. Things like <sup>th</sup>
 		
 		$html->buildInput($field, $name, 'text', $value, array('class'=>'text-long'), "<input class='button' type='button' value=' ... ' id='date_button_$field' />");
 		$print_time = 1;
@@ -100,13 +103,14 @@ foreach($save_current_state as $state_name) {
 }
 
 // The action area.
-print "<div class='action-area'>&nbsp;";
+print "<div class='action-area'>";
 if(($QUERY['action'] == 'edit' or $QUERY['action'] == 'edit_save') and $this->allow['delete'])
-	print "<a href='" . getLink($this->urls['main'], array('select_row[]'=>i($QUERY, 'id'), 'action'=>'delete')) . "' title='Delete this row' class='delete-current-item confirm with-icon delete'>Delete</a>";
+	print "<a href='" . getLink($this->urls['main'], array('select_row[]'=>i($QUERY, 'id'), 'action'=>'delete')) . "' title='Delete this row' class='btn btn-sm btn-danger delete-current-item confirm float-right'>Delete</a>";
 
-print "<input type='submit' id='action-save' name='submit' class='action-submit btn btn-primary' value='Save' />";
-if($this->allow['save_and_edit_form_button']) print "<input type='submit' id='action-save-edit' name='submit' class='action-submit btn btn-default' value='Save and Continue Editing' />";
-if($this->allow['save_and_new_form_button']) print "<input type='submit' id='action-save-new' name='submit' class='action-submit btn btn-success' value='Save and Show New Form' />";
+print "<input type='submit' id='action-save' name='submit' class='action-submit btn btn-success' value='Save' />";
+if($this->allow['save_and_edit_form_button']) print " &nbsp; <input type='submit' id='action-save-edit' name='submit' class='action-submit btn btn-secondary' value='Save and Continue Editing' />";
+if($this->allow['save_and_new_form_button']) print " &nbsp; <input type='submit' id='action-save-new' name='submit' class='action-submit btn btn-light' value='Save and Show New Form' />";
+
 print "</div>";
 
 if($QUERY['action'] == 'edit' or $QUERY['action'] == 'add') $form_action = $QUERY['action'] . "_save";

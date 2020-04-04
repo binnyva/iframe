@@ -4,10 +4,6 @@ use iframe\App;
 
 /**
  * File	: classes/Template.php
- * This file holds all the templating actions. 
- */
- 
-/**
  * Class : Template
  * All Template action are in this class - Templating and Model, anyway
  */
@@ -28,8 +24,8 @@ class Template {
 	public $includes	= array();
 	public $css_includes= array();
 	public $js_includes = array();
-	public $css_folder	= 'asset/css/';
-	public $js_folder	= 'asset/js/';
+	public $css_folder	= 'assets/css/';
+	public $js_folder	= 'assets/js/';
 	
 	public $content	= array(
 		'head'		=>	''
@@ -87,7 +83,7 @@ class Template {
 	 *			  $use_exact_path - If this is false, MVC will try to find the template file using some rules(search in the templates folder etc. If true, it will just include the exact page.
 	 */
 	function setTemplate($template_file, $use_exact_path = false) {
-		$this->_findResources($template_file);
+		$this->findResources($template_file);
 
 		if(!$use_exact_path) {
 			$template_file = joinPath(App::$config['app_folder'], $this->options['template_folder'], $template_file);
@@ -116,7 +112,7 @@ class Template {
 			return;
 		}
 		$model_file = $this->controller . '.php';
-		$model_folder = joinPath(App::$config['app_relative_path'], $this->options['model_folder'], '/');
+		$model_folder = joinPath(App::$config['app_folder'], $this->options['model_folder'], '/');
 		$model_name = '';
 	
 		if(!file_exists($model_file)) {
@@ -148,13 +144,17 @@ class Template {
 	/**
 	 * Finds all the CSS and JS files that must be included in this page.
 	 */
-	function _findResources($template_file) {
-		
+	function findResources($template_file) {
+		// Common CSS / JS files
+		if(file_exists(joinPath(App::$config['app_folder'], $this->js_folder, "common.js"))) $this->addResource("common.js",  'js');
+		if(file_exists(joinPath(App::$config['app_folder'], $this->css_folder, "common.css"))) $this->addResource("common.css",  'css');
+
+		// Template specific css/js
 		$css_file = preg_replace('/\.php$/','.css',$template_file);
 		$js_file  = preg_replace('/\.php$/','.js', $template_file);
 		
-		if(file_exists(joinPath(App::$config['app_relative_path'], $this->css_folder, $css_file))) $this->addResource($css_file, 'css');
-		if(file_exists(joinPath(App::$config['app_relative_path'], $this->js_folder, $js_file))) $this->addResource($js_file,  'js');
+		if(file_exists(joinPath(App::$config['app_folder'], $this->css_folder, $css_file))) $this->addResource($css_file, 'css');
+		if(file_exists(joinPath(App::$config['app_folder'], $this->js_folder, $js_file))) $this->addResource($js_file,  'js');
 	}
 
 	/**

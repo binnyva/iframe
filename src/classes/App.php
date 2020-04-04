@@ -81,7 +81,7 @@ class App {
 		}
 		static::$config['app_assets_url'] = static::$config['app_url'];
 		if(file_exists(static::$config['app_folder'] . '/assets')) {
-			static::$config['app_assets_url'] = static::$config['app_url'] . '/assets';
+			static::$config['app_assets_url'] = static::$config['app_url'] . 'assets';
 		}
 
 		// Default Date and time formats.

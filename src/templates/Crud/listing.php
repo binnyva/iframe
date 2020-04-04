@@ -97,7 +97,7 @@ foreach($this->current_page_data as $row) {
 			print "<a href='" . getLink($this->urls['main'], array(
 						'select_row[]'	=> $id,
 						'action'		=> 'toggle_status',
-						'field_name'	=> $field_name), true) . "' title='".ucfirst($toggle_action)."' class='icon $status_class'>$state</a>";
+						'field_name'	=> $field_name), true) . "' title='".ucfirst($toggle_action)."' class='icon icon-$status_class'>$state</a>";
 		
 		// The sorter...
 		} elseif($f['value_type'] == 'sort') {
@@ -114,9 +114,9 @@ foreach($this->current_page_data as $row) {
 		print "</td>\n";
 	}
 	
-if($this->allow['edit']) { ?><td class="action"><a href="<?php echo getLink($this->urls['edit'], array('id'=>$id, 'action'=>'edit'), true);?>" class="icon edit">Edit</a></td><?php } ?>
+if($this->allow['edit']) { ?><td class="action"><a href="<?php echo getLink($this->urls['edit'], array('id'=>$id, 'action'=>'edit'), true);?>" class="icon icon-edit">Edit</a></td><?php } ?>
 
-<?php if($this->allow['delete']) { ?><td class="action"><a href="<?php echo getLink($this->urls['delete'], array('select_row[]'=>$id, 'action'=>'delete'), true);?>" title="Delete <?php echo i($row, 'name', 'row')?>" class="icon delete confirm">Delete</a></td><?php } ?>
+<?php if($this->allow['delete']) { ?><td class="action"><a href="<?php echo getLink($this->urls['delete'], array('select_row[]'=>$id, 'action'=>'delete'), true);?>" title="Delete <?php echo i($row, 'name', 'row')?>" class="icon icon-delete confirm">Delete</a></td><?php } ?>
 </tr>
 <?php }
 
@@ -130,15 +130,15 @@ if($this->current_page_data) {
 			$starting_point++; // - to make sure our rowspan = 2 is taken into account.
 			?><td colspan="2" nowrap="nowrap">
 	<ul class="actions-multiple vertical">
-	<?php if($this->allow['delete']) { ?><li><a href="javascript:submit('delete');" class="with-icon delete">Delete Selected</a></li><?php } ?>
-	<?php if($this->allow['status_change'] and !empty($this->status_field)) { ?><li><a href="javascript:submit('activate');" class="with-icon activate">Activate Selected</a></li>
-	<li><a href="javascript:submit('deactivate');" class="with-icon deactivate">Deactivate Selected</a></li><?php } ?>
+	<?php if($this->allow['delete']) { ?><li><a href="javascript:submit('delete');" class="with-icon icon-delete">Delete Selected</a></li><?php } ?>
+	<?php if($this->allow['status_change'] and !empty($this->status_field)) { ?><li><a href="javascript:submit('activate');" class="with-icon icon-activate">Activate Selected</a></li>
+	<li><a href="javascript:submit('deactivate');" class="with-icon icon-deactivate">Deactivate Selected</a></li><?php } ?>
 	<?php echo $this->code['multi_select_choice']; ?>
 	</ul></td>
 	<?php } else print "<td>&nbsp;</td>";
 		
 		for($i=$starting_point; $i<=count($this->listing_fields); $i++) {
-			if($sort_field and $sort_field == $i) print "<td><a href=\"javascript:submit('sort');\" class='with-icon save'>Sort</a></td>";
+			if($sort_field and $sort_field == $i) print "<td><a href=\"javascript:submit('sort');\" class='with-icon icon-save'>Sort</a></td>";
 			else print "<td>&nbsp;</td>";
 		}
 		

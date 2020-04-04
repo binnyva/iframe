@@ -1,5 +1,6 @@
 <?php
 namespace iframe\Development;
+use iframe\DB\Sql;
 
 /**
  * Logging Class. This can be used to log debug message to an external text file. By default, the text file is [Project Folder]/Logs/Development.log file.

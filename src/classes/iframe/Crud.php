@@ -2,6 +2,7 @@
 namespace iframe\iframe;
 use iframe\App;
 use iframe\HTML\HTML;
+use iframe\DB\SqlPager;
 
 $html = new HTML;
  
@@ -45,8 +46,8 @@ class Crud {
 		'searching'			=> true,	// Show the search form.
 		'status_change'		=> true,	// Allow the status changes. If false, the single click status toggle will be disable, as will the bulk status change thingy.
 		'header'			=> true,	// Show header in the listing.
-		'save_and_edit_form_button'	=> true,	//Shows the 'Save and Continue Editing' button in the edit form.
-		'save_and_new_form_button'	=> true,	//Shows the 'Save and Show New Form' button in the edit form.
+		'save_and_edit_form_button'	=> false,	//Shows the 'Save and Continue Editing' button in the edit form.
+		'save_and_new_form_button'	=> false,	//Shows the 'Save and Show New Form' button in the edit form.
 		
 		'add'				=> true,	// Allow the user to add new rows.
 		'delete'			=> true,	// Lets the user delete stuff.
@@ -927,12 +928,12 @@ class Crud {
 		if($this->action == 'edit' or $this->action == 'add') {
 			$this->_addResource('form_functions.js');
 			$this->_addResource('../library/validation.js');
+
 		} elseif($this->action == 'add_save' or $this->action == 'edit_save') {
 			$this->_addResource('list_functions.js');
 			$this->_addResource('form_functions.js');
 			$this->_addResource('../library/validation.js');
-		}
-		else {
+		} else {
 			$this->_addResource('list_functions.js');
 		}
 		
@@ -1102,11 +1103,17 @@ class Crud {
 			require(__DIR__ . '/../../templates/Crud/listing_csv.php');
 
 		} else {
-			showTop($this->title);
+			$template = new Template;
+			$template->findResources($template->page);
+			$css_includes = implode($template->css_includes, "\n");
+			$js_includes = implode($template->js_includes, "\n");
+
+			require(__DIR__ . '/../../templates/layout/head.php');
+			require(__DIR__ . '/../../templates/layout/begin.php');
 			print $this->code['top'];
 			$this->printAction();
 			print $this->code['bottom'];
-			showEnd();
+			require(__DIR__ . '/../../templates/layout/end.php');
 		}
 	}
 	
@@ -1140,6 +1147,7 @@ class Crud {
 				$use_exact_path = true;
 			}
 		}
+
 		App::$template->addResource($file, $type, $use_exact_path);
 	}
 	
