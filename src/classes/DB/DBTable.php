@@ -150,8 +150,7 @@ class DBTable {
 				}
 			}
 			
-			$this->query = "INSERT INTO `{$this->table_name}` (`" . implode('`,`', $field_names) . '`) '
-					. ' VALUES (' .implode(",", $field_values) . ')';
+			$this->query = "INSERT INTO `{$this->table_name}` (`" . implode('`,`', $field_names) . '`) VALUES (' .implode(",", $field_values) . ')'; // '"
 
 			$this->_execQuery('exec', $reset_fields);
 			$return_value = $sql->fetchInsertId();
@@ -172,7 +171,7 @@ class DBTable {
 	function delete() {
 		global $sql;
 
-		$this->query = "DELETE FROM `{$this->table_name}` ";
+		$this->query = "DELETE FROM `{$this->table_name}` "; // " - This is to fix the syntax highlight issue in VSCode
 		$ids = $this->_getArguments(func_get_args());
 		
 		if(count($ids)) {
@@ -269,7 +268,7 @@ class DBTable {
 	 *			$User->where("name='Binny'","age=23")->get();
 	 */
 	function where() {
-		global $sql;
+		$sql = \iframe\App::$db;
 		$conditions = $this->_getArguments(func_get_args()); // Don't call _addTableName for this - it may mess things up
 		
 		foreach($conditions as $key => $cond) {
@@ -365,7 +364,7 @@ class DBTable {
 	
 	/// The SQL is executed only here.
 	private function _execQuery($return_type, $reset_fields = true) {
-		global $sql;
+		$sql = \iframe\App::$db;
 		$result = array();
 
 		if(DBTable::$mode == 't') { //Just testing, fools!
@@ -420,7 +419,7 @@ class DBTable {
 	}
 	
 	private function _escape($string) {
-		global $sql;
+		$sql = \iframe\App::$db;
 		return "'" . $sql->escape($string) . "'";
 	}
 }

@@ -106,7 +106,7 @@ class App {
 		// Plugin System
 		$i_plugin = false;
 		if(file_exists(joinPath(static::$config['app_folder'],'plugins'))) {
-			$i_plugin = new Plugin(joinPath(static::$config['app_folder'],'plugins'));
+			$i_plugin = new iframe\Plugin(joinPath(static::$config['app_folder'],'plugins'));
 
 			$i_plugin->callHook('init');
 		}
