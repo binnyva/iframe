@@ -99,7 +99,7 @@ class App {
 		// dump(static::$config); exit;
 
 		$this->registerGlobals();
-		// $this->setupAutoIncludes();
+		$this->setupAutoIncludes();
 		$this->initDevHelpers();
 		$this->includeAppFiles();
 
@@ -164,13 +164,14 @@ class App {
 		}
 	}
 
-	// :TODO: Not working.
+	// Auto include models/ files on 'new ModelName'.
 	private function setupAutoIncludes()
 	{
-		// Register Models folder if it exist
-		if(file_exists(joinPath(static::$config['app_folder'] , 'models'))) set_include_path(get_include_path() . PATH_SEPARATOR .  joinPath(static::$config['app_folder'] , 'models'));
 		spl_autoload_register(function ($class_name) {
-			include_once $class_name . '.php';
+			$class_file = joinPath(static::$config['app_folder'] , 'models', $class_name . ".php");
+			if(file_exists($class_file)) {
+				include_once $class_file;
+			}
 		});
 	}
 

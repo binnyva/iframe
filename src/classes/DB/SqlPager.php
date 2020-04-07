@@ -84,13 +84,12 @@ class SqlPager {
 
 		if(isset($options['total_items'])) $this->total_items = $options['total_items'];
 		
-		global $sql;
 		if($this->total_items) { // If application is throwing a out of memory error, just assign total items already.
 			$this->total_pages = ceil($this->total_items / $this->items_per_page);
 		} else {
-			$total_items_sql = $sql->getSql($this->query);
+			$total_items_sql = \iframe\App::$db->getSql($this->query);
 			if($total_items_sql) {
-				$this->total_items = $sql->fetchNumRows($total_items_sql);
+				$this->total_items = \iframe\App::$db->fetchNumRows($total_items_sql);
 				$this->total_pages = ceil($this->total_items / $this->items_per_page);
 			}
 		}
@@ -101,8 +100,7 @@ class SqlPager {
 	 * Return : The SQL resource of the pager.
 	 */
 	function getSql() {
-		global $sql;
-		$this->_sql_resource = $sql->getSql($this->_pager_query);
+		$this->_sql_resource = \iframe\App::$db->getSql($this->_pager_query);
 		
 		return $this->_sql_resource;
 	}
@@ -112,8 +110,7 @@ class SqlPager {
 	 * Returns : All the items for one page in a list.
 	 */
 	function getPage() {
-		global $sql;
-		return $sql->getAll($this->_pager_query);
+		return \iframe\App::$db->getAll($this->_pager_query);
 	}
 
 	//////////////////////////////////// Functions that print ///////////////////////////////////////

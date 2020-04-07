@@ -186,9 +186,16 @@ class Template {
 
 		if($use_exact_path) $link = $file;
 		elseif(file_exists(joinPath(App::$config['app_folder'], $file))) {
-			$link = joinPath(App::$config['app_url'], $file);	
+			$link = joinPath(App::$config['app_url'], $file);
+
+		} elseif(file_exists(joinPath(App::$config['app_folder'], $folder, $file))) {
+			$link = joinPath(App::$config['app_url'], $folder, $file);
+		} else {
+			$error = "<!-- Error: Can't find the resource file $file($type) -->";
+			if($type === "css") array_push($this->css_includes, $error);
+			if($type === "js") array_push($this->js_includes, $error);
+			return;
 		}
-		else $link = joinPath(App::$config['app_url'], $folder, $file);
 
 		if($type=='css' or $type=='stylesheet' or $type=='style' or $type=='stylesheets') {
 			$current_include = '<link href="' . $link . '" type="text/css" rel="stylesheet" />';

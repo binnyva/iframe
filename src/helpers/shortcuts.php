@@ -151,8 +151,9 @@ function dump() {
 }
 
 function iapp($obj = false) {
-	if($obj === 'db') return iframe\App::$db;
+	if($obj === 'db' or $obj == "sql") return iframe\App::$db;
 	elseif($obj === 'template') return iframe\App::$template;
+	elseif($obj === 'config') return iframe\App::$config;
 
 	return false;
 }
