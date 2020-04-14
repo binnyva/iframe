@@ -282,8 +282,8 @@ class Template {
  		}
 
 		if($use_layout and $this->options['insert_layout']) $this->printLayout($variable_array);
-		else {
-			$title = ($this->title) ? $this->title : App::$config['app_title'];
+		else { // Don't use a layout.
+			$title = ($this->title) ? $this->title : App::$config['app_name'];
 			$app_config = App::$config;
 			$includes = implode($this->includes,"\n");
 			$css_includes = implode($this->css_includes,"\n");

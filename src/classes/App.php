@@ -5,6 +5,7 @@ class App {
 	public static $config;
 	public static $db;
 	public static $template;
+	public static $plugin;
 
 	function __construct($options = [])
 	{
@@ -104,11 +105,11 @@ class App {
 		$this->includeAppFiles();
 
 		// Plugin System
-		$i_plugin = false;
+		static::$plugin = false;
 		if(file_exists(joinPath(static::$config['app_folder'],'plugins'))) {
-			$i_plugin = new iframe\Plugin(joinPath(static::$config['app_folder'],'plugins'));
+			static::$plugin = new iframe\Plugin(joinPath(static::$config['app_folder'],'plugins'));
 
-			$i_plugin->callHook('init');
+			static::$plugin->callHook('init');
 		}
 	}
 
@@ -341,7 +342,7 @@ class App {
 	/**
 	 * Shows the final message - redirects to a new page with the message in the URL
 	 */
-	public function showMessage($message, $url='', $status="success",$extra_data=array(), $use_existing_params=true, $ajax = false) {
+	public static function showMessage($message, $url='', $status="success",$extra_data=array(), $use_existing_params=true, $ajax = false) {
 		$config = static::$config;
 		if($config['server_host'] == 'cli') {
 			print $message . "\n";
@@ -383,8 +384,8 @@ class App {
 		exit;
 	}
 	/// Shortcut for showMessage when using ajax.
-	public function showAjaxMessage($message, $type='success') {
-		$this->showMessage($message,'',$type,array(),true,true);
+	public static function showAjaxMessage($message, $type='success') {
+		static::showMessage($message,'',$type,array(),true,true);
 	}
 
 	/**

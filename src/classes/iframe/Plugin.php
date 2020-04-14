@@ -7,7 +7,7 @@ class Plugin {
 
 	private $available_hooks = array(
 	// Hook Name	Called at...
-		'init',		// At the very start. At the end of config.php
+		'init',		// At the very start. At the end of App::bootstrap
 		'end',		// At the end - at the end of the render() function.
 	);
 
