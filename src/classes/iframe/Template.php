@@ -291,6 +291,6 @@ class Template {
 
 			include($this->template);
 		}
-		if(isset($GLOBALS['i_plugin'])) $GLOBALS['i_plugin']->callHook('end');
+		App::$plugin->callHook('end');
 	}
 }

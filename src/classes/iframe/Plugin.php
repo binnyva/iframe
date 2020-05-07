@@ -12,6 +12,8 @@ class Plugin {
 	);
 
 	public function __construct($plugin_folder) {
+		if($plugin_folder == false) return false;
+		
 		$plugins = ls("*",$plugin_folder,false,array('return_folders'));
 		foreach ($plugins as $current_plugin_folder) {
 			if(file_exists(joinPath($plugin_folder, $current_plugin_folder, "hooks.php"))) {

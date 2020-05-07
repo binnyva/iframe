@@ -78,7 +78,7 @@ class App {
 
 		// Get the full URL of the website.
 		if(!isset(static::$config['app_url']) and isset($_SERVER['HTTP_HOST'])) {
-			static::$config['app_url']	= "http://" . $_SERVER['HTTP_HOST'] . static::$config['app_absolute_path'];
+			static::$config['app_url']	= $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST'] . static::$config['app_absolute_path'];
 		}
 		static::$config['app_assets_url'] = static::$config['app_url'];
 		if(file_exists(static::$config['app_folder'] . '/assets')) {
@@ -93,7 +93,7 @@ class App {
 		static::$config['time_format_php']	= static::phpDateFormat(static::$config['time_format']);
 
 		static::$config['iframe_url'] = ''; // :TODO: :DEPRICATED:
-		if(!static::$config['server_online']) static::$config['iframe_url'] = "http://" . static::$config['server_host'] . '/iframe/';
+		if(!static::$config['server_online']) static::$config['iframe_url'] = $_SERVER['REQUEST_SCHEME'] . "://" . static::$config['server_host'] . '/iframe/';
 
 		static::$config['iframe_backward_compatible'] = true; // :TODO:
 
@@ -105,11 +105,12 @@ class App {
 		$this->includeAppFiles();
 
 		// Plugin System
-		static::$plugin = false;
 		if(file_exists(joinPath(static::$config['app_folder'],'plugins'))) {
 			static::$plugin = new iframe\Plugin(joinPath(static::$config['app_folder'],'plugins'));
 
 			static::$plugin->callHook('init');
+		} else {
+			static::$plugin = new iframe\Plugin(false);
 		}
 	}
 
@@ -374,7 +375,7 @@ class App {
 				return;
 			}
 		
-			if(strpos($url, 'http://') === false) {
+			if(strpos($url, $_SERVER['REQUEST_SCHEME'] . '://') === false) {
 				$url = joinPath($config['app_url'], $url);
 			}
 			
