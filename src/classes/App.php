@@ -80,7 +80,9 @@ class App {
 		if(!isset(static::$config['app_url']) and isset($_SERVER['HTTP_HOST'])) {
 			static::$config['app_url']	= $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST'] . static::$config['app_absolute_path'];
 		}
-		static::$config['app_assets_url'] = static::$config['app_url'];
+		if(isset(static::$config['app_url'])) {
+			static::$config['app_assets_url'] = static::$config['app_url'];
+		}
 		if(file_exists(static::$config['app_folder'] . '/assets')) {
 			static::$config['app_assets_url'] = static::$config['app_url'] . 'assets';
 		}
@@ -93,7 +95,9 @@ class App {
 		static::$config['time_format_php']	= static::phpDateFormat(static::$config['time_format']);
 
 		static::$config['iframe_url'] = ''; // :TODO: :DEPRICATED:
-		if(!static::$config['server_online']) static::$config['iframe_url'] = $_SERVER['REQUEST_SCHEME'] . "://" . static::$config['server_host'] . '/iframe/';
+		if(!static::$config['server_online'] and isset($_SERVER['REQUEST_SCHEME'])) {
+			static::$config['iframe_url'] = $_SERVER['REQUEST_SCHEME'] . "://" . static::$config['server_host'] . '/iframe/';
+		}
 
 		static::$config['iframe_backward_compatible'] = true; // :TODO:
 

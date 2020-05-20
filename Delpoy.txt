@@ -1,7 +1,0 @@
-Deploying the package.
-
-- Bump version number in README.md
-- Bump version number in composer.json
-- Commit everything
-- Create a new tag of the repo - with the name as the version number. 
-    git tag -a "v2.0.1" -m "Minor version release"

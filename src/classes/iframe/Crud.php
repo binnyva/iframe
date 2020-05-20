@@ -287,7 +287,6 @@ class Crud {
 		$this->addField($field, $name, 'enum', [], $values);
 	}
 
-	
 	/**
 	 * Add a many to many relation field.
 	 * Example: (Fairly complicated...)
@@ -935,22 +934,7 @@ class Crud {
 			$this->_addResource('../library/validation.js');
 		} else {
 			$this->_addResource('list_functions.js');
-		}
-		
-		foreach($this->form_fields as $field_name) {
-			$field_info = $this->fields[$field_name];
-			extract($field_info);
-			if(($type == 'datetime' or $type == 'date') and !isset($done[$type])
-					and ($this->action == 'edit' or $this->action == 'add' or $this->action == 'add_save' or $this->action == 'edit_save')) {
-				$this->_addResource(joinPath($this->urls['js_folder'], "jscalendar/calendar-blue.css"),	"css", true);
-				$this->_addResource("jscalendar/calendar.js",		"js");
-				$this->_addResource("jscalendar/calendar-en.js",	"js");
-				$this->_addResource("jscalendar/calendar-setup.js", "js");
-			}
-			
-			$done[$type] = true; // To make sure that the includes are not inserted twice.
-		}
-		
+		}		
 	}
 	
 	/// Prints the listing table and content. Creates the content - and then includes the template file.

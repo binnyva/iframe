@@ -30,7 +30,7 @@ class DBTable {
 	 * Return : $query - The created Query
 	 */
 	function createQuery() {
-		$query = "SELECT {$this->select} FROM {$this->table_name}";
+		$query = "SELECT {$this->select} FROM `{$this->table_name}`";
 		
 		if($this->joins) {
 			foreach($this->joins as $join) {

@@ -174,5 +174,5 @@ foreach($save_current_state as $state_name) {
 </form><br />
 
 <?php if($this->allow['add']) { ?>
-<a href="<?php echo getLink($this->urls['add'], array('action'=>'add'), true)?>" class="with-icon add">Add New <?php echo $this->title?></a><br />
+<a href="<?php echo getLink($this->urls['add'], array('action'=>'add'), true)?>" class="with-icon icon-add">Add New <?php echo $this->title?></a><br />
 <?php } ?>
