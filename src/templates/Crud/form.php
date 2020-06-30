@@ -40,12 +40,12 @@ foreach($this->form_fields as $field_name) {
 	
 	// Date Field.
 	} elseif($field_type == 'datetime' or $field_type == 'date') {
-		if($field_type == 'datetime') $js_date_format = \iframe\App::$config['time_format'];
-		else $js_date_format = \iframe\App::$config['date_format'];
+		if($field_type == 'datetime') $format = "Y-m-d\TH:i";
+		else $format = "Y-m-d";
 		
-		if($value and $value != '0000-00-00 00:00:00' and $value != '0000-00-00') $value = date(phpDateFormat($js_date_format), strtotime($value));
-		elseif($this->action == 'add' and $field == 'added_on') $value = date(phpDateFormat($js_date_format)); // Its the good old added_on field. If we are creating a new row, put the current time there.
-		elseif($this->action == 'edit' and ($field == 'edited_on' or $field == 'updated_on')) $value = date(phpDateFormat($js_date_format)); // Same for edited_on field.
+		if($value and $value != '0000-00-00 00:00:00' and $value != '0000-00-00') $value = date($format, strtotime($value));
+		elseif($this->action == 'add' and $field == 'added_on') $value = date($format); // Its the good old added_on field. If we are creating a new row, put the current time there.
+		elseif($this->action == 'edit' and ($field == 'edited_on' or $field == 'updated_on')) $value = date($format); // Same for edited_on field.
 		else $value = '';
 		$value = preg_replace('/<.+?>[^>]+>/','', $value); // Remove the tags. Things like <sup>th</sup>
 		
@@ -62,6 +62,8 @@ foreach($this->form_fields as $field_name) {
 	} else {
 		if($field_type == 'checkbox' or $field_type == 'radio' or $field_type == 'textarea') $attributes = array();
 		else $attributes = array('class'=>'text-long');
+
+		if($field_type == 'checkbox') $attributes['label_first'] = true;
 		
 		if($data and !$value) $value = $data;
 		if(is_array($value)) $value = i($value, 'data', '');
