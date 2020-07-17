@@ -152,7 +152,7 @@ class Template {
 		// Template specific css/js
 		$css_file = preg_replace('/\.php$/','.css',$template_file);
 		$js_file  = preg_replace('/\.php$/','.js', $template_file);
-		
+
 		if(file_exists(joinPath(App::$config['app_folder'], $this->css_folder, $css_file))) $this->addResource($css_file, 'css');
 		if(file_exists(joinPath(App::$config['app_folder'], $this->js_folder, $js_file))) $this->addResource($js_file,  'js');
 	}
@@ -235,9 +235,9 @@ class Template {
 		}
 
 		$title = ($this->title) ? $this->title : App::$config['app_name'];
-		$includes = implode($this->includes,"\n");
-		$css_includes = implode($this->css_includes,"\n");
-		$js_includes = implode($this->js_includes,"\n");
+		$includes = implode("\n",$this->includes);
+		$css_includes = implode("\n",$this->css_includes);
+		$js_includes = implode("\n",$this->js_includes);
 
 		// If the App does have a layout file.
 		if(file_exists(joinPath(App::$config['app_folder'], $this->options['layout_file']))) {
@@ -285,9 +285,9 @@ class Template {
 		else { // Don't use a layout.
 			$title = ($this->title) ? $this->title : App::$config['app_name'];
 			$app_config = App::$config;
-			$includes = implode($this->includes,"\n");
-			$css_includes = implode($this->css_includes,"\n");
-			$js_includes = implode($this->js_includes,"\n");
+			$includes = implode("\n",$this->includes);
+			$css_includes = implode("\n",$this->css_includes);
+			$js_includes = implode("\n",$this->js_includes);
 
 			include($this->template);
 		}

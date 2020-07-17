@@ -1089,8 +1089,8 @@ class Crud {
 		} else {
 			$template = new Template;
 			$template->findResources($template->page);
-			$css_includes = implode($template->css_includes, "\n");
-			$js_includes = implode($template->js_includes, "\n");
+			$css_includes = implode("\n", $template->css_includes);
+			$js_includes = implode("\n", $template->js_includes);
 
 			require(__DIR__ . '/../../templates/layout/head.php');
 			require(__DIR__ . '/../../templates/layout/begin.php');
