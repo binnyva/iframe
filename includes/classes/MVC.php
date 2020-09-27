@@ -227,9 +227,9 @@ class MVC {
 		if($variable_array) extract($variable_array);
 
 		$title = ($this->title) ? $this->title : $config['site_title'];
-		$includes = implode($this->includes,"\n");
-		$css_includes = implode($this->css_includes,"\n");
-		$js_includes = implode($this->js_includes,"\n");
+		$includes = implode("\n",$this->includes);
+		$css_includes = implode("\n",$this->css_includes);
+		$js_includes = implode("\n",$this->js_includes);
 
 		// If the App does have a layout file.
 		if(file_exists(joinPath($config['site_folder'], $this->options['layout_file']))) {
@@ -270,9 +270,9 @@ class MVC {
 		if($use_layout and $this->options['insert_layout']) $this->printLayout($variable_array);
 		else {
 			$title = ($this->title) ? $this->title : $config['site_title'];
-			$includes = implode($this->includes,"\n");
-			$css_includes = implode($this->css_includes,"\n");
-			$js_includes = implode($this->js_includes,"\n");
+			$includes = implode("\n",$this->includes);
+			$css_includes = implode("\n",$this->css_includes);
+			$js_includes = implode("\n",$this->js_includes);
 
 			include($this->template);
 		}
