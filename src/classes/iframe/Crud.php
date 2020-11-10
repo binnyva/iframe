@@ -2,7 +2,6 @@
 namespace iframe\iframe;
 use iframe\App;
 use iframe\HTML\HTML;
-use iframe\DB\SqlPager;
 
 $html = new HTML;
  
@@ -941,7 +940,7 @@ class Crud {
 	function printListing() {
 		global $QUERY, $PARAM;
 		$this->setListingQuery();
-		$this->pager = new SqlPager($this->listing_query, $this->items_per_page);
+		$this->pager = new \iframe\DB\SqlPager($this->listing_query, $this->items_per_page);
 		
 		// Create the URL for the pager
 		$save_params = [];
@@ -1077,9 +1076,9 @@ class Crud {
 	/// Shows everything - not often called.
 	function render($format = 'html') {
 		if($format == 'csv') {
-			global $QUERY, $PARAM;
+			global $PARAM;
 			$this->setListingQuery();
-			$this->pager = new SqlPager($this->listing_query, 1000000); // Disable paging by giving a very large number.
+			$this->pager = new iframe\iframe\SqlPager($this->listing_query, 1000000); // Disable paging by giving a very large number.
 			
 			$this->current_page_data = $this->pager->getPage();
 			$this->makeListingDisplayData();
@@ -1103,8 +1102,7 @@ class Crud {
 	
 	////////////////////////////////////////////// Library Stuff //////////////////////////////
 	private function execQuery($query, $type='all') {
-		global $sql;
-		return $sql->query($query, $type);
+		return iapp('db')->query($query, $type);
 	}
 	
 	private function _getArguments($id_list) {

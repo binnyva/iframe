@@ -68,8 +68,10 @@ function keyFormat($data, $primary_field='id') {
 		if(is_array($primary_field) and count($primary_field) == 2) {
 			if(is_object($row) and isset($row->{$primary_field[0]})) $return[$row->{$primary_field[0]}] = $row->{$primary_field[1]};
 			elseif(isset($row[$primary_field[0]])) $return[$row[$primary_field[0]]] = $row[$primary_field[1]];
+		} else {
+			if(is_object($row) and isset($row->{$primary_field})) $return[$row->{$primary_field}] = $row;
+			elseif(isset($row[$primary_field])) $return[$row[$primary_field]] = $row;
 		}
-		else $return[$row[$primary_field]] = $row;
 	}
 	
 	return $return;

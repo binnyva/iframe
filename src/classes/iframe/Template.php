@@ -173,7 +173,7 @@ class Template {
 	 */
 	function addResource($file, $type="", $use_exact_path=false) {
 		if(!$file) return;
-		
+
 		if(preg_match('#https?\://#', $file)) $use_exact_path = true; // If a full absolute url is given, use exact path.
 		
 		if(!$type) {
