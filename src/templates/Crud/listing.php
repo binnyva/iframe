@@ -155,7 +155,7 @@ if($this->current_page_data) {
 <input type='hidden' name='action' id='list-form-action' value='list' />
 <?php
 if($this->pager) {
-	$this->pager->link_template = '<a href="%%PAGE_LINK%%" class="page-%%CLASS%%"><img alt="%%TEXT%%" src="images/icons/arrows/%%CLASS%%.png" /></a>';
+	$this->pager->link_template = "<a href='%%PAGE_LINK%%' class='page-%%CLASS%%'><img alt='%%TEXT%%' src='" . \iframe\App::$config['app_assets_url'] . "/images/silk_icons/%%CLASS%%.png' /></a>";
 	if($this->pager->total_pages > 1) {
 		print $this->pager->getLink("first") . $this->pager->getLink("back");
 		$this->pager->printPager();

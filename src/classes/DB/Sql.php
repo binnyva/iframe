@@ -312,6 +312,8 @@ class Sql {
 		foreach($values as $field_value) {
 			if ($this->isKeyword($field_value)) { //If the is values has a special meaning - like NOW() give it special consideration
 				$insert_values[] = $field_value;
+			} else if(is_null($field_value)) {
+				$insert_values[] = "NULL";
 			} else {
 				$insert_values[] = "'" . $this->escape($field_value) . "'";
 			}
@@ -517,14 +519,16 @@ class Sql {
 				$arr[$key] = $this->_stripSlashes($value);// :RECURSION:
 			}
 		} else {
-			$arr = stripslashes($arr);
+			if(is_string($arr)) $arr = stripslashes($arr);
 		}
 		return $arr;
 	}
 	
 	/*****************************************************************************/
 	function escape($string) {
-		if(self::$env == 'x') return mysql_real_escape_string($string);;
+		if(!is_string($string)) return $string;
+
+		if(self::$env == 'x') return mysql_real_escape_string($string);
 		
 		return mysqli_real_escape_string($this->_db_connection, $string);
 	}

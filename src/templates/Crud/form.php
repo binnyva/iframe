@@ -44,8 +44,8 @@ foreach($this->form_fields as $field_name) {
 		else $format = "Y-m-d";
 		
 		if($value and $value != '0000-00-00 00:00:00' and $value != '0000-00-00') $value = date($format, strtotime($value));
-		elseif($this->action == 'add' and $field == 'added_on') $value = date($format); // Its the good old added_on field. If we are creating a new row, put the current time there.
-		elseif($this->action == 'edit' and ($field == 'edited_on' or $field == 'updated_on')) $value = date($format); // Same for edited_on field.
+		elseif($this->action == 'add' and in_array($field, $this->default_field_names['added_timestamp'])) $value = date($format); // Its the good old added_on field. If we are creating a new row, put the current time there.
+		elseif($this->action == 'edit' and in_array($field, $this->default_field_names['edited_timestamp'])) $value = date($format); // Same for edited_on field.
 		else $value = '';
 		$value = preg_replace('/<.+?>[^>]+>/','', $value); // Remove the tags. Things like <sup>th</sup>
 		
@@ -94,7 +94,7 @@ print "<div class='action-area'>";
 if(($QUERY['action'] == 'edit' or $QUERY['action'] == 'edit_save') and $this->allow['delete'])
 	print "<a href='" . getLink($this->urls['main'], array('select_row[]'=>i($QUERY, 'id'), 'action'=>'delete')) . "' title='Delete this row' class='btn btn-sm btn-danger delete-current-item confirm float-right'>Delete</a>";
 
-print "<input type='submit' id='action-save' name='submit' class='action-submit btn btn-success' value='Save' />";
+$html->buildInput("action-save", "&nbsp;", "submit", 'Save', ['name' => 'submit', 'class'=>'action-submit btn btn-success', 'no_br' => true]);
 if($this->allow['save_and_edit_form_button']) print " &nbsp; <input type='submit' id='action-save-edit' name='submit' class='action-submit btn btn-secondary' value='Save and Continue Editing' />";
 if($this->allow['save_and_new_form_button']) print " &nbsp; <input type='submit' id='action-save-new' name='submit' class='action-submit btn btn-light' value='Save and Show New Form' />";
 

@@ -75,6 +75,11 @@ class Crud {
 		'bit'				=> 'checkbox',
 		'file'				=> 'file',
 	);
+
+	private $default_field_names = [
+		'added_timestamp'	=> ['added_on', 'created_on', 'added_at', 'created_at'],
+		'edited_timestamp'	=> ['edited_on', 'updated_on', 'edited_at', 'updated_at'],
+	];
 	
 	public $success = '';				// A success message - if any.
 	public $error = '';					// Error message holder.
@@ -85,6 +90,8 @@ class Crud {
 		'before_content'	=> '',		// Show this before the content is shown
 		'multi_select_choice'	=> '',	// In the Delete, Activate, Deactivate part - below all the rows.
 	);
+
+	private $sql;
 	
 	///////////////////////////////////////// Configuration Function ////////////////////////////////////
 	function __construct($table, $title='', $primary_key='id', $guess=true) {
@@ -116,6 +123,8 @@ class Crud {
 	
 		$this->setPrimaryKey($primary_key);
 		$this->setUrl();
+
+		$this->sql = iapp('db');
 		
 		if($guess) $this->guess();
 	}
@@ -125,7 +134,7 @@ class Crud {
 		$all_fields_info = $this->execQuery("SHOW FIELDS IN {$this->table}", "all");
 		foreach($all_fields_info as $field_info) {
 			extract($field_info);
-			if(!$Field) continue;
+			if(!$Field) continue; // Uppercase 'Field' because result of extract()
 
 			$field_type = false;
 			$value_type = false;
@@ -188,7 +197,7 @@ class Crud {
 						if($Field == 'sort' or $Field == 'order' or $Field == 'sortorder' or $Field == 'sort_order' or $Field == 'sort_by') {
 							$field_type = 'input';
 							$value_type = 'sort';
-							$this->setSortField($Field);
+							$this->setSortField($field);
 						}
 						break;
 					case 'varchar':
@@ -196,8 +205,8 @@ class Crud {
 						if($length > 250) $field_type = 'textarea';
 						$validation['length<'] = $length;
 				}
-				
-				$this->addField($Field, $field_title, $data_type, $validation, $data, $field_type, $value_type);
+
+				$this->addField($Field, $field_title, $data_type, $validation, $data, $field_type, $value_type, ['default' => $Default]);
 			}
 		}
 		// Some pre render stuff.
@@ -257,6 +266,7 @@ class Crud {
 			'field_type' => $field_type,
 			'value_type' => $value_type,
 			'validation' => $validation,
+			'default'	 => $extra_info['default'],
 			'data'		 =>	$data,
 			'extra_info' => $extra_info,
 		);
@@ -482,7 +492,7 @@ class Crud {
 				$validation['extension'] = array('png','jpg','jpeg','gif','bmp');
 			}
 		
-		} elseif($data_type == 'datetime' and ($field == 'added_on' or $field == 'edited_on')) {
+		} elseif($data_type == 'datetime' and (in_array($field, $this->default_field_names['added_timestamp']) or in_array($field, $this->default_field_names['edited_timestamp']))) {
 			$field_type = 'hidden';
 			$value_type = 'now';
 		}
@@ -521,15 +531,16 @@ class Crud {
 	 * Example: $admin->add(array('username'=>'binnyva', 'name'=>'Binny'));
 	 */
 	function add($field_data) {
-		global $sql, $QUERY;
+		global $QUERY;
 		// Some fields require special handling...
 		$stripped_field_data = $this->preSaveChanges($field_data);
 
 		if($field_data) {
 			$this->success = 'Added a new ' . $this->title;
 			if(!empty($field_data['name'])) $this->success .= " called '$field_data[name]'";
-			
-			$insert_id = $sql->insert($this->table, $stripped_field_data);
+
+			// dump($stripped_field_data, $stripped_field_data['achieved_on']); // :TODO:
+			$insert_id = $this->sql->insert($this->table, $stripped_field_data);
 			$QUERY['id'] = $insert_id; // Slightly hacky. But needed for 'Save and Continue Editing' to work
 
 			$this->postSaveChanges($field_data, $insert_id);
@@ -544,13 +555,13 @@ class Crud {
 	 * Example: $admin->edit(5, array('username'=>'binnyva', 'name'=>'Binny'));
 	 */
 	function edit($primary_key_value, $field_data) {
-		global $sql, $QUERY;
+		global $QUERY;
 		$field_data = $this->preSaveChanges($field_data);
 		if($field_data) {
 			$this->success = 'Updated the ' . $this->title;
 			if(!empty($field_data['name'])) $this->success .= " called '$field_data[name]'";
 			
-			$sql->update($this->table, $field_data, "`{$this->primary_key}`=$primary_key_value");
+			$this->sql->update($this->table, $field_data, "`{$this->primary_key}`=$primary_key_value");
 
 			$this->postSaveChanges($field_data, $primary_key_value);
 			return true;
@@ -604,34 +615,37 @@ class Crud {
 				unset($field_data[$field_name]);
 				continue;
 			}
-			$value = i($field_data, $field_name);
+			$value = i($field_data, $field_name, $field_info['default']);
 
 			// Changing the value depending on the type.
 			switch($field_info['type']) {
 				case 'datetime':
-					if($field_name == 'added_on' and $field_info['field_type'] == 'hidden') {
+					if(in_array($field_name, $this->default_field_names['added_timestamp']) and $field_info['field_type'] == 'hidden') {
 						if($this->action == 'add_save') $value = date('Y-m-d H:i:s'); // Automatically stamp the added date/time in this field.
 						
-					} elseif($field_name == 'edited_on') {
-						if($this->action == 'edit_save') $value = date('Y-m-d H:i:s');
+					} elseif(in_array($field_name, $this->default_field_names['edited_timestamp'])) {
+						if($this->action == 'edit_save' or $this->action == 'add_save') $value = date('Y-m-d H:i:s');
+
 					} else {
-						$value = date('Y-m-d H:i:s', strtotime($value));
+						if($value) $value = date('Y-m-d H:i:s', strtotime($value));
+						else $value = $field_info['default'];
 					}
 					
 					break;
 				case 'date':
-					$value = date('Y-m-d', strtotime($value));
+					if($value) $value = date('Y-m-d', strtotime($value));
+					else $value = $field_info['default'];
 					break;
 				
 				// File uploads.
 				case 'file':
 					$value = '';
 					if(!empty($_FILES[$field_name]['name'])) {
-						global $config;
+						$config = App::$config;
 						$valid_extension = '';
 						if(isset($field_info['validation']['extension'])) $valid_extension = implode(',', $field_info['validation']['extension']);
 						
-						list($filename, $result) = upload($field_name, joinPath($config['site_folder'], $this->folder['uploads']), $valid_extension);
+						list($filename, $result) = upload($field_name, joinPath($config['app_folder'], $this->folder['uploads']), $valid_extension);
 						
 						if($result) return $this->validationError($field_name, $result);
 						else $value = $filename;
@@ -778,7 +792,7 @@ class Crud {
 	/// Process the data of the current page and convert it to a format that is usable in the Listing template.
 	function makeListingDisplayData() {
 		if(!$this->current_page_data) return;
-		global $config;
+		$config = App::$config;
 
 		$total_rows = count($this->current_page_data);
 		for($i=0; $i<$total_rows; $i++) {
@@ -799,11 +813,11 @@ class Crud {
 						break;
 					
 					case 'datetime':
-						if($value != '0000-00-00 00:00:00') $new_value = date($config['time_format_php'], strtotime($value));
+						if($value and $value != '0000-00-00 00:00:00') $new_value = date($config['time_format_php'], strtotime($value));
 						break;
 						
 					case 'date':
-						if($value != '0000-00-00 00:00:00') $new_value = date($config['date_format_php'], strtotime($value));
+						if($value and $value != '0000-00-00 00:00:00') $new_value = date($config['date_format_php'], strtotime($value));
 						break;
 					
 					case 'virtual': //Not actually a DB column.
@@ -981,7 +995,7 @@ class Crud {
 	
 	/// This function decides which action should be shown.
 	function printAction($action = '') {
-		global $QUERY, $sql;
+		global $QUERY;
 		if(!$action and !empty($_REQUEST['action'])) $action = $_REQUEST['action'];
 		
 		// Fixes a bug that happens when user presses Enter in the sort input box.
@@ -1034,7 +1048,7 @@ class Crud {
 				
 				if($sort_field) {
 					foreach($QUERY['sort_row_id'] as $i=>$row_id) {
-						$sql->update($this->table, array($sort_field=>$QUERY['sort_order'][$i]), "{$this->primary_key}=$row_id");
+						$this->sql->update($this->table, array($sort_field=>$QUERY['sort_order'][$i]), "{$this->primary_key}=$row_id");
 					}
 				}
 				$this->printListing();
