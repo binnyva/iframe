@@ -15,6 +15,7 @@ namespace iframe\HTML;
 class Calendar {
 	public $month;
 	public $year;
+	private $day = 1;
 	public $limit;
 	public $link_template = "?year=%YEAR%&amp;month=%MONTH%"; /// The template that will be used to create the link to each month page
 	
@@ -25,6 +26,10 @@ class Calendar {
 	private $_callback; /// The callback function that the user have to provide - this will be called for every day - from within the day's cell
 	private $_callback_cell_class_provider;
 	private $_month_days;
+
+	private $_before_week_cell;
+	private $_after_week_cell;
+
 	
 	/**
 	 * Constructor
@@ -78,6 +83,14 @@ class Calendar {
 	 */
 	function setDateField($field) {
 		$this->date_field = $field;
+	}
+
+	function setBeforeWeekCell($func) {
+		$this->_before_week_cell = $func;
+	}
+
+	function setAfterWeekCell($func) {
+		$this->_after_week_cell = $func;
 	}
 	
 	/**
@@ -140,7 +153,7 @@ class Calendar {
 	private function _each_day() {
 		static $flag = 0;
 		static $column = 1;
-		static $d = 1;
+		$d = $this->day;
 		
 		$start_day = date('w',mktime(0,0,0,$this->month,1,$this->year)) + 1;//Get the first day of this month - 0 (for Sunday) through 6 (for Saturday)
 		$curmonth = ($this->month>9) ? $this->month : '0'.$this->month;
@@ -183,6 +196,8 @@ class Calendar {
 		}
 		print "</td>\n";
 		$column++;
+
+		$this->day = $d;
 		
 		return $d;
 	}
@@ -241,20 +256,36 @@ class Calendar {
 		$this_month = date('F',mktime(0,0,0,$this->month,1,$this->year)) . ' ' . $this->year;
 		$next_month = date('F',mktime(0,0,0,$this->month+1,1,$this->year));
 		?>
-<tr><th><?php if($this->_withinLimit($this->year-1, $this->month)) { ?><a href="<?=$this->_monthLink($this->year-1, $this->month)?>">&lt;&lt; <?=$this->year-1?></a><?php } ?></th>
-<th><?php if($this->_withinLimit($this->year, $this->month-1)) { ?><a href="<?=$this->_monthLink($this->year, $this->month-1)?>">&lt; <?=$last_month?></a><?php } ?></th>
-<th colspan='3' style="text-align:center;"><?=$this_month?></th>
-<th style="text-align:right;"><?php if($this->_withinLimit($this->year, $this->month+1)) { ?><a href="<?=$this->_monthLink($this->year, $this->month+1)?>"><?=$next_month?> &gt;</a><?php } ?></th>
-<th style="text-align:right;"><?php if($this->_withinLimit($this->year+1, $this->month)) { ?><a href="<?=$this->_monthLink($this->year+1, $this->month)?>"><?=$this->year+1?> &gt;&gt;</a><?php } ?></th></tr>
-		
-		<?php
+<tr>
+	<?php if($this->_before_week_cell) { ?><th>&nbsp;</th><?php } /* Padding for extra before week column */ ?>
+	<th><?php if($this->_withinLimit($this->year-1, $this->month)) { ?>
+		<a href="<?=$this->_monthLink($this->year-1, $this->month)?>">&lt;&lt; <?=$this->year-1?></a>
+	<?php } ?></th>
+	<th><?php if($this->_withinLimit($this->year, $this->month-1)) { ?>
+		<a href="<?=$this->_monthLink($this->year, $this->month-1)?>">&lt; <?=$last_month?></a>
+	<?php } ?></th>
+	<th colspan='3' style="text-align:center;"><?=$this_month?></th>
+	<th style="text-align:right;"><?php if($this->_withinLimit($this->year, $this->month+1)) { ?>
+		<a href="<?=$this->_monthLink($this->year, $this->month+1)?>"><?=$next_month?> &gt;</a>
+	<?php } ?></th>
+	<th style="text-align:right;"><?php if($this->_withinLimit($this->year+1, $this->month)) { ?>
+		<a href="<?=$this->_monthLink($this->year+1, $this->month)?>"><?=$this->year+1?> &gt;&gt;</a>
+	<?php } ?></th>
+	<?php if($this->_after_week_cell) { ?><th>&nbsp;</th><?php } ?>
+</tr>
+
+	<?php
 	}
 
 	/**
 	 * Prints out the Weekday names that are at the top of the table.
 	 */
 	function printDayNames() {
-		print "<tr class='weekday-names'><td>Sun</td><td>Mon</td><td>Tue</td><td>Wed</td><td>Thu</td><td>Fri</td><td>Sat</td></tr>\n";
+		print "<tr class='weekday-names'>";
+		if($this->_before_week_cell) print "<td>&nbsp;</td>"; /* Padding for extra before week column */
+		print "<td>Sun</td><td>Mon</td><td>Tue</td><td>Wed</td><td>Thu</td><td>Fri</td><td>Sat</td>";
+		if($this->_after_week_cell) print "<td>&nbsp;</td>"; 
+		print "</tr>\n";
 	}
 	
 	/// Prints out the top of the table - calls printCalendarNavigationLinks() and printDayNames()
@@ -263,6 +294,21 @@ class Calendar {
 
 		$this->printCalendarNavigationLinks();
 		$this->printDayNames();
+	}
+
+	function weekDelimiter($type, $date) {
+		$func = $this->{"_" . $type . "_week_cell"};
+		if(!$func) return;
+
+		// Get the beginning of the week date(sunday of that week)
+		$date_str = strtotime($date);
+		if(date('w', $date_str) == 0) $sunday_date = $date;
+		else $sunday_date = date('Y-m-d', strtotime("last sunday", $date_str));
+
+		print "<td class='$type-week'>";
+		if(function_exists($func)) $func($sunday_date);
+		else print $func;
+		print "</td>";
 	}
 	
 	/**
@@ -274,9 +320,17 @@ class Calendar {
 		for($i=0; $i<=5; $i++) { //5 Rows in the calendar
 			$class = ($i%2) ? 'odd-row' : 'even-row';
 			print "<tr class='$class'>";
+
+			$date = date('Y-m-d',mktime(0,0,0,$this->month, $this->day, $this->year));
+
+			$this->weekDelimiter('before', $date);
+
 			for($j=0;$j<7;$j++) { //7 Columns
 				$d = $this->_each_day();
 			}
+
+			$this->weekDelimiter('after', $date);
+
 			print "</tr>\n";
 			if($d >= $this->_month_days[$this->month-1] + 1) break;
 		}

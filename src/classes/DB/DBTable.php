@@ -121,15 +121,24 @@ class DBTable {
 
 		if(!count($this->field)) return false;
 		$return_value = -1;
+		$types = '';
+		$values = [];
 		
 		if($this->primary_key_value) { //If we have the private key, it is an existing row - so do an update
 			$this->query = "UPDATE `{$this->table_name}` SET ";
 			$update_array = array();
 			foreach($this->field as $field_name => $field_value) {
 				if ($sql->isKeyword($field_value)) { //If the is values has a special meaning - like NOW() give it special consideration
-					$update_array[] = "`$field_name`=$field_value";
+					$update_array[] = "`$field_name` = $field_value";
+
 				} else {
-					$update_array[] = "`$field_name`=" . $this->_escape($field_value);
+					$update_array[] = "`$field_name` = ?";
+
+					if(is_float($field_value)) $types .= 'd';
+					elseif(is_int($field_value)) $types .= 'i';
+					else $types .= 's';
+
+					$values[] = $field_value;
 				}
 			}
 			$this->query .= implode(', ',$update_array);
@@ -137,8 +146,9 @@ class DBTable {
 			$this->where("`{$this->primary_key_field}`={$this->primary_key_value}");
 			$this->query .= ' WHERE ' . implode(' AND ',array_values($this->conditions));
 
- 			$this->_execQuery('exec', $reset_fields);
- 			$return_value = $sql->fetchAffectedRows();
+			// dump($this->query, $types, $values);exit;
+
+			$return_value = \iframe\App::$db->bindExec($this->query, $types, $values);
 
 		} else { //New row - do an insert
 			$field_names = array_keys($this->field);
@@ -146,14 +156,20 @@ class DBTable {
 
 			for($i=0; $i<count($field_values); $i++) {
 				if(!$sql->isKeyword($field_values[$i])) {//Quote the value if it is not a Function call
-					$field_values[$i] = $this->_escape($field_values[$i]);
+					if(is_float($field_values[$i])) $types .= 'd';
+					elseif(is_int($field_values[$i])) $types .= 'i';
+					else $types .= 's';
+
+					$values[] = $field_values[$i];
+					$field_values[$i] = '?';
 				}
 			}
 			
 			$this->query = "INSERT INTO `{$this->table_name}` (`" . implode('`,`', $field_names) . '`) VALUES (' .implode(",", $field_values) . ')'; // '"
+			
+			// dump($this->query, $types, $values);exit;
 
-			$this->_execQuery('exec', $reset_fields);
-			$return_value = $sql->fetchInsertId();
+			$return_value = \iframe\App::$db->bindExec($this->query, $types, $values);
 		}
 		if($reset_fields) $this->field = array(); //Reset the data after the save
 		
@@ -420,6 +436,8 @@ class DBTable {
 	
 	private function _escape($string) {
 		$sql = \iframe\App::$db;
+
+		if(!is_string($string)) return $string; // Null/Boolean handling
 		return "'" . $sql->escape($string) . "'";
 	}
 }

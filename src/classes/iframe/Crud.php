@@ -266,7 +266,7 @@ class Crud {
 			'field_type' => $field_type,
 			'value_type' => $value_type,
 			'validation' => $validation,
-			'default'	 => $extra_info['default'],
+			'default'	 => i($extra_info, 'default'),
 			'data'		 =>	$data,
 			'extra_info' => $extra_info,
 		);

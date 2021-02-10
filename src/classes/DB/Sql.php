@@ -2,6 +2,9 @@
 namespace iframe\DB;
 use iframe\App;
 
+// :TODO: Convert this is into mysqli class(https://www.php.net/manual/en/class.mysqli.php)
+// :TODO: Alternatively, use a Eloquent type existing library
+
 /**
  * 	Creates a Database abstration layer - using the most commonly used functions.
  * 		get*: functions require a query as the argument
@@ -403,6 +406,42 @@ class Sql {
 	}
 
 	/**
+	 * A wrapper function that will prepare the query, bind the given vaules and execute it.
+	 * Arguments :	$query - The SQL Query to be executed.
+	 *				$type - The type of values passed. Should be a string with each char corrosponding to each parameter type. Eg. If you are sending a string and a number, this should be 'si'
+	 *				Data that should be used in the query
+	 */
+	function bindExec() {
+		$args = func_get_args();
+		$qry = $args[0];
+		$types = $args[1];
+		$datas = array_slice($args, 2);
+		
+		//If there is only one argument and it is an array, set it as the data provider.
+		if(count($datas) == 1 and is_array($datas)) {
+			$datas = $datas[0];
+		}
+		
+		$stmt = mysqli_prepare($this->_db_connection, $qry);
+		$parameters = array_merge([$stmt, $types], $datas);
+		@call_user_func_array('mysqli_stmt_bind_param', $parameters);
+
+		if(!mysqli_stmt_execute($stmt)) {
+			$this->_error($qry . " : $types : " . implode(',', $datas));
+		}
+
+		if(preg_match('/^\s*insert\s/i',$qry))
+			$return = mysqli_stmt_insert_id($stmt);
+		else // Else return affected rows
+			$return = mysqli_stmt_affected_rows($stmt);
+		
+		mysqli_stmt_close($stmt);
+
+		return $return;
+	}
+
+	/**
+	 * :DEPRICATED:
 	 * To emulate the functioning of prepare and execute command - if we are on a PHP 5/MySQL 5 system, we should NOT use this
 	 * Arguments :	$query - The SQL Query to be executed.
 	 *				Data that should be used in the query
