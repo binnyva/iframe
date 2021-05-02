@@ -68,8 +68,6 @@ class Route {
 		$method = $_SERVER['REQUEST_METHOD'];
 		$route_found = false;
 
-		$route_found = false;
-
 		foreach ($this->actions as $route => $act) {
 			if($act['method'] and $act['method'] != $method) continue;
 			$vars = $this->_match_route($act['route']);
@@ -92,7 +90,15 @@ class Route {
 	 * For eg: If the action route is '/user/{user_id}/fetch/{content_name}' and the actual url is '/user/433/fetch/age', the returned array will be {'user_id': 433, 'content_name': 'age'}
 	 */
 	function _match_route($action_route, $route = '') {
-		if(!$route) $route = $GLOBALS['QUERY']['_url'];
+		if(!$route and isset($GLOBALS['QUERY']['_url'])) { // Coming Via .htaccess redirect
+			$route = $GLOBALS['QUERY']['_url'];
+		}
+		if(!$route) { // Coming with WEBSITE/index.php/route_goes_here
+			$route = preg_replace('/^.*index.php/', '', $_SERVER['REQUEST_URI']);
+		}
+		if(!$route) {
+			$route = $_SERVER['REQUEST_URI'];
+		}
 		$url_variables = array();
 
 		if(strpos($route, '?') !== false) $route = @reset(explode("?", $route));// If URL has parameters, ignore them

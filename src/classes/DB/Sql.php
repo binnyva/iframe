@@ -254,6 +254,8 @@ class Sql {
 				$field_value = $values[$fld];
 				if ($this->isKeyword($field_value)) { //If the is values has a special meaning - like NOW() give it special consideration
 					$insert_values[] = $field_value;
+				} else if(is_null($field_value)) {
+					$insert_values[] = "NULL";
 				} else {
 					$insert_values[] = "'$field_value'";
 				}
@@ -278,7 +280,9 @@ class Sql {
 	function updateFields($table,$fields,$values,$where) {
 		$update_query = "UPDATE `$table` SET ";
 		foreach($fields as $fld) {
-			if(isset($values[$fld])) $update_query .= $fld . "='" . $values[$fld] . "',";
+			if(isset($values[$fld])) {
+				$update_query .= $fld . "='" . $values[$fld] . "',";
+			}
 		}
 		$update_query = substr($update_query,0,-1);
 		
@@ -380,6 +384,8 @@ class Sql {
 		foreach($data as $field=>$value) {
 			if ($this->isKeyword($value)) { //If the is values has a special meaning - like NOW() give it special consideration
 				$update_fields[] = "`$field` = $value";
+			} else if(is_null($value)) {
+				$update_fields[] = "`$field` = NULL";
 			} else {
 				$update_fields[] = "`$field` = '" . $this->escape($value) . "'";
 			}

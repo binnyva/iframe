@@ -1,5 +1,5 @@
 # iFrame
-## 2.0.6
+## 2.0.7
 
 iFrame is a lightweight PHP framework.
 
