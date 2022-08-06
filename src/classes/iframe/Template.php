@@ -50,7 +50,6 @@ class Template {
 		//Remove the absolute site path while conserving the directory structure in the URL
 		$file_name = str_replace($_SERVER['DOCUMENT_ROOT'], '', $file_name);
 		
-		// :TODO: - This has some issues in Windows OS. App::$config['app_absolute_path'] - has a wierd \ or / at the end, messing up the regexp.
 		$escaped_path = preg_replace('/([\/\\\.\?\~\\=\_\-\,])/','\\\$1', App::$config['app_absolute_path']);
 		$file_name = preg_replace('/' . $escaped_path . '/', '', $file_name, 1); //Replace just 1 time
 		$file_name = preg_replace('/controllers\//', '', $file_name);//If we are following mvc architecture

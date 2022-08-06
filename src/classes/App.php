@@ -19,8 +19,10 @@ class App {
 
 	public function bootstrap($options)
 	{
+		$path_seperator = '/'; // Or DIRECTORY_SEPARATOR - but that was causing issues in windows.
+
 		// Iframe src folder. Absolute.
-		$iframe_folder = dirname(__DIR__) . DIRECTORY_SEPARATOR;
+		$iframe_folder = dirname(__DIR__) . $path_seperator;
 
 		// App Folder. Absolute
 		$full_self = $_SERVER['SCRIPT_FILENAME'];
@@ -53,10 +55,10 @@ class App {
 			$path = dirname(static::$config['PHP_SELF']);
 			//Go up until the correct path is found
 			while (strlen($path) > 2) {
-				if(file_exists($_SERVER["DOCUMENT_ROOT"] . $path . DIRECTORY_SEPARATOR . 'configuration.php')) break;
+				if(file_exists($_SERVER["DOCUMENT_ROOT"] . $path . $path_seperator . 'configuration.php')) break;
 				else $path = dirname($path);
 			}
-			static::$config['app_absolute_path'] = str_replace('//','/', $path . DIRECTORY_SEPARATOR);
+			static::$config['app_absolute_path'] = str_replace('//','/', $path . $path_seperator);
 		}
 		static::$config['current_page'] = str_replace(static::$config['app_absolute_path'], '/', static::$config['PHP_SELF']);
 
@@ -252,9 +254,11 @@ class App {
 		if(!$param_array)
 			$param_array = $_POST + $_GET; //Don't use $_REQUEST - it has cookie/session info in it.
 
-		if(!$ignore_magic_quote_setting and !get_magic_quotes_gpc()) return $param_array;//If Magic quotes is disabled, just return the data - it is not escaped.
+		if(function_exists('get_magic_quotes_gpc')) {
+			if(!$ignore_magic_quote_setting and !get_magic_quotes_gpc()) return $param_array;//If Magic quotes is disabled, just return the data - it is not escaped.
+		}
 
-		while(list($key,$value) = each($param_array)) {
+		foreach($param_array as $key => $value) {
 			if(is_array($value)) { //UnEscape Arrays recursively
 				$PARAM[$key] = $this->unescapeQuery($value,$ignore_magic_quote_setting); //:RECURSION:
 			} else {
