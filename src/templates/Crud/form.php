@@ -2,7 +2,7 @@
 global $PARAM;
 $html = new iframe\HTML\HTML;
 
-// :TODO: Convert the form to bootstap type - use class=form-control
+// :TODO: Convert the form to bootstrap type - use class=form-control
 ?>
 <h2 class="action-title"><?php echo ucfirst($this->action) . ' ' . $this->title?></h2>
 
@@ -125,7 +125,7 @@ function validate(e) {
 		}
 	}
 	if(isset($conditions)) print "success = check(" . json_encode($conditions) . ", 1);";
-	else print "success = true; // No conditios found\n";
+	else print "success = true; // No conditions found\n";
 	?>
 	if(!success) e.stopPropagation();
 	return success;

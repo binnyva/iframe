@@ -16,8 +16,8 @@ if($this->title) { ?>
 <?php 
 $html->buildInput('iframe_crud_search', '');
 if(count($this->search_fields) == 1) { // If there is only one field to search in, don't show the select box.
-	$searh_keys = array_keys($this->search_fields);
-	$html->buildInput('iframe_crud_search_in','', 'hidden', $searh_keys[0]);
+	$search_keys = array_keys($this->search_fields);
+	$html->buildInput('iframe_crud_search_in','', 'hidden', $search_keys[0]);
 }
 else $html->buildInput('iframe_crud_search_in','', 'select', i($GLOBALS['PARAM'], 'iframe_crud_search_in'), array('options'=>$this->search_fields));
 $html->buildInput('action', '', 'submit', 'Search');
@@ -84,7 +84,7 @@ foreach($this->current_page_data as $row) {
 		$value = $row[$field_name];
 		print '<td>';
 		
-		// The Active/Deactive Status column.
+		// The Active/Deactivate Status column.
 		if($f['field_type'] == 'checkbox' and $f['value_type'] == 'status') {
 			$toggle_action = 'activate';
 			$status_class = 'deactive';

@@ -98,7 +98,7 @@ class HTML {
 		unset($all_attributes['options']);
 		if($tag == 'textarea' and isset($all_attributes['value'])) unset($all_attributes['value']); //Textarea don't have a value attribute.
 		
-		// Show the title tag only if there is a label. Hidden stuff don't need a title. Nither does the submit button.
+		// Show the title tag only if there is a label. Hidden stuff don't need a title. Neither does the submit button.
 		$label = '';
 		if($title) $label = $this->getTag('label', array('for'=>$all_attributes['id']), $title);
 		
@@ -133,7 +133,7 @@ class HTML {
 			$attributes .= " $attrib=\"$value\"";
 		}
 		
-		$tag = "<" . $tag . $attributes; //Space betweet $tag and $attributes is not needed.
+		$tag = "<" . $tag . $attributes; //Space between $tag and $attributes is not needed.
 		$tag .= ($end) ? ' />' : '>'; //Auto close the tag?
 	
 		return $tag;

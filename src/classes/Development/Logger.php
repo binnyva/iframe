@@ -28,7 +28,7 @@ class Logger {
 		
 		if($log_type == 'file') {
 			$folder = joinPath($config['site_folder'],'Logs');
-			if(!$log_destination) { //Log file not specifed - use default.
+			if(!$log_destination) { //Log file not specified - use default.
 				if(file_exists($folder)) $log_destination = joinPath($folder, 'Development.log');
 			
 			} else { //Use user specified log file

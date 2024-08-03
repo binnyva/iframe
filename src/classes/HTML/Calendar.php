@@ -156,7 +156,7 @@ class Calendar {
 		$d = $this->day;
 		
 		$start_day = date('w',mktime(0,0,0,$this->month,1,$this->year)) + 1;//Get the first day of this month - 0 (for Sunday) through 6 (for Saturday)
-		$curmonth = ($this->month>9) ? $this->month : '0'.$this->month;
+		$current_month = ($this->month>9) ? $this->month : '0'.$this->month;
 	
 		if($d > $this->_month_days[$this->month-1]) $flag=0;//If the days has overshot the number of days in this month, stop writing
 		else if($column>=$start_day and !$flag) $flag=1;//If the first day of this month has come, start the date writing
@@ -172,20 +172,20 @@ class Calendar {
 		if(is_callable($this->_callback_cell_class_provider) and $flag) {
 			$da = ($d<10) ? "0".$d : $d ;
 			$func = $this->_callback_cell_class_provider;
-			$class .= $func($this->year, $curmonth, $da);
+			$class .= $func($this->year, $current_month, $da);
 		}
 		print "<td class='$class days'>";
 		
 		if($flag) {
 			$da = ($d<10) ? "0".$d : $d ;
-			$full_day = "{$this->year}-{$curmonth}-$da";
+			$full_day = "{$this->year}-{$current_month}-$da";
 	
 			print "<span class='date-number'>$d</span>";//Print the date
 	
 			print "<div class='calendar-info'>";
 			if(is_callable($this->_callback)) {
 				$func = $this->_callback;
-				$func($this->year, $curmonth, $da);
+				$func($this->year, $current_month, $da);
 			}
 			print "</div>";
 	

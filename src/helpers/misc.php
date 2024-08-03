@@ -80,19 +80,19 @@ function getLink($url,$params=array(),$use_existing_arguments=false) {
 }
 
 /**
- * Arguments :  $conditions - An array containing all the validaiton information.
+ * Arguments :  $conditions - An array containing all the validation information.
  *				$show(Integer) - The value given here decides how the data should be returned - or printed.[OPTIONAL]
  *						1 = Prints the errors as an HTML List
  *						2 = Return the errors as a string(HTML list)
  *						3 = Return the errors as an array 
  *						4 = Return the errors as an array with field name as the key.
  *						Defaults to 1
- * Super powerful validaiton script for form fields. I may make this a class to do both serverside and 
- *			client side validaiton - both in the same package
- * :TODO: This function is not fully tested. It is not even partaily tested.
- * :TODO: Documentation needed desperatly
+ * Super powerful validation script for form fields. I may make this a class to do both server side and 
+ *			client side validation - both in the same package
+ * :TODO: This function is not fully tested. It is not even partially tested.
+ * :TODO: Documentation needed desperately
  * :TODO: Change this function to a class.
- * The first argument - $conditions is an array with all the validaiton rule
+ * The first argument - $conditions is an array with all the validation rule
  * Each element of the array is one rule.
  * Each rule is an associative array. The following keys are supported
  * 
@@ -100,8 +100,8 @@ function getLink($url,$params=array(),$use_existing_arguments=false) {
  * is		: What sort data should MAKE AN ERROR. If the given type is found as the field value, an error will be raised. Example 'empty'
  * title	: The human friendly name for the field (eg. 'Date of Birth')
  * error  : The message that should be shown if there is a validation error
- * value	: The programmer provided value. Some rules must have an additional value to be matched against. For example the '<' condition must have a value - the user inputed value and the value given in this index will be compared
- * when	: This is a method to short-circut the validation. If this is false, or '0' validaiton will NOT take place. The rule will just be ignored.
+ * value	: The programmer provided value. Some rules must have an additional value to be matched against. For example the '<' condition must have a value - the user imputed value and the value given in this index will be compared
+ * when	: This is a method to short-circuit the validation. If this is false, or '0' validation will NOT take place. The rule will just be ignored.
  *  
  * Example :
  * $conditions = array(
@@ -114,7 +114,7 @@ function getLink($url,$params=array(),$use_existing_arguments=false) {
  *		 'name'	=>	'username',
  *		 'is'	=>	'length<',
  *		 'value'	=> 	3,
- *		 'error' =>	'Make sure that then username has atleast 3 chars'
+ *		 'error' =>	'Make sure that then username has at least 3 chars'
  *	 )
  * )
  */
@@ -137,7 +137,7 @@ function check($conditions,$show=1) {
 		if(!isset($error)) $error = $default_error;
 		
 		if(isset($when)) {
-			if(($when === 0) or ($when === false)) {//Ok - don't validate this field - ignore erros if any
+			if(($when === 0) or ($when === false)) {//Ok - don't validate this field - ignore errors if any
 				continue;
 			} else if ($when != "") { //When error
 				$errors[] = $error;
@@ -250,9 +250,9 @@ function check($conditions,$show=1) {
 /**
  * A function for easily uploading files. This function will automatically generate a new 
  *		file name so that files are not overwritten.
- * Arguments:	 $file_id - The name of the input field contianing the file.
+ * Arguments:	 $file_id - The name of the input field containing the file.
  *				$folder  - The folder to which the file should be uploaded to - it must be writable. OPTIONAL
- *				$types   - A list of comma(,) seperated extensions that can be uploaded. If it is empty, anything goes OPTIONAL
+ *				$types   - A list of comma(,) separated extensions that can be uploaded. If it is empty, anything goes OPTIONAL
  * Returns  : This is somewhat complicated - this function returns an array with two values...
  *				The first element is randomly generated filename to which the file was uploaded to.
  *				The second element is the status - if the upload failed, it will be 'Error : Cannot upload the file 'name.txt'.' or something like that
@@ -265,7 +265,7 @@ function upload($file_id, $folder="", $types="") {
 	$ext_arr = explode(".",basename($file_title));
 	$ext = strtolower($ext_arr[count($ext_arr)-1]); //Get the last extension
 
-	//Not really uniqe - but for all practical reasons, it is
+	//Not really unique - but for all practical reasons, it is
 	$uniqer = substr(md5(uniqid(rand(),1)),0,5);
 	$file_name = $uniqer . '_' . $file_title;//Get Unique Name
 
@@ -280,28 +280,28 @@ function upload($file_id, $folder="", $types="") {
 
 	//Where the file must be uploaded to
 	if($folder) $folder .= '/';//Add a '/' at the end of the folder
-	$uploadfile = $folder . $file_name;
+	$upload_file = $folder . $file_name;
 
 	$result = '';
 	//Move the file from the stored location to the new location
-	if (!move_uploaded_file($_FILES[$file_id]['tmp_name'], $uploadfile)) {
+	if (!move_uploaded_file($_FILES[$file_id]['tmp_name'], $upload_file)) {
 		$result = "Cannot upload the file '".$_FILES[$file_id]['name']."'"; //Show error if any.
 		if(!file_exists($folder)) {
 			$result .= " : Folder don't exist.";
 		} elseif(!is_writable($folder)) {
 			$result .= " : Folder not writable.";
-		} elseif(!is_writable($uploadfile)) {
+		} elseif(!is_writable($upload_file)) {
 			$result .= " : File not writable.";
 		}
 		$file_name = '';
 		
 	} else {
 		if(!$_FILES[$file_id]['size']) { //Check if the file is made
-			@unlink($uploadfile);//Delete the Empty file
+			@unlink($upload_file);//Delete the Empty file
 			$file_name = '';
 			$result = "Empty file found - please use a valid file."; //Show the error message
 		} else {
-			chmod($uploadfile,0777);//Make it universally writable.
+			chmod($upload_file,0777);//Make it universally writable.
 		}
 	}
 
@@ -357,32 +357,32 @@ function load($url,$options=array()) {
 		$cache_file = joinPath($cache_folder, $cache_file_name); //Don't change the variable name - used at the end of the function.
 		
 		if(file_exists($cache_file) and filesize($cache_file) != 0) { // Cached file exists - return that.
-			$timedout = false;
+			$timed_out = false;
 			if($options['cache_timeout']) {
-				if(((time() - filemtime($cache_file)) / 60) > $options['cache_timeout']) $timedout = true;  // If the cached file is older than the timeout value, download the URL once again.
+				if(((time() - filemtime($cache_file)) / 60) > $options['cache_timeout']) $timed_out = true;  // If the cached file is older than the timeout value, download the URL once again.
 			}
 			
-			if(!$timedout) {
+			if(!$timed_out) {
 				$response = file_get_contents($cache_file);
 				
-				//Seperate header and content
-				$seperator_charector_count = 4;
+				//Separate header and content
+				$separator_character_count = 4;
 				$separator_position = strpos($response,"\r\n\r\n");
 				if(!$separator_position) {
 					$separator_position = strpos($response,"\n\n");
-					$seperator_charector_count = 2;
+					$separator_character_count = 2;
 				}
-				// If the real seperator(\r\n\r\n) is NOT found, search for the first < char.
+				// If the real separator(\r\n\r\n) is NOT found, search for the first < char.
 				if(!$separator_position) {
 					$separator_position = strpos($response,"<"); //:HACK:
-					$seperator_charector_count = 0;
+					$separator_character_count = 0;
 				}
 				
 				$body = '';
 				$header_text = '';
 				if($separator_position) {
 					$header_text = substr($response,0,$separator_position);
-					$body = substr($response,$separator_position+$seperator_charector_count);
+					$body = substr($response,$separator_position+$separator_character_count);
 				}
 				
 				foreach(explode("\n",$header_text) as $line) {
@@ -426,7 +426,7 @@ function load($url,$options=array()) {
 	if($options['session'] and isset($GLOBALS['_binget_curl_session'])) $ch = $GLOBALS['_binget_curl_session']; //Session is stored in a global variable
 	else $ch = curl_init($url_parts['host']);
 	
-	curl_setopt($ch, CURLOPT_URL, $page) or die("Invalid cURL Handle Resouce");
+	curl_setopt($ch, CURLOPT_URL, $page) or die("Invalid cURL Handle Resource");
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); //Just return the data - not print the whole thing.
 	curl_setopt($ch, CURLOPT_HEADER, true); //We need the headers
 	curl_setopt($ch, CURLOPT_NOBODY, !($options['return_body'])); //The content - if true, will not download the contents. There is a ! operation - don't remove it.
@@ -459,7 +459,7 @@ function load($url,$options=array()) {
 	$response = curl_exec($ch);
 	$info = curl_getinfo($ch); //Some information on the fetch
 	
-	if($options['session'] and !$options['session_close']) $GLOBALS['_binget_curl_session'] = $ch; //Dont close the curl session. We may need it later - save it to a global variable
+	if($options['session'] and !$options['session_close']) $GLOBALS['_binget_curl_session'] = $ch; //Don't close the curl session. We may need it later - save it to a global variable
 	else curl_close($ch);  //If the session option is not set, close the session.
 
 	//Get the headers in an associative array
@@ -469,7 +469,7 @@ function load($url,$options=array()) {
 		$body = "";
 		$headers['Status'] = 404;
 	} else {
-		//Seperate header and content
+		// Separate header and content
 		$header_text = '';
 		$body = $response;
 		if(isset($info['header_size'])) {
@@ -508,16 +508,16 @@ function load($url,$options=array()) {
 
 
 /**
- * This funtion will take a pattern and a folder as the argument and go thru it(recursivly if needed)and return the list of 
+ * This function will take a pattern and a folder as the argument and go thru it(recursively if needed)and return the list of 
  *			   all files in that folder.
  * Link			 : http://www.bin-co.com/php/scripts/filesystem/ls/
  * Arguments	 :  $pattern - The pattern to look out for [OPTIONAL]
  *					$folder - The path of the directory of which's directory list you want [OPTIONAL]
- *					$recursivly - The funtion will traverse the folder tree recursivly if this is true. Defaults to false. [OPTIONAL]
+ *					$recursively - The function will traverse the folder tree recursively if this is true. Defaults to false. [OPTIONAL]
  *					$options - An array of values 'return_files' or 'return_folders' or both
  * Returns	   : A flat list with the path of all the files(no folders) that matches the condition given.
  */
-function ls($pattern="*", $folder="", $recursivly=false, $options=array('return_files','return_folders')) {
+function ls($pattern="*", $folder="", $recursively=false, $options=array('return_files','return_folders')) {
 	if($folder) {
 		$current_folder = realpath('.');
 		if(in_array('quiet', $options)) { // If quiet is on, we will suppress the 'no such folder' error
@@ -534,7 +534,7 @@ function ls($pattern="*", $folder="", $recursivly=false, $options=array('return_
 	
 	// Get the all files and folders in the given directory.
 	if($get_files) $both = glob($pattern, GLOB_BRACE + GLOB_MARK);
-	if($recursivly or $get_folders) $folders = glob("*", GLOB_ONLYDIR + GLOB_MARK);
+	if($recursively or $get_folders) $folders = glob("*", GLOB_ONLYDIR + GLOB_MARK);
 	
 	//If a pattern is specified, make sure even the folders match that pattern.
 	$matching_folders = array();
@@ -543,7 +543,7 @@ function ls($pattern="*", $folder="", $recursivly=false, $options=array('return_
 	//Get just the files by removing the folders from the list of all files.
 	$all = array_values(array_diff($both,$folders));
 		
-	if($recursivly or $get_folders) {
+	if($recursively or $get_folders) {
 		foreach ($folders as $this_folder) {
 			if($get_folders) {
 				//If a pattern is specified, make sure even the folders match that pattern.
@@ -553,9 +553,9 @@ function ls($pattern="*", $folder="", $recursivly=false, $options=array('return_
 				else array_push($all, $this_folder);
 			}
 			
-			if($recursivly) {
+			if($recursively) {
 				// Continue calling this function for all the folders
-				$deep_items = ls($pattern, $this_folder, $recursivly, $options); # :RECURSION:
+				$deep_items = ls($pattern, $this_folder, $recursively, $options); # :RECURSION:
 				foreach ($deep_items as $item) {
 					array_push($all, $this_folder . $item);
 				}
@@ -590,11 +590,11 @@ function getElementsBySelector($all_selectors, $document) {
 	foreach ($selectors as $selector) {
 		$comma_count++;
 		$context = array($document);
-		$inheriters = explode(" ", $selector);
+		$inheritors = explode(" ", $selector); 
 
 		// SPACE:
 		$space_count = 0;
-		foreach($inheriters as $element) {
+		foreach($inheritors as $element) {
 			$space_count++;
 			//This part is to make sure that it is not part of a CSS3 Selector
 			$left_bracket = strpos($element, "[");
@@ -620,7 +620,7 @@ function getElementsBySelector($all_selectors, $document) {
 				}
 				
 				//If Id is the last element, return it as a single element and not as an array.
-				if(count($inheriters) == $space_count and count($selectors) == $comma_count) return $ele;
+				if(count($inheritors) == $space_count and count($selectors) == $comma_count) return $ele;
 
 				$context = array($ele);
 				continue;

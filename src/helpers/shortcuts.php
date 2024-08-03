@@ -2,8 +2,8 @@
 /**
  * Formats the given text and return the result. For example, if 'avionics_filed_no12' is given,
  *		it will return 'Avionics Filed No 12'.
- * Argument: $value - The string that should be formated
- * Returns : The formated string
+ * Argument: $value - The string that should be formatted
+ * Returns : The formatted string
  */
 function format($value) {
 	$value = preg_replace(
@@ -17,10 +17,10 @@ function format($value) {
 }
 
 /**
- * Removes all the formating from the given text and returns a string that could be used in an URL. 
- *		This fucntion lowercases the string and replaces all the special chars with '_'
- * Argument: $value - The string that should be un-formated
- * Returns : The unformated string
+ * Removes all the formatting from the given text and returns a string that could be used in an URL. 
+ *		This function lowercases the string and replaces all the special chars with '_'
+ * Argument: $value - The string that should be un-formatted
+ * Returns : The unformatted string
  */
 function unformat($value) {
 	$value = str_replace("'s", 's', $value); // Changes the text 'Binny's code' to 'Binnys code'. Because 'binny_s_code' looks bad.
@@ -39,7 +39,7 @@ function unformat($value) {
  *		if the specified index of the specified function is not set. If it there,
  *		this function will return that element.
  * Arguments:	$array - The array in which the item must be checked for
- *				$index - The index to be seached.
+ *				$index - The index to be searched.
  *				$default_value - The value that must be returned if the item is not set
  * Example:
  *	if(i($_REQUEST, 'item')) {
@@ -77,7 +77,7 @@ function keyFormat($data, $primary_field='id') {
 	return $return;
 }
 
-/// Flattens a mutli colmn array - Removes everything but the first element of each element of the array.
+/// Flattens a multi column array - Removes everything but the first element of each element of the array.
 function colFormat($data) {
 	$return = array();
 	foreach($data as $row) $return[] = current($row);
@@ -91,7 +91,7 @@ function idNameFormat($data, $fields = false) {
 }
 
 /**
- * Transilation function
+ * Translation function
  * Arguments: $message - First argument is the string to be translated - this will be translated if a corresponding value is present in the locale file.
  *            The rest of the arguments will be passed to an sprintf() with the message - use this to put variables inside the sting.
  * Return: The translated string according to the current locale.
