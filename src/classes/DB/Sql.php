@@ -6,9 +6,9 @@ use iframe\App;
 // :TODO: Alternatively, use a Eloquent type existing library
 
 /**
- * 	Creates a Database abstration layer - using the most commonly used functions.
+ * 	Creates a Database abstraction layer - using the most commonly used functions.
  * 		get*: functions require a query as the argument
- * 		fetch*: functions requrire a sql resource as the argument. If none provided, will you existing resourse.
+ * 		fetch*: functions require a sql resource as the argument. If none provided, will you existing resource.
  */
 class Sql {
 	//All Variables - Public
@@ -66,7 +66,7 @@ class Sql {
 	
 	//////////////////////////////////////// Raw SQL Functions ///////////////////////////////////////
 	/**
-	 * Executes the given query and returns the resource. If an error has occured, passes the error data to $Sql->_error()
+	 * Executes the given query and returns the resource. If an error has occurred, passes the error data to $Sql->_error()
 	 * Argument : $query - SQL query
 	 * Return   : The SQL Resource of the given query
 	 */
@@ -98,7 +98,7 @@ class Sql {
 	}
 
 	/**
-	 * Returns the first row of the result as an associative array - after stripslashing it
+	 * Returns the first row of the result as an associative array - after stripslash-ing it
 	 * Argument : $query - SQL query
 	 * Return   : First row in the query result - as an associative array.
 	 */ 
@@ -306,7 +306,7 @@ class Sql {
 	 *				'name' => 'Binny',
 	 *				'age' => 12,
 	 *				'year' => 2007,
-	 *				'something' => 'Xrats'
+	 *				'something' => 'Else'
 	 *			));</pre>
 	 */
 	function insert($table,$data) {
@@ -373,7 +373,7 @@ class Sql {
 	 *				'name' => 'Binny',
 	 *				'age' => 12,
 	 *				'year' => 2007,
-	 *				'something' => 'Xrats'
+	 *				'something' => 'Else'
 	 *			),'id=14');</pre>
 	 */
 	function update($table, $data, $where) {
@@ -412,28 +412,28 @@ class Sql {
 	}
 
 	/**
-	 * A wrapper function that will prepare the query, bind the given vaules and execute it.
+	 * A wrapper function that will prepare the query, bind the given values and execute it.
 	 * Arguments :	$query - The SQL Query to be executed.
-	 *				$type - The type of values passed. Should be a string with each char corrosponding to each parameter type. Eg. If you are sending a string and a number, this should be 'si'
+	 *				$type - The type of values passed. Should be a string with each char corresponding to each parameter type. Eg. If you are sending a string and a number, this should be 'si'
 	 *				Data that should be used in the query
 	 */
 	function bindExec() {
 		$args = func_get_args();
 		$qry = $args[0];
 		$types = $args[1];
-		$datas = array_slice($args, 2);
+		$data = array_slice($args, 2);
 		
 		//If there is only one argument and it is an array, set it as the data provider.
-		if(count($datas) == 1 and is_array($datas)) {
-			$datas = $datas[0];
+		if(count($data) == 1 and is_array($data)) {
+			$data = $data[0];
 		}
 		
 		$stmt = mysqli_prepare($this->_db_connection, $qry);
-		$parameters = array_merge([$stmt, $types], $datas);
+		$parameters = array_merge([$stmt, $types], $data);
 		@call_user_func_array('mysqli_stmt_bind_param', $parameters);
 
 		if(!mysqli_stmt_execute($stmt)) {
-			$this->_error($qry . " : $types : " . implode(',', $datas));
+			$this->_error($qry . " : $types : " . implode(',', $data));
 		}
 
 		if(preg_match('/^\s*insert\s/i',$qry))
@@ -447,7 +447,7 @@ class Sql {
 	}
 
 	/**
-	 * :DEPRICATED:
+	 * :DEPRECATED:
 	 * To emulate the functioning of prepare and execute command - if we are on a PHP 5/MySQL 5 system, we should NOT use this
 	 * Arguments :	$query - The SQL Query to be executed.
 	 *				Data that should be used in the query
@@ -456,15 +456,15 @@ class Sql {
 	function prepExec() {
 		$args = func_get_args();
 		$qry = $args[0];
-		$datas = array_slice($args,1);
+		$data = array_slice($args,1);
 		
 		//If there is only one argument and it is an array, set it as the data provider.
-		if(count($datas) == 1 and is_array($datas)) {
-			$datas = $datas[0];
+		if(count($data) == 1 and is_array($data)) {
+			$data = $data[0];
 		}
 		
 		//Go thru each available value and insert it at the position of the '?'
-		foreach($datas as $value) {
+		foreach($data as $value) {
 			$pos = strpos($qry,'?');
 			if($pos === false) break;
 			$value = $this->escape($value);
@@ -516,7 +516,7 @@ class Sql {
 	
 	/**
 	 * Handles the SQL errors depending on what mode we are in.
-	 * Argument : $query - The SQL Query in which the error occured.
+	 * Argument : $query - The SQL Query in which the error occurred.
 	 */
 	private function _error($query='') {
 		$sql_error 	= htmlentities(mysqli_error($this->_db_connection));
@@ -553,8 +553,8 @@ class Sql {
 	
 	/**
 	 * Do a stripslash on every element of the array and return it.
-	 * Arguments: $arr - The array that should be stripslashed
-	 * Return	: The array given in the argument - stripslashed
+	 * Arguments: $arr - The array that should be stripslash-ed
+	 * Return	: The array given in the argument - stripslash-ed
 	 */
 	function _stripSlashes($arr) {
 		if(!$this->options['stripslashes']) return $arr;

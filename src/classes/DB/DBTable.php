@@ -17,7 +17,7 @@ class DBTable {
 	public $field = array();
 	public $primary_key_field = 'id';
 	public $primary_key_value = 0;
-	public static $mode = 'p'; ///Mode - p = Production, d = Development and t = Testing
+	public static $mode = 'dev'; ///Mode - prod = Production, dev = Development and dry = DryRun
 	
 	///Constructor
 	function __construct($table_name) {
@@ -60,12 +60,12 @@ class DBTable {
 	/**
 	 * This function is enough to create and execute a query.
 	 * 		You can specify any number of argument. If the argument is a number, this function will assume that 
-	 *		it is an ID. If it is an array, it will be send to setRequirement() function. If it is a stirng,
+	 *		it is an ID. If it is an array, it will be send to setRequirement() function. If it is a string,
 	 *		it will be assumed to be a where clause.
 	 * Argument : See description
 	 * Return : The result of the executed query
 	 * Example :$User->find(15);  = SELECT * FROM User WHERE id=15
-	 *			$Project->find("user_id=15","name LIKE '%Nexty%'");  = SELECT * FROM Project WHERE user_id=15 AND name LIKE '%Nexty'
+	 *			$Project->find("user_id=15","name LIKE '%Binny%'");  = SELECT * FROM Project WHERE user_id=15 AND name LIKE '%Binny'
 	 */
 	function find() {
 		$arguments = func_get_args();
@@ -87,8 +87,8 @@ class DBTable {
 	}
 	
 	/// Return just one data value.
-	function findOne($requiements, $field) {
-		$data = $this->find($requiements);
+	function findOne($requirements, $field) {
+		$data = $this->find($requirements);
 		return isset($data[0][$field]) ? $data[0][$field] : '';
 	}
 	
@@ -198,7 +198,7 @@ class DBTable {
 			}
 			if(count($this->conditions)) $this->query .= ' AND ' . implode(' AND ', array_values($this->conditions));
 
-		} else { //Remove muliptle rows at once
+		} else { //Remove multiple rows at once
 			if($this->primary_key_value) $this->query .= " WHERE `{$this->primary_key_field}` = {$this->primary_key_value}"; // If the user made an newRow() call before the delete.
 			if(count($this->conditions)) $this->query .= ' WHERE ' . implode(' AND ', array_values($this->conditions));
 		}
@@ -253,7 +253,7 @@ class DBTable {
 		
 		if(isset($arg['result_type'])) $this->query_result_type = $arg['result_type'];
 		
-		//If its just array with none of our 'special' keys - it is consided to be an array of where clauses
+		//If its just array with none of our 'special' keys - it is considered to be an array of where clauses
 		if(!isset($arg['conditions']) and !isset($arg['where']) and !isset($arg['limit']) 
 				and !isset($arg['offset']) and !isset($arg['order']) and !isset($arg['group']) 
 				and !isset($arg['select']) and !isset($arg['result_type'])) {
@@ -383,7 +383,7 @@ class DBTable {
 		$sql = \iframe\App::$db;
 		$result = array();
 
-		if(DBTable::$mode == 't') { //Just testing, fools!
+		if(DBTable::$mode == 'dry') { //Just testing, fools!
 			print '<pre><code>' . $this->query . '</code></pre><br />';
 
 		} else {
@@ -401,11 +401,6 @@ class DBTable {
 				$result = $sql->getById($this->query);
 			} else { //exec
 				$sql->getSql($this->query);
-			}
-
-			if(DBTable::$mode == 'd') {
-				print '<pre><code>' . $this->query . '</code></pre><br />';
-				print "Result Size : " . count($result) . "<br />";
 			}
 		}
 		if($reset_fields) $this->newRow();

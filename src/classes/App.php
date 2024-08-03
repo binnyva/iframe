@@ -19,10 +19,10 @@ class App {
 
 	public function bootstrap($options)
 	{
-		$path_seperator = '/'; // Or DIRECTORY_SEPARATOR - but that was causing issues in windows.
+		$path_separator = '/'; // Or DIRECTORY_SEPARATOR - but that was causing issues in windows.
 
 		// Iframe src folder. Absolute.
-		$iframe_folder = dirname(__DIR__) . $path_seperator;
+		$iframe_folder = dirname(__DIR__) . $path_separator;
 
 		// App Folder. Absolute
 		$full_self = $_SERVER['SCRIPT_FILENAME'];
@@ -55,10 +55,10 @@ class App {
 			$path = dirname(static::$config['PHP_SELF']);
 			//Go up until the correct path is found
 			while (strlen($path) > 2) {
-				if(file_exists($_SERVER["DOCUMENT_ROOT"] . $path . $path_seperator . 'configuration.php')) break;
+				if(file_exists($_SERVER["DOCUMENT_ROOT"] . $path . $path_separator . 'configuration.php')) break;
 				else $path = dirname($path);
 			}
-			static::$config['app_absolute_path'] = str_replace('//','/', $path . $path_seperator);
+			static::$config['app_absolute_path'] = str_replace('//','/', $path . $path_separator);
 		}
 		static::$config['current_page'] = str_replace(static::$config['app_absolute_path'], '/', static::$config['PHP_SELF']);
 
@@ -76,8 +76,8 @@ class App {
 		if(static::$config['server_host'] == 'cli') static::$config['server_online'] = false;
 
 		if(!isset(static::$config['env'])) {
-		static::$config['env'] = 'dev';
-		if(static::$config['server_online']) static::$config['env'] = 'prod';
+			static::$config['env'] = 'dev';
+			if(static::$config['server_online']) static::$config['env'] = 'prod';
 		}
 
 		// Get the full URL of the website.
@@ -98,7 +98,7 @@ class App {
 		static::$config['date_format_php']	= static::phpDateFormat(static::$config['date_format']);
 		static::$config['time_format_php']	= static::phpDateFormat(static::$config['time_format']);
 
-		static::$config['iframe_url'] = ''; // :TODO: :DEPRICATED:
+		static::$config['iframe_url'] = ''; // :TODO: :DEPRECATED:
 		if(!static::$config['server_online'] and isset($_SERVER['REQUEST_SCHEME'])) {
 			static::$config['iframe_url'] = $_SERVER['REQUEST_SCHEME'] . "://" . static::$config['server_host'] . '/iframe/';
 		}
@@ -125,7 +125,7 @@ class App {
 	public function registerGlobals()
 	{
 		global $PARAM, $QUERY;
-		// This is $_REQUERST without the problems asssociated with magic quotes
+		// This is $_REQUEST without the problems associated with magic quotes
 		$PARAM = $this->unescapeQuery();
 		$QUERY = $this->escapeQuery($PARAM, true);
 		if(!isset($QUERY['error']))	 {$QUERY['error'] = ''; $PARAM['error'] = '';}
@@ -135,9 +135,9 @@ class App {
 	private function initDevHelpers() 
 	{
 		/**
-		 * The current envionment of the system. This will affect how errors will be shown
+		 * The current environment of the system. This will affect how errors will be shown
 		 *  dev = Development 
-		 *	test = Testing 
+		 *	dry = DryRun
 		 *	prod = Production 
 		 */
 		if(!isset(static::$config['env']) or isset($_GET['enable_debug_env'])) static::$config['env']	= 'dev'; //Default Config Mode // :UNSAFE:
@@ -163,7 +163,7 @@ class App {
 		}
 		if(!isset(static::$config['use_mvc']) or static::$config['use_mvc'] === false) static::$template = new iframe\Template;
 
-		//Otherways it is a mess with google
+		//Otherwise it is a mess with google
 		ini_set('url_rewriter.tags',"");
 		ini_set('session.use_trans_sid',false); 
 		if(isset($_SERVER["HTTP_HOST"])) session_start(); //Don't start the session for a console app.
@@ -214,7 +214,7 @@ class App {
 	}
 
 	/**
-	 * This function will escape the user inputed data. It will check to see if magic quotes is on.
+	 * This function will escape the user inputted data. It will check to see if magic quotes is on.
 	 * If it is not on, it will manually escape(using mysql_real_escape_string()) all the requests and return it.
 	 * Argument : $param_array - [OPTIONAL] The array that must be escaped. If empty, the function uses $_POST + $_GET
 	 *			  $ignore_magic_quote_setting - [OPTIONAL] If set to true, this will escape the given array no matter what the get_magic_quotes_gpc() returns. Defaults to 'true'
@@ -275,13 +275,13 @@ class App {
 	 * Arguments:
 	 * 	$msg - The error message
 	 *	$file - The file at which the error happened [OPTIONAL]
-	 *	$line - The line where the error occured [OPTIONAL]
+	 *	$line - The line where the error occurred [OPTIONAL]
 	 *	$priority - The priority or the error - if its to high(>=10) the app will die. 10 has more priority than 1
 	 */
 	public static function error($error_message, $error_title='Error', $file="", $line="", $priority=5) {
 		static $error_call_count = 1;
 
-		// This is to prevent recursion. Some of the functions used in the this fuction can return error.
+		// This is to prevent recursion. Some of the functions used in the this function can return error.
 		$error_call_count++;
 		if($error_call_count > 10) die("Too much recursion in the error() function call.");
 		
@@ -294,7 +294,7 @@ class App {
 					$line = $line - 1;
 					$error_message .= "In file '$file' at line $line..<br /><pre>";
 					
-					//Get the 5 lines surronding the error lines - before and after
+					//Get the 5 lines surrounding the error lines - before and after
 					$lines = explode("\n",file_get_contents($file));
 					for($i=$line-5; $i<$line+5; $i++) {
 						if($i == $line) $error_message .= '<span class="error-line">';
@@ -324,8 +324,8 @@ class App {
 
 	/**
 	 * Shows the status of the system. If there is many success message, it will show up as a list. If there is just 1, 
-	 *		it shows as a div message. Same goes for error message - it uses a different classname. Success uses the classname
-	 *		'message-success' and Errors use the classname 'message-error'
+	 *		it shows as a div message. Same goes for error message - it uses a different class name. Success uses the class name
+	 *		'message-success' and Errors use the class name 'message-error'
 	 */
 	public function showStatus() {
 		global $QUERY;

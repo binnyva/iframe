@@ -52,7 +52,7 @@ class Tagging {
 	}
 	
 	/** 
-	 * This function will check the full setup and decide if all necessary inforamtion is available. If there is any problems, it will print an error. Put this call in the developemnt time.
+	 * This function will check the full setup and decide if all necessary information is available. If there is any problems, it will print an error. Put this call in the development time.
 	 */
 	function checkSetup() {
 		$errors = array();
@@ -64,7 +64,7 @@ class Tagging {
 
 		// Check Tag Table Details
 		if(!$this->_tag_table) $errors[] = "Tag table's name is not given. Use the code <code>\$tags->setTagTable('TableName', 'ID_Field', 'Name_field');</code>";
-		if(!$this->_tag_id_field) $errors[] = "The ID Field's name in the Tag Tablle is not given. Use the code <code>\$tags->setTagTable('TableName', 'ID_Field', 'Name_field');</code>";
+		if(!$this->_tag_id_field) $errors[] = "The ID Field's name in the Tag Table is not given. Use the code <code>\$tags->setTagTable('TableName', 'ID_Field', 'Name_field');</code>";
 		if(!$this->_tag_name_field) $errors[] = "The Tag Name field's name not given. Use the code <code>\$tags->setTagTable('TableName', 'ID_Field', 'Name_field');</code>";
 
 		// Check Item Table Details
@@ -103,7 +103,7 @@ class Tagging {
 	}
 	
 	/**
-	 * This will get all the tags from the DB and caches it in two arrays - ::$tag and ::$tag_hash. This will eleminate the need to query the db to get the tags.
+	 * This will get all the tags from the DB and caches it in two arrays - ::$tag and ::$tag_hash. This will eliminate the need to query the db to get the tags.
 	 * Private
 	 */
 	private function _cacheTags() {
@@ -174,7 +174,7 @@ class Tagging {
 	}
 	
 	/**
-	 * Removes all existing tags for a item and insertes a new set of tags for it.
+	 * Removes all existing tags for a item and inserts a new set of tags for it.
 	 * Arguments :	$item_id	- The ID of the item that must be tagged with the given tags.
 	 *				$tags(Array) - An array of all the tags that must be inserted for this item
 	 */

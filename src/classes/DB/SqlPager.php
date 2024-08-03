@@ -52,7 +52,7 @@ class SqlPager {
 			'left'	=> '[',
 			'right'	=> ']'
 		),
-		'link_seperator' => " "							//The text between the paging links(Page numbers). 
+		'link_separator' => " "							//The text between the paging links(Page numbers). 
 	);
 
 	///Private Variables
@@ -134,7 +134,7 @@ class SqlPager {
 			//Make sure the numbers are in range.
 			if($from < 1) {
 				//The numbers that cannot be put in the right side can be put in the left side
-				$to = $to + (-$from);//$from is negetive
+				$to = $to + (-$from);//$from is negative
 				$from = 1;
 			}
 			if($to > $this->total_pages) {
@@ -157,7 +157,7 @@ class SqlPager {
 				);
 				$to_print .= str_replace(array_keys($replaces), array_values($replaces), $this->link_template);
 			}
-			$to_print .= $this->text['link_seperator'];
+			$to_print .= $this->text['link_separator'];
 		}
 		
 		if($return_data) return $to_print;
@@ -184,7 +184,7 @@ class SqlPager {
 	}
 	
 	/**
-	 * Return the Next/Previous and First/Last Link based on the argument. The link will be formated 
+	 * Return the Next/Previous and First/Last Link based on the argument. The link will be formatted 
 	 *		using the $link_template member variable of this class.
 	 * Arguments  : $dir(String) - the direction of the link you want. Possible values are...
      *					- 'next' get the next link 
@@ -379,7 +379,7 @@ function goToPage(page) {
 	}
 	
 	/**
-	 * Adds the given parameters to the given URL are retuns the result. The returned URL will be XHTML complient
+	 * Adds the given parameters to the given URL are returns the result. The returned URL will be XHTML compliant
 	 * Argument : $url - The URL of the page.
 	 *			  $params(Array) - An associative array holding the parameters that should be added to the URL. 
 	 * Example : _getLinkParameters('index.php?user=1',array('sp_page'=>7,'sp_items_per_page'=>5))
