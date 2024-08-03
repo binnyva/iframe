@@ -75,8 +75,10 @@ class App {
 		}
 		if(static::$config['server_host'] == 'cli') static::$config['server_online'] = false;
 
+		if(!isset(static::$config['env'])) {
 		static::$config['env'] = 'dev';
 		if(static::$config['server_online']) static::$config['env'] = 'prod';
+		}
 
 		// Get the full URL of the website.
 		if(!isset(static::$config['app_url']) and isset($_SERVER['HTTP_HOST'])) {
