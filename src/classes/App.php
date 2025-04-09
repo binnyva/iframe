@@ -227,8 +227,10 @@ class App {
 
 		if(!$param_array)
 			$param_array = $_POST + $_GET; //Don't use $_REQUEST - it has cookie/session info in it.
-
-		if(!$ignore_magic_quote_setting and get_magic_quotes_gpc()) return $param_array;//If Magic quotes is enabled, just return the data - it is already escaped.
+		
+		if(function_exists('get_magic_quotes_gpc')) {
+			if(!$ignore_magic_quote_setting and get_magic_quotes_gpc()) return $param_array;//If Magic quotes is enabled, just return the data - it is already escaped.
+		}
 
 		foreach($param_array as $key => $value) {
 			if(is_array($value)) { //Escape Arrays recursively
