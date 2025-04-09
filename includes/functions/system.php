@@ -63,7 +63,9 @@ function escapeQuery($param_array = array(),$ignore_magic_quote_setting = false)
 	if(!$param_array)
 		$param_array = $_POST + $_GET; //Don't use $_REQUEST - it has cookie/session info in it.
 
-	if(!$ignore_magic_quote_setting and get_magic_quotes_gpc()) return $param_array;//If Magic quotes is enabled, just return the data - it is already escaped.
+	if(function_exists('get_magic_quotes_gpc')) {
+		if(!$ignore_magic_quote_setting and get_magic_quotes_gpc()) return $param_array;//If Magic quotes is enabled, just return the data - it is already escaped.
+	}
 
 	foreach($param_array as $key => $value) {
 		if(is_array($value)) { //Escape Arrays recursively
@@ -91,9 +93,12 @@ function unescapeQuery($param_array = array(),$ignore_magic_quote_setting = fals
 	if(!$param_array)
 		$param_array = $_POST + $_GET; //Don't use $_REQUEST - it has cookie/session info in it.
 
-	if(!$ignore_magic_quote_setting and !get_magic_quotes_gpc()) return $param_array;//If Magic quotes is disabled, just return the data - it is not escaped.
-
-	while(list($key,$value) = each($param_array)) {
+	if(function_exists('get_magic_quotes_gpc')) {
+		if(!$ignore_magic_quote_setting and !get_magic_quotes_gpc()) return $param_array;//If Magic quotes is disabled, just return the data - it is not escaped.
+	}
+	
+	// while(list($key,$value) = each($param_array)) {
+	foreach($param_array as $key => $value) {
 		if(is_array($value)) { //UnEscape Arrays recursively
 			$PARAM[$key] = unescapeQuery($value,$ignore_magic_quote_setting); //:RECURSION:
 		} else {
