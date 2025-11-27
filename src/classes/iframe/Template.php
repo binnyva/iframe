@@ -144,9 +144,18 @@ class Template {
 	 * Finds all the CSS and JS files that must be included in this page.
 	 */
 	function findResources($template_file) {
-		// Common CSS / JS files
-		if(file_exists(joinPath(App::$config['app_folder'], $this->js_folder, "common.js"))) $this->addResource("common.js",  'js');
-		if(file_exists(joinPath(App::$config['app_folder'], $this->css_folder, "common.css"))) $this->addResource("common.css",  'css');
+		// Common CSS / JS files - in app or in iframe skeleton
+		if(file_exists(joinPath(App::$config['app_folder'], $this->js_folder, "common.js"))) {
+			$this->addResource("common.js",  'js');
+		} elseif(isset(App::$config['iframe_skeleton_folder']) and file_exists(joinPath(App::$config['iframe_skeleton_folder'], $this->js_folder, "common.js"))) {
+			$this->addResource(joinPath(App::$config['iframe_skeleton_url'], $this->js_folder, "common.js"),  'js', true);
+		}
+
+		if(file_exists(joinPath(App::$config['app_folder'], $this->css_folder, "common.css"))) {
+			$this->addResource("common.css",  'css');
+		} elseif(isset(App::$config['iframe_skeleton_folder']) and file_exists(joinPath(App::$config['iframe_skeleton_folder'], $this->css_folder, "common.css"))) {
+			$this->addResource(joinPath(App::$config['iframe_skeleton_url'], $this->css_folder, "common.css"),  'css', true);
+		}
 
 		// Template specific css/js
 		$css_file = preg_replace('/\.php$/','.css',$template_file);

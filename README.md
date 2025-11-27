@@ -1,5 +1,5 @@
 # iFrame
-## 2.0.9
+## 2.0.10
 
 iFrame is a lightweight PHP framework.
 
@@ -35,7 +35,7 @@ Use [composer](https://getcomposer.org/doc/00-intro.md) to install iFrame
 $ composer require binnyva/iframe
 ```
 
-If you are starting a new project with iframe, its recommened to install the skeleton project...
+If you are starting a new project with iframe, its recommend to install the skeleton project...
 
 ```
 $ composer create-project binnyva/iframe-skeleton [my-app-name]
