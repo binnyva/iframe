@@ -4,9 +4,9 @@
 * Author : Binny V A(binnyva@gmail.com | http://www.bin-co.com/)
 * Date   : 1 Feb, 2007
 ***************************************************************************************************
-* 	Creates a Database abstration layer - using the most commonly used functions.
+* 	Creates a Database abstraction layer - using the most commonly used functions.
 * 		get*: functions require a query as the argument
-* 		fetch*: functions requrire a sql resource as the argument. If none provided, will you existing resourse.
+* 		fetch*: functions require a sql resource as the argument. If none provided, will you existing resource.
 ***************************************************************************************************/
 class Sql {
 	//All Variables - Public
@@ -64,7 +64,7 @@ class Sql {
 	
 	//////////////////////////////////////// Raw SQL Functions ///////////////////////////////////////
 	/**
-	 * Executes the given query and returns the resource. If an error has occured, passes the error data to $Sql->_error()
+	 * Executes the given query and returns the resource. If an error has occurred, passes the error data to $Sql->_error()
 	 * Argument : $query - SQL query
 	 * Return   : The SQL Resource of the given query
 	 */
@@ -470,7 +470,7 @@ class Sql {
 	
 	/**
 	 * Handles the SQL errors depending on what mode we are in.
-	 * Argument : $query - The SQL Query in which the error occured.
+	 * Argument : $query - The SQL Query in which the error occurred.
 	 */
 	private function _error($query='') {
 		$sql_error 	= htmlentities(mysqli_error($this->_db_connection));
@@ -517,7 +517,7 @@ class Sql {
 			foreach($arr as $key=>$value) {
 				$arr[$key] = $this->_stripSlashes($value);// :RECURSION:
 			}
-		} else {
+		} else if($arr) {
 			$arr = stripslashes($arr);
 		}
 		return $arr;

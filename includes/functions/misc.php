@@ -435,7 +435,7 @@ function load($url,$options=array()) {
 	$info = curl_getinfo($ch); //Some information on the fetch
 	
 	if($options['session'] and !$options['session_close']) $GLOBALS['_binget_curl_session'] = $ch; //Dont close the curl session. We may need it later - save it to a global variable
-	else curl_close($ch);  //If the session option is not set, close the session.
+	//else curl_close($ch);  //If the session option is not set, close the session.
 
 	//Get the headers in an associative array
 	$headers = array();
@@ -566,7 +566,6 @@ function xml2array($contents, $get_attributes=1, $priority = 'tag') {
 	xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
 	xml_parser_set_option($parser, XML_OPTION_SKIP_WHITE, 1);
 	xml_parse_into_struct($parser, trim($contents), $xml_values);
-	xml_parser_free($parser);
 
 	if(!$xml_values) return;//Hmm...
 
